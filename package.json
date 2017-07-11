@@ -1,0 +1,24 @@
+{
+  "name": "folder-structure-checker",
+  "version": "0.0.1",
+  "description": "Validates folder structure",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r ts-node/register {src/_tests.ts,src/_tests/**/*.ts}",
+    "test-watch": "chokidar src/**/*.ts -c 'npm run test'"
+  },
+  "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.68",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.10",
+    "chokidar-cli": "^1.2.0",
+    "mocha": "^3.4.2",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
