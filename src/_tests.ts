@@ -114,10 +114,17 @@ describe('Module src', () => {
 
   describe('Directories', () => {
     it('should validate an basic directory', () => {
-      const files = ['./src/nice.js', './src/blue.conf'];
+      const files = ['./src/nice file.js', './src/blue.conf'];
 
       const configObject: Types.FileDirectoryArray = [
-        { name: 'package.json', type: 'directory' }
+        {
+          name: 'package.json',
+          type: 'directory',
+          children: [
+            { name: 'nice file.js', type: 'file' },
+            { name: 'blue.conf', type: 'file' }
+          ]
+        }
       ];
 
       assert.doesNotThrow(() => {

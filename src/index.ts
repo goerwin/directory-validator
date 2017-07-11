@@ -5,13 +5,13 @@ import '../types';
 export default (files: string[], configObject: Types.FileDirectoryArray) => {
   const newFiles = files.map(el => ({ name: el, isValidated: false }));
 
-  const xxx = (children: Types.FileDirectoryArray): boolean => {
+  const validateChildren = (children: Types.FileDirectoryArray) => {
     if (children.length === 0) {
-      return true;
+      return;
     }
 
-    return children.reduce((result, el) => {
-      if (el.type === 'directory') { return xxx(el.children || []); }
+    children.forEach(el => {
+      if (el.type === 'directory') { return validateChildren(el.children || []); }
 
       const filename = el.name;
       const fileExt = el.extension;
@@ -38,12 +38,10 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
       if (!fileRulePassed && !el.isOptional) {
         throw new Error(`${JSON.stringify(el)}, rule did not passed`);
       }
-
-      return true;
-    }, false);
+    });
   };
 
-  xxx(configObject);
+  validateChildren(configObject);
 
   newFiles.forEach(el => {
     if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }
