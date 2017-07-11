@@ -10,14 +10,19 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
       return;
     }
 
-    children.forEach(el => {
-      if (el.type === 'directory') {
-        validateChildren(el.children || [], [...paths, el.name]);
+    children.forEach(rule => {
+      if (rule.type === 'directory') {
+        const dirPath = paths.concat(rule.name).join('/');
+
+        if (!rule.isOptional || newFiles.some(el => el.name.indexOf(dirPath) === 0)) {
+          validateChildren(rule.children || [], [...paths, rule.name]);
+        }
+
         return;
       }
 
-      const filename = el.name;
-      const fileExt = el.extension;
+      const filename = rule.name;
+      const fileExt = rule.extension;
       let fileRulePassed = false;
 
       fileRulePassed = newFiles
@@ -41,12 +46,12 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
             evaluation = false;
           }
 
-          file.isValidated = file.isValidated || evaluation || !!el.isOptional;
-          return result || evaluation || !!el.isOptional;
+          file.isValidated = file.isValidated || evaluation || !!rule.isOptional;
+          return result || evaluation || !!rule.isOptional;
         }, false);
 
       if (!fileRulePassed) {
-        throw new Error(`${JSON.stringify(el)}, deep: ${paths.length}, rule did not passed`);
+        throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
       }
     });
   };

@@ -157,6 +157,26 @@ describe('Module src', () => {
       );
     });
 
+    it('should validate because optional directory', () => {
+      const files = ['./index.js'];
+
+      const configObject: Types.FileDirectoryArray = [
+        { name: 'index.js', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          isOptional: true,
+          children: [
+            { name: 'blue.conf', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program(files, configObject);
+      }, () => null);
+    });
+
     /**
      * if recursive is true and optional is not, only
      * the first iteration should be required, children will
