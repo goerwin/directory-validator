@@ -280,7 +280,7 @@ describe('Module src', () => {
       }, () => null);
     });
 
-    it('should validate a complex tree with recursion', () => {
+    it('should validate a simple tree with recursion', () => {
       const files = [
         './package.json',
         './.gitignore',
@@ -306,6 +306,32 @@ describe('Module src', () => {
       assert.doesNotThrow(() => {
         program(files, configObject);
       }, () => null);
+    });
+
+    it('should throw a simple tree with recursion because random file', () => {
+      const files = [
+        './src/index.js',
+        './src/src/index.js',
+        './src/src/src/index.js',
+        './src/src/src/index2.js',
+        './src/src/src/src/index.js'
+      ];
+
+      const configObject: Types.FileDirectoryArray = [
+        {
+          name: 'src',
+          type: 'directory',
+          isRecursive: true,
+          children: [
+            { name: 'index.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.throws(
+        () => { program(files, configObject); },
+        (err: Error) => err.message.includes(`${files[3]}, was not validated`)
+      );
     });
 
     it(`should throw when files with same name in same level but
@@ -374,42 +400,3 @@ describe('Module src', () => {
     });
   });
 });
-
-    // const files = [
-    //   './.gitignore',
-    //   './package.json',
-    //   './src/landingPages/index.js'
-    // ];
-
-    // const configObject: Types.FileDirectoryArray = [
-    //   {
-    //     name: 'src',
-    //     type: 'directory',
-    //     children: [
-    //       {
-    //         name: '[camelCase]',
-    //         type: 'directory',
-    //         isOptional: true,
-    //         isRecursive: true,
-    //         children: [
-    //           {
-    //             name: 'index.js',
-    //             type: 'file'
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     name: 'package.json',
-    //     type: 'file'
-    //   },
-    //   {
-    //     name: '.gitignore',
-    //     type: 'file'
-    //   }
-    // ];
-
-    // assert.doesNotThrow(() => {
-    //   program(files, configObject);
-    // });

@@ -4,7 +4,7 @@
   "description": "Validates folder structure",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register {src/_tests.ts,src/_tests/**/*.ts}",
+    "test": "mocha -r ts-node/register src/_tests.ts",
     "test-watch": "chokidar src/**/*.ts -c 'npm run test'"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",

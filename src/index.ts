@@ -13,8 +13,18 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
     children.forEach(rule => {
       if (rule.type === 'directory') {
         const dirPath = paths.concat(rule.name).join('/');
+        const areTherePossibleFiles = newFiles.some(el => el.name.indexOf(dirPath) === 0);
 
-        if (!rule.isOptional || newFiles.some(el => el.name.indexOf(dirPath) === 0)) {
+        if (rule.isRecursive) {
+          if (areTherePossibleFiles) {
+            validateChildren([rule], [...paths, rule.name]);
+          } else {
+            rule.isOptional = true;
+            rule.isRecursive = false;
+          }
+        }
+
+        if (!rule.isOptional || areTherePossibleFiles) {
           validateChildren(rule.children || [], [...paths, rule.name]);
         }
 
