@@ -8,7 +8,7 @@ describe('Module src', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -21,7 +21,7 @@ describe('Module src', () => {
     it('should validate using name/extension(string) combo', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package', extension: 'json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -34,7 +34,7 @@ describe('Module src', () => {
     it('should validate using name/extension(regex) combo', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -47,7 +47,7 @@ describe('Module src', () => {
     it('should throw because a rule did not passed', () => {
       const files = ['./.gitignore', './package.lul'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -64,7 +64,7 @@ describe('Module src', () => {
     it('should throw if it has invalid files', () => {
       const files = ['./.gitignore', './package.json', 'extraneous.js'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -80,7 +80,7 @@ describe('Module src', () => {
     it('should validate because rule is optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file', isOptional: true },
         { name: '.gitignore', type: 'file' }
@@ -96,7 +96,7 @@ describe('Module src', () => {
     it('should throw because rule is not optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: (Types.Directory | Types.File)[] = [
+      const configObject: Types.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file' },
         { name: '.gitignore', type: 'file' }
@@ -113,6 +113,17 @@ describe('Module src', () => {
   });
 
   describe('Directories', () => {
+    it('should validate an basic directory', () => {
+      const files = ['./src/nice.js', './src/blue.conf'];
+
+      const configObject: Types.FileDirectoryArray = [
+        { name: 'package.json', type: 'directory' }
+      ];
+
+      assert.doesNotThrow(() => {
+        program(files, configObject);
+      }, () => null);
+    });
     /**
      * if recursive is true and optional is not, only
      * the first iteration should be required, children will
@@ -123,3 +134,42 @@ describe('Module src', () => {
     it('should throw with camelCase names');
   });
 });
+
+    // const files = [
+    //   './.gitignore',
+    //   './package.json',
+    //   './src/landingPages/index.js'
+    // ];
+
+    // const configObject: Types.FileDirectoryArray = [
+    //   {
+    //     name: 'src',
+    //     type: 'directory',
+    //     children: [
+    //       {
+    //         name: '[camelCase]',
+    //         type: 'directory',
+    //         isOptional: true,
+    //         isRecursive: true,
+    //         children: [
+    //           {
+    //             name: 'index.js',
+    //             type: 'file'
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     name: 'package.json',
+    //     type: 'file'
+    //   },
+    //   {
+    //     name: '.gitignore',
+    //     type: 'file'
+    //   }
+    // ];
+
+    // assert.doesNotThrow(() => {
+    //   program(files, configObject);
+    // });

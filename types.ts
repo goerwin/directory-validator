@@ -15,4 +15,6 @@ namespace Types {
     isRecursive?: boolean;
     children?: (Directory | File)[];
   }
+
+  export type FileDirectoryArray = (File | Directory)[];
 }
