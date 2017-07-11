@@ -41,11 +41,11 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
             evaluation = false;
           }
 
-          file.isValidated = evaluation || file.isValidated;
-          return result || evaluation;
+          file.isValidated = file.isValidated || evaluation || !!el.isOptional;
+          return result || evaluation || !!el.isOptional;
         }, false);
 
-      if (!fileRulePassed && !el.isOptional) {
+      if (!fileRulePassed) {
         throw new Error(`${JSON.stringify(el)}, deep: ${paths.length}, rule did not passed`);
       }
     });
@@ -56,41 +56,4 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
   newFiles.forEach(el => {
     if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }
   });
-
-  // configObject.forEach((el, i) => {
-  //   const filename = el.name;
-
-  //   if (el.type === 'directory') {
-
-  //   } else {
-  //     const fileExt = el.extension;
-  //     let fileRulePassed = false;
-
-  //     fileRulePassed = newFiles.some(file => {
-  //       const { base, name, ext } = path.parse(file.name);
-  //       const correctExt = ext.substring(1);
-
-  //       if (!fileExt) {
-  //         if (filename !== base) { return false; }
-  //       } else {
-  //         if (filename !== name) { return false; }
-
-  //         if (fileExt instanceof RegExp) {
-  //           if (!fileExt.test(correctExt)) { return false; }
-  //         } else if (fileExt !== correctExt) { return false; }
-  //       }
-
-  //       file.isValidated = true;
-  //       return true;
-  //     });
-
-  //     if (!fileRulePassed && !el.isOptional) {
-  //       throw new Error(`${JSON.stringify(el)}, rule did not passed`);
-  //     }
-  //   }
-  // });
-
-  // newFiles.forEach(el => {
-  //   if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }
-  // });
 };

@@ -4,7 +4,7 @@ import '../types';
 import program from './';
 
 describe('Module src', () => {
-  describe('files', () => {
+  describe('Files', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
@@ -146,9 +146,6 @@ describe('Module src', () => {
         }
       ];
 
-      // const badObject = ;
-
-      // const badObject = JSON.stringify((configObject[0] as Types.Directory).children[0]);
       assert.throws(
         () => { program(files, configObject); },
         (err: Error) =>
@@ -170,161 +167,191 @@ describe('Module src', () => {
     it('should throw with camelCase names');
   });
 
-  it('should validate basic directories/files mixed', () => {
-    const files = [
-      './package.json',
-      './.gitignore',
-      './src/nice file.js',
-      './src/blue.conf'
-    ];
+  describe('Files/Directories', () => {
+    it('should validate basic directories/files mixed', () => {
+      const files = [
+        './package.json',
+        './.gitignore',
+        './src/nice file.js',
+        './src/blue.conf'
+      ];
 
-    const configObject: Types.FileDirectoryArray = [
-      { name: '.gitignore', type: 'file' },
-      { name: 'package.json', type: 'file' },
-      {
-        name: 'src',
-        type: 'directory',
-        children: [
-          { name: 'nice file.js', type: 'file' },
-          { name: 'blue.conf', type: 'file' }
-        ]
-      }
-    ];
+      const configObject: Types.FileDirectoryArray = [
+        { name: '.gitignore', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          children: [
+            { name: 'nice file.js', type: 'file' },
+            { name: 'blue.conf', type: 'file' }
+          ]
+        }
+      ];
 
-    assert.doesNotThrow(() => {
-      program(files, configObject);
-    }, () => null);
-  });
+      assert.doesNotThrow(() => {
+        program(files, configObject);
+      }, () => null);
+    });
 
-  it('should validate a complex tree with no recursion', () => {
-    const files = [
-      './package.json',
-      './.gitignore',
-      './src/nice file.js',
-      './src/blue.conf',
-      './src/dir2/index.js',
-      './src/dir2/dir2-1/index.js',
-      './src/dir2/dir2-2/index.js',
-      './src/dir3/index.js',
-      './src/dir4/index.js'
-    ];
+    it('should validate a complex tree with no recursion', () => {
+      const files = [
+        './package.json',
+        './.gitignore',
+        './src/nice file.js',
+        './src/blue.conf',
+        './src/dir2/index.js',
+        './src/dir2/dir2-1/index.js',
+        './src/dir2/dir2-2/index.js',
+        './src/dir3/index.js',
+        './src/dir4/index.js'
+      ];
 
-    const configObject: Types.FileDirectoryArray = [
-      { name: '.gitignore', type: 'file' },
-      { name: 'package.json', type: 'file' },
-      {
-        name: 'src',
-        type: 'directory',
-        children: [
-          { name: 'nice file.js', type: 'file' },
-          { name: 'blue.conf', type: 'file' },
-          {
-            name: 'dir2',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' },
-              {
-                name: 'dir2-1',
-                type: 'directory',
-                children: [
-                  { name: 'index.js', type: 'file' }
-                ]
-              },
-              {
-                name: 'dir2-2',
-                type: 'directory',
-                children: [
-                  { name: 'index.js', type: 'file' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'dir3',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' }
-            ]
-          },
-          {
-            name: 'dir4',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' }
-            ]
-          }
-        ]
-      }
-    ];
+      const configObject: Types.FileDirectoryArray = [
+        { name: '.gitignore', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          children: [
+            { name: 'nice file.js', type: 'file' },
+            { name: 'blue.conf', type: 'file' },
+            {
+              name: 'dir2',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' },
+                {
+                  name: 'dir2-1',
+                  type: 'directory',
+                  children: [
+                    { name: 'index.js', type: 'file' }
+                  ]
+                },
+                {
+                  name: 'dir2-2',
+                  type: 'directory',
+                  children: [
+                    { name: 'index.js', type: 'file' }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'dir3',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' }
+              ]
+            },
+            {
+              name: 'dir4',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' }
+              ]
+            }
+          ]
+        }
+      ];
 
-    assert.doesNotThrow(() => {
-      program(files, configObject);
-    }, () => null);
-  });
+      assert.doesNotThrow(() => {
+        program(files, configObject);
+      }, () => null);
+    });
 
-  it(`should throw when files with same name in same level but
-      different directories and one dir does not allow them`, () => {
-    const files = [
-      './src/nice file.js',
-      './src/blue.conf',
-      './src/dir2/index.js',
-      './src/dir2/dir2-1/index.js',
-      './src/dir2/dir2-2/index.js',
-      './src/dir2/dir2-2/index2.js',
-      './src/dir3/index.js',
-      './src/dir4/index.js'
-    ];
+    it('should validate a complex tree with recursion', () => {
+      const files = [
+        './package.json',
+        './.gitignore',
+        './src/index.js',
+        './src/src/index.js',
+        './src/src/src/index.js',
+        './src/src/src/src/index.js'
+      ];
 
-    const configObject: Types.FileDirectoryArray = [
-      {
-        name: 'src',
-        type: 'directory',
-        children: [
-          { name: 'nice file.js', type: 'file' },
-          { name: 'blue.conf', type: 'file' },
-          {
-            name: 'dir2',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' },
-              {
-                name: 'dir2-1',
-                type: 'directory',
-                children: [
-                  { name: 'index.js', type: 'file' }
-                ]
-              },
-              {
-                name: 'dir2-2',
-                type: 'directory',
-                children: [
-                  { name: 'index2.js', type: 'file' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'dir3',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' }
-            ]
-          },
-          {
-            name: 'dir4',
-            type: 'directory',
-            children: [
-              { name: 'index.js', type: 'file' }
-            ]
-          }
-        ]
-      }
-    ];
+      const configObject: Types.FileDirectoryArray = [
+        { name: '.gitignore', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          isRecursive: true,
+          children: [
+            { name: 'index.js', type: 'file' }
+          ]
+        }
+      ];
 
-    assert.throws(
-      () => { program(files, configObject); },
-      (err: Error) => err.message.includes(`${files[4]}, was not validated`)
-    );
+      assert.doesNotThrow(() => {
+        program(files, configObject);
+      }, () => null);
+    });
+
+    it(`should throw when files with same name in same level but
+        different directories and one dir does not allow them`, () => {
+      const files = [
+        './src/nice file.js',
+        './src/blue.conf',
+        './src/dir2/index.js',
+        './src/dir2/dir2-1/index.js',
+        './src/dir2/dir2-2/index.js',
+        './src/dir2/dir2-2/index2.js',
+        './src/dir3/index.js',
+        './src/dir4/index.js'
+      ];
+
+      const configObject: Types.FileDirectoryArray = [
+        {
+          name: 'src',
+          type: 'directory',
+          children: [
+            { name: 'nice file.js', type: 'file' },
+            { name: 'blue.conf', type: 'file' },
+            {
+              name: 'dir2',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' },
+                {
+                  name: 'dir2-1',
+                  type: 'directory',
+                  children: [
+                    { name: 'index.js', type: 'file' }
+                  ]
+                },
+                {
+                  name: 'dir2-2',
+                  type: 'directory',
+                  children: [
+                    { name: 'index2.js', type: 'file' }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'dir3',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' }
+              ]
+            },
+            {
+              name: 'dir4',
+              type: 'directory',
+              children: [
+                { name: 'index.js', type: 'file' }
+              ]
+            }
+          ]
+        }
+      ];
+
+      assert.throws(
+        () => { program(files, configObject); },
+        (err: Error) => err.message.includes(`${files[4]}, was not validated`)
+      );
+    });
   });
 });
 
