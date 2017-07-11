@@ -15,8 +15,13 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
         const dirPath = paths.concat(rule.name).join('/');
         const areTherePossibleFiles = newFiles.some(el => el.name.indexOf(dirPath) === 0);
 
+        if (!areTherePossibleFiles && !rule.isOptional) {
+          throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+        }
+
         if (rule.isRecursive) {
           if (areTherePossibleFiles) {
+            rule.isOptional = true;
             validateChildren([rule], [...paths, rule.name]);
           } else {
             rule.isOptional = true;

@@ -150,9 +150,7 @@ describe('Module src', () => {
         () => { program(files, configObject); },
         (err: Error) =>
           err.message.includes(
-            `${JSON.stringify(
-              (configObject[0] as any).children[0] as string
-             )}, deep: 2, rule did not passed`
+            `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
           )
       );
     });
@@ -177,12 +175,6 @@ describe('Module src', () => {
       }, () => null);
     });
 
-    /**
-     * if recursive is true and optional is not, only
-     * the first iteration should be required, children will
-     * be optional
-     */
-    it('should work if recursive is true but optional is not');
     it('should work with camelCase names');
     it('should throw with camelCase names');
   });
@@ -306,6 +298,31 @@ describe('Module src', () => {
       assert.doesNotThrow(() => {
         program(files, configObject);
       }, () => null);
+    });
+
+    it(`should throw in a simple tree with
+        recursion and optional because recursive folder not found`, () => {
+      const files = ['./package.json', './.gitignore'];
+
+      const configObject: Types.FileDirectoryArray = [
+        { name: '.gitignore', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          isRecursive: true,
+          children: [
+            { name: 'index.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.throws(
+        () => { program(files, configObject); },
+        (err: Error) => err.message.includes(
+          `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`
+        )
+      );
     });
 
     it('should throw a simple tree with recursion because random file', () => {
