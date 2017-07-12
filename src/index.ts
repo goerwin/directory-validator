@@ -12,7 +12,7 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
 
     children.forEach(rule => {
       if (rule.type === 'directory') {
-        const dirPath = paths.concat(rule.name).join('/');
+        const dirPath = paths.concat(rule.name).join(path.sep);
         const areTherePossibleFiles = newFiles.some(el => el.name.indexOf(dirPath) === 0);
 
         if (!areTherePossibleFiles && !rule.isOptional) {
@@ -42,8 +42,8 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
 
       fileRulePassed = newFiles
         .filter(file => {
-          const doesFileBelongsToThisDir = path.dirname(file.name) === paths.join('/');
-          const isFileInCurrentDeep = file.name.split('/').length === paths.length + 1;
+          const doesFileBelongsToThisDir = path.dirname(file.name) === paths.join(path.sep);
+          const isFileInCurrentDeep = file.name.split(path.sep).length === paths.length + 1;
           return doesFileBelongsToThisDir && isFileInCurrentDeep;
         })
         .reduce((result, file) => {
