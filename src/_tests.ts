@@ -1,60 +1,58 @@
 import * as assert from 'assert';
-import 'mocha';
-import '../types';
-import program from './';
+import * as program from './';
 
 describe('Module src:', () => {
   describe('Files:', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
     it('should validate using name/extension(string) combo', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package', extension: 'json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
     it('should validate using name/extension(regex) combo', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
     it('should throw because a rule did not passed', () => {
       const files = ['./.gitignore', './package.lul'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
 
       assert.throws(
         () => {
-          program(files, configObject);
+          program.run(files, configObject);
         },
         (err: Error) =>
           err.message.includes(`${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`)
@@ -64,14 +62,14 @@ describe('Module src:', () => {
     it('should throw if it has invalid files', () => {
       const files = ['./.gitignore', './package.json', 'extraneous.js'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
 
       assert.throws(
         () => {
-          program(files, configObject);
+          program.run(files, configObject);
         },
         (err: Error) => err.message.includes(`${files[2]}, was not validated`)
       );
@@ -80,7 +78,7 @@ describe('Module src:', () => {
     it('should validate because rule is optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file', isOptional: true },
         { name: '.gitignore', type: 'file' }
@@ -88,7 +86,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(
         () => {
-          program(files, configObject);
+          program.run(files, configObject);
         }, () => null
       );
     });
@@ -96,7 +94,7 @@ describe('Module src:', () => {
     it('should throw because rule is not optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file' },
         { name: '.gitignore', type: 'file' }
@@ -104,7 +102,7 @@ describe('Module src:', () => {
 
       assert.throws(
         () => {
-          program(files, configObject);
+          program.run(files, configObject);
         },
         (err: Error) =>
           err.message.includes(`${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`)
@@ -116,7 +114,7 @@ describe('Module src:', () => {
     it('should validate a basic directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         {
           name: 'src',
           type: 'directory',
@@ -128,14 +126,14 @@ describe('Module src:', () => {
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
     it('should throw because wrong name of directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         {
           name: 'lol',
           type: 'directory',
@@ -147,7 +145,7 @@ describe('Module src:', () => {
       ];
 
       assert.throws(
-        () => { program(files, configObject); },
+        () => { program.run(files, configObject); },
         (err: Error) =>
           err.message.includes(
             `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
@@ -158,7 +156,7 @@ describe('Module src:', () => {
     it('should validate because optional directory', () => {
       const files = ['./index.js'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: 'index.js', type: 'file' },
         {
           name: 'src',
@@ -171,7 +169,7 @@ describe('Module src:', () => {
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
@@ -188,7 +186,7 @@ describe('Module src:', () => {
         './src/blue.conf'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -202,7 +200,7 @@ describe('Module src:', () => {
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
@@ -219,7 +217,7 @@ describe('Module src:', () => {
         './src/dir4/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -268,7 +266,7 @@ describe('Module src:', () => {
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
@@ -282,7 +280,7 @@ describe('Module src:', () => {
         './src/src/src/src/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -296,7 +294,7 @@ describe('Module src:', () => {
       ];
 
       assert.doesNotThrow(() => {
-        program(files, configObject);
+        program.run(files, configObject);
       }, () => null);
     });
 
@@ -304,7 +302,7 @@ describe('Module src:', () => {
         recursion and optional because recursive folder not found`, () => {
       const files = ['./package.json', './.gitignore'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -318,7 +316,7 @@ describe('Module src:', () => {
       ];
 
       assert.throws(
-        () => { program(files, configObject); },
+        () => { program.run(files, configObject); },
         (err: Error) => err.message.includes(
           `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`
         )
@@ -334,7 +332,7 @@ describe('Module src:', () => {
         './src/src/src/src/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         {
           name: 'src',
           type: 'directory',
@@ -346,7 +344,7 @@ describe('Module src:', () => {
       ];
 
       assert.throws(
-        () => { program(files, configObject); },
+        () => { program.run(files, configObject); },
         (err: Error) => err.message.includes(`${files[3]}, was not validated`)
       );
     });
@@ -364,7 +362,7 @@ describe('Module src:', () => {
         './src/dir4/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: program.FileDirectoryArray = [
         {
           name: 'src',
           type: 'directory',
@@ -412,7 +410,7 @@ describe('Module src:', () => {
 
       console.log(`${files[4]}, was not validated`);
       assert.throws(
-        () => { program(files, configObject); },
+        () => { program.run(files, configObject); },
         (err: Error) => err.message.includes(`${files[4]}, was not validated`)
       );
     });

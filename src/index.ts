@@ -1,11 +1,28 @@
 import * as _ from 'lodash';
+import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
-import '../types';
 
-export default (files: string[], configObject: Types.FileDirectoryArray) => {
+export interface File {
+  type: 'file';
+  name: string;
+  extension?: string | RegExp;
+  isOptional?: boolean;
+}
+
+export interface Directory {
+  type: 'directory';
+  name: string;
+  isOptional?: boolean;
+  isRecursive?: boolean;
+  children?: (Directory | File)[];
+}
+
+export type FileDirectoryArray = (File | Directory)[];
+
+export function run(files: string[], configObject: FileDirectoryArray) {
   const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
-  const validateChildren = (children: Types.FileDirectoryArray, paths: string[] = ['.']) => {
+  const validateChildren = (children: FileDirectoryArray, paths: string[] = ['.']) => {
     if (children.length === 0) {
       return;
     }
@@ -78,4 +95,4 @@ export default (files: string[], configObject: Types.FileDirectoryArray) => {
   newFiles.forEach(el => {
     if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }
   });
-};
+}
