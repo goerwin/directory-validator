@@ -3,8 +3,8 @@ import 'mocha';
 import '../types';
 import program from './';
 
-describe('Module src', () => {
-  describe('Files', () => {
+describe('Module src:', () => {
+  describe('Files:', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
@@ -112,7 +112,7 @@ describe('Module src', () => {
     });
   });
 
-  describe('Directories', () => {
+  describe('Directories:', () => {
     it('should validate a basic directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
@@ -179,7 +179,7 @@ describe('Module src', () => {
     it('should throw with camelCase names');
   });
 
-  describe('Files/Directories', () => {
+  describe('Files/Directories:', () => {
     it('should validate basic directories/files mixed', () => {
       const files = [
         './package.json',
@@ -330,7 +330,7 @@ describe('Module src', () => {
         './src/index.js',
         './src/src/index.js',
         './src/src/src/index.js',
-        './src/src/src/index2.js',
+        'src/src/src/index2.js',
         './src/src/src/src/index.js'
       ];
 
@@ -358,7 +358,7 @@ describe('Module src', () => {
         './src/blue.conf',
         './src/dir2/index.js',
         './src/dir2/dir2-1/index.js',
-        './src/dir2/dir2-2/index.js',
+        'src/dir2/dir2-2/index.js',
         './src/dir2/dir2-2/index2.js',
         './src/dir3/index.js',
         './src/dir4/index.js'
@@ -410,6 +410,7 @@ describe('Module src', () => {
         }
       ];
 
+      console.log(`${files[4]}, was not validated`);
       assert.throws(
         () => { program(files, configObject); },
         (err: Error) => err.message.includes(`${files[4]}, was not validated`)
