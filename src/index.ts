@@ -59,6 +59,11 @@ function isNameValid(nameRule: string | RegExp, name: string) {
   return nameRule.test(name);
 }
 
+function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
+  if (fileExtRule instanceof RegExp) { return fileExtRule.test(ext); }
+  return fileExtRule !== ext;
+}
+
 export function run(files: string[], configObject: FileDirectoryArray) {
   const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
@@ -110,21 +115,16 @@ export function run(files: string[], configObject: FileDirectoryArray) {
         .reduce((result, file) => {
           const { base, name, ext } = path.parse(file.name);
           const correctExt = ext.substring(1);
-          let evaluation = true;
+          let isFileValid;
 
           if (!fileExtRule) {
-            evaluation = isNameValid(filenameRule, base);
-            // if (filenameRule !== base) { evaluation = false; }
-          } else if (filenameRule !== name) {
-            evaluation = false;
-          } else if (fileExtRule instanceof RegExp) {
-            if (!fileExtRule.test(correctExt)) { evaluation = false; }
-          } else if (fileExtRule !== correctExt) {
-            evaluation = false;
+            isFileValid = isNameValid(filenameRule, base);
+          } else {
+            isFileValid = isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, ext);
           }
 
-          file.isValidated = file.isValidated || evaluation || !!rule.isOptional;
-          return result || evaluation || !!rule.isOptional;
+          file.isValidated = file.isValidated || isFileValid || !!rule.isOptional;
+          return result || isFileValid || !!rule.isOptional;
         }, false);
 
       if (!fileRulePassed) {
