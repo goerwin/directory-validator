@@ -69,7 +69,7 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
   function validateRules(rules: Types.FileDirectoryArray, paths: (string | RegExp)[] = ['.']) {
     if (rules.length === 0) { return; }
 
-    rules.forEach(rule => {
+    rules.forEach((rule, idx) => {
       if (rule.type === 'directory') {
         const canDirHaveFiles = newFiles.some(el =>
           canFileBelongToThisDir(el.name, paths.concat(rule.name))
@@ -116,25 +116,30 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
 
       const fileRulePassed = filesThatCanBelongToThisDir.reduce((result, file) => {
         const { base, name, ext } = path.parse(file.name);
+        let isValid;
 
         if (!rule.extension) {
-          file.isValidated = isNameValid(rule.name, base);
+          isValid = isNameValid(rule.name, base);
         } else {
-          file.isValidated =
+          isValid =
             isNameValid(rule.name, name) && isFileExtValid(rule.extension, ext.substring(1));
         }
 
-        return result || file.isValidated || !!rule.isOptional;
+        file.isValidated = file.isValidated || isValid;
+        return result || isValid || !!rule.isOptional;
       }, newFiles.length === 0);
 
       if (!fileRulePassed) {
         throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
       }
 
-      // Idea here is to remove all the files that were validated since there can
-      // be multiple matches from different dirs, we look for the dirPath with more
-      // file children validated and we remove them from the files to validate
-      // in the next iteration
+      if (idx !== rules.length - 1) { return; }
+
+      // Idea here is to remove all the files that were validated after all rules of
+      // a particular directory successfully passed.
+      // Since there can be multiple children matches from different dirs, we look for
+      // the dirPath with more children validated so that we remove them from the files
+      // to validate in the next iteration
 
       const parentPaths = _.groupBy(filesThatCanBelongToThisDir, el => {
         const pathFragments = el.name.split(path.sep);

@@ -507,6 +507,39 @@ describe('Module src:', () => {
     it('[snake_case]');
 
     describe('Edge Cases:', () => {
+      it(`should throw when a rule matches 2 dirs (dirA, dirB), the rule first
+          doesn't satisfiy dirA's children neither dirB's. But it satisfies
+          them in conjunction`, () => {
+        const files = [
+          './dirA/index.js',
+          './dirA/X.js',
+          './dirB/index.js',
+          './dirB/Y.js'
+        ];
+
+        const configObject: Types.FileDirectoryArray = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            rules: [
+              { name: 'index.js', type: 'file' },
+              { name: 'X.js', type: 'file' },
+              { name: 'Y.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) =>
+            err.message.includes(
+              `${JSON.stringify((
+                configObject[0] as Types.Directory).rules![1]
+              )}, deep: 2, rule did not passed`
+            )
+        );
+      });
+
       it(`should throw when a rule matches 2 dirs (dirA, dirB), dirB's children
           are a subset of dirA's. the rule first satisfies dirA's children but does
           not for dirB's`, () => {
@@ -533,7 +566,9 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
+              `${JSON.stringify((
+                configObject[0] as Types.Directory).rules![0]
+              )}, deep: 2, rule did not passed`
             )
         );
       });
@@ -565,7 +600,9 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
+              `${JSON.stringify((
+                configObject[0] as Types.Directory).rules![0]
+              )}, deep: 2, rule did not passed`
             )
         );
       });
@@ -615,7 +652,9 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
+              `${JSON.stringify((
+                configObject[0] as Types.Directory).rules![0]
+              )}, deep: 2, rule did not passed`
             )
         );
       });
@@ -665,7 +704,9 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
+              `${JSON.stringify((
+                configObject[0] as Types.Directory).rules![0]
+              )}, deep: 2, rule did not passed`
             )
         );
       });
