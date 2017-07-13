@@ -12,6 +12,8 @@
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "@types/commander": "^2.9.1",
+    "@types/glob": "^5.0.30",
     "@types/lodash": "^4.14.68",
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.10",
@@ -22,13 +24,25 @@
     "typescript": "^2.4.1"
   },
   "dependencies": {
+    "commander": "^2.11.0",
+    "glob": "^7.1.2",
     "lodash": "^4.17.4",
     "node-helpers": "git+https://github.com/erwingo/node-helpers.git"
   },
   "nyc": {
-    "include": ["src/**/*.ts"],
-    "exclude": ["dist", "src/_tests.ts"],
-    "extension": [".ts", ".tsx"],
-    "require": ["ts-node/register"]
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "dist",
+      "src/_tests.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

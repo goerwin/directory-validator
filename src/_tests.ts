@@ -1,9 +1,15 @@
 import * as assert from 'assert';
-import * as program from './';
+import * as program from './program';
 import * as Types from './types';
 
 describe('Module src:', () => {
-  it('should validate if not rules passed', () => {
+  it('should validate if no rules passed', () => {
+    assert.doesNotThrow(() => {
+      program.run(['package.json', '.gitignore'], []);
+    });
+  });
+
+  it('should validate if no rules passed and no files passed', () => {
     assert.doesNotThrow(() => {
       program.run([], []);
     });
