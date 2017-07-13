@@ -12,7 +12,7 @@ export interface File {
 
 export interface Directory {
   type: 'directory';
-  name: string;
+  name: string | RegExp;
   isOptional?: boolean;
   isRecursive?: boolean;
   children?: (Directory | File)[];
@@ -20,20 +20,17 @@ export interface Directory {
 
 export type FileDirectoryArray = (File | Directory)[];
 
-function canFileBelongToThisDir(elPath: string, parentPaths: string[]) {
-  const pathSegments = elPath.split(path.sep);
+function canDirHaveChildren() {
+
+}
+
+function canFileBelongToThisDir(filePath: string, parentPaths: (string | RegExp)[]) {
+  let pathSegments = filePath.split(path.sep);
+  pathSegments = pathSegments.slice(0, pathSegments.length - 1);
+  parentPaths = parentPaths.slice(1, parentPaths.length);
+
   if (parentPaths.length !== pathSegments.length) { return false; }
-
-  // package.json
-  // .
-  // pathSegments.slice(0, pathSegments.length - 1).every
-  // [package.json, src]
-  // [., src]
-  switch (elPath) {
-    case '[camelCase]': {
-
-    }
-  }
+  return pathSegments.every((el, i) => isNameValid(parentPaths[i], el));
 }
 
 function isNameValid(nameRule: string | RegExp, name: string) {
@@ -67,22 +64,23 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
 export function run(files: string[], configObject: FileDirectoryArray) {
   const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
-  const validateChildren = (children: FileDirectoryArray, paths: string[] = ['.']) => {
+  const validateChildren = (children: FileDirectoryArray, paths: (string | RegExp)[] = ['.']) => {
     if (children.length === 0) {
       return;
     }
 
     children.forEach(rule => {
       if (rule.type === 'directory') {
-        const dirPath = path.normalize(paths.concat(rule.name).join(path.sep));
-        const areTherePossibleFiles = newFiles.some(el => el.name.indexOf(dirPath) === 0);
+        const couldHaveFiles = newFiles.some(el =>
+          canFileBelongToThisDir(el.name, paths.concat(rule.name))
+        );
 
-        if (!areTherePossibleFiles && !rule.isOptional) {
+        if (!couldHaveFiles && !rule.isOptional) {
           throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
         }
 
         if (rule.isRecursive) {
-          if (areTherePossibleFiles) {
+          if (couldHaveFiles) {
             rule.isOptional = true;
             validateChildren([rule], [...paths, rule.name]);
           } else {
@@ -91,7 +89,7 @@ export function run(files: string[], configObject: FileDirectoryArray) {
           }
         }
 
-        if (!rule.isOptional || areTherePossibleFiles) {
+        if (!rule.isOptional || couldHaveFiles) {
           validateChildren(rule.children || [], [...paths, rule.name]);
         }
 
@@ -103,15 +101,7 @@ export function run(files: string[], configObject: FileDirectoryArray) {
       let fileRulePassed = false;
 
       fileRulePassed = newFiles
-        .filter(file => {
-          const doesFileBelongsToThisDir =
-            path.dirname(file.name) === path.normalize(paths.join(path.sep));
-          // TODO: Get possible directories
-          canFileBelongToThisDir(file.name, paths);
-
-          const isFileInCurrentDeep = file.name.split(path.sep).length === paths.length;
-          return doesFileBelongsToThisDir && isFileInCurrentDeep;
-        })
+        .filter(file => canFileBelongToThisDir(file.name, paths))
         .reduce((result, file) => {
           const { base, name, ext } = path.parse(file.name);
           const newExt = ext.substring(1);

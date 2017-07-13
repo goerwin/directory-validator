@@ -496,7 +496,6 @@ describe('Module src:', () => {
         }
       ];
 
-      console.log(`${files[4]}, was not validated`);
       assert.throws(
         () => { program.run(files, configObject); },
         (err: Error) => err.message.includes(`${files[4]}, was not validated`)
@@ -533,6 +532,100 @@ describe('Module src:', () => {
 
       assert.throws(() => {
         program.run(files, configObject);
+      });
+    });
+
+    describe('RegExp:', () => {
+      it('should validate regexp dirnames', () => {
+        const files = [
+          './src/index.js',
+          './.srcNice/index.js',
+          './srcThisWorksToo/index.js'
+        ];
+
+        const configObject: program.FileDirectoryArray = [
+          {
+            name: /src.*/,
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should throw because a dirname does not match regex', () => {
+        const files = [
+          './src/index.js',
+          './srrcNice/index.js',
+          './srcThisWorksToo/index.js'
+        ];
+
+        const configObject: program.FileDirectoryArray = [
+          {
+            name: /src.*/,
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes('srrcNice/index.js, was not validated')
+        );
+      });
+    });
+
+    describe('[camelCase]:', () => {
+      it('should validate camelcase dirnames', () => {
+        const files = [
+          './src/index.js',
+          './srcOmg/index.js',
+          './srcLul/index.js'
+        ];
+
+        const configObject: program.FileDirectoryArray = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should throw because one dirname is not camelcase', () => {
+        const files = [
+          './src/index.js',
+          './SRC/index.js',
+          './srcLul/index.js'
+        ];
+
+        const configObject: program.FileDirectoryArray = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes('SRC/index.js, was not validated')
+        );
       });
     });
   });
