@@ -16,32 +16,6 @@ describe('Module src:', () => {
       }, () => null);
     });
 
-    it('should validate using name/extension(string) combo', () => {
-      const files = ['./.gitignore', './package.json'];
-
-      const configObject: program.FileDirectoryArray = [
-        { name: 'package', extension: 'json', type: 'file' },
-        { name: '.gitignore', type: 'file' }
-      ];
-
-      assert.doesNotThrow(() => {
-        program.run(files, configObject);
-      }, () => null);
-    });
-
-    it('should validate using name/extension(regex) combo', () => {
-      const files = ['./.gitignore', './package.json'];
-
-      const configObject: program.FileDirectoryArray = [
-        { name: 'package', extension: /json/, type: 'file' },
-        { name: '.gitignore', type: 'file' }
-      ];
-
-      assert.doesNotThrow(() => {
-        program.run(files, configObject);
-      }, () => null);
-    });
-
     it('should throw because a rule did not passed', () => {
       const files = ['./.gitignore', './package.lul'];
 
@@ -107,6 +81,34 @@ describe('Module src:', () => {
         (err: Error) =>
           err.message.includes(`${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`)
       );
+    });
+
+    describe('Extension:', () => {
+      it('should validate using string', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: 'package', extension: 'json', type: 'file' },
+          { name: '.gitignore', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should validate using regex', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: 'package', extension: /(json|js)/, type: 'file' },
+          { name: '.gitignore', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
     });
 
     describe('[camelCase]:', () => {
