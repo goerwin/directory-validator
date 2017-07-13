@@ -97,6 +97,22 @@ describe('Module src:', () => {
         }, () => null);
       });
 
+      it('should throw because wrong string extension', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: 'package', extension: '.json', type: 'file' },
+          { name: '.gitignore', type: 'file' }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes(
+            `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          )
+        );
+      });
+
       it('should validate using regex', () => {
         const files = ['./.gitignore', './package.json'];
 
@@ -108,6 +124,22 @@ describe('Module src:', () => {
         assert.doesNotThrow(() => {
           program.run(files, configObject);
         }, () => null);
+      });
+
+      it('should throw because wrong regex extension', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: 'package', extension: /.(json|js)/, type: 'file' },
+          { name: '.gitignore', type: 'file' }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes(
+            `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          )
+        );
       });
     });
 

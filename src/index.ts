@@ -20,21 +20,21 @@ export interface Directory {
 
 export type FileDirectoryArray = (File | Directory)[];
 
-// function canFileBelongsToThisDir(elPath: string, parentPaths: string[]) {
-//   const pathSegments = elPath.split(path.sep);
-//   if (parentPaths.length !== pathSegments.length) { return false; }
+function canFileBelongToThisDir(elPath: string, parentPaths: string[]) {
+  const pathSegments = elPath.split(path.sep);
+  if (parentPaths.length !== pathSegments.length) { return false; }
 
-//   // package.json
-//   // .
-//   pathSegments.slice(0, pathSegments.length - 1).every
-//   // [package.json, src]
-//   // [., src]
-//   switch (elPath) {
-//     case '[camelCase]': {
+  // package.json
+  // .
+  // pathSegments.slice(0, pathSegments.length - 1).every
+  // [package.json, src]
+  // [., src]
+  switch (elPath) {
+    case '[camelCase]': {
 
-//     }
-//   }
-// }
+    }
+  }
+}
 
 function isNameValid(nameRule: string | RegExp, name: string) {
   if (typeof nameRule === 'string') {
@@ -61,7 +61,7 @@ function isNameValid(nameRule: string | RegExp, name: string) {
 
 function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
   if (fileExtRule instanceof RegExp) { return fileExtRule.test(ext); }
-  return fileExtRule !== ext;
+  return fileExtRule === ext;
 }
 
 export function run(files: string[], configObject: FileDirectoryArray) {
@@ -107,20 +107,20 @@ export function run(files: string[], configObject: FileDirectoryArray) {
           const doesFileBelongsToThisDir =
             path.dirname(file.name) === path.normalize(paths.join(path.sep));
           // TODO: Get possible directories
-          // canFileBelongsToThisDir(file.name, paths);
+          canFileBelongToThisDir(file.name, paths);
 
           const isFileInCurrentDeep = file.name.split(path.sep).length === paths.length;
           return doesFileBelongsToThisDir && isFileInCurrentDeep;
         })
         .reduce((result, file) => {
           const { base, name, ext } = path.parse(file.name);
-          const correctExt = ext.substring(1);
+          const newExt = ext.substring(1);
           let isFileValid;
 
           if (!fileExtRule) {
             isFileValid = isNameValid(filenameRule, base);
           } else {
-            isFileValid = isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, ext);
+            isFileValid = isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, newExt);
           }
 
           file.isValidated = file.isValidated || isFileValid || !!rule.isOptional;
