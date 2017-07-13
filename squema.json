@@ -1,0 +1,41 @@
+{
+  "title": "Folder schema validator",
+  "type": "object",
+  "properties": {
+    "rules": {
+      "id": "rules",
+      "description": "Rules",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "oneOf": [
+          {
+            "title": "File",
+            "type": "object",
+            "properties": {
+              "type": { "enum": ["file"] },
+              "name": { "type": "string" },
+              "extension": { "type": "string" },
+              "isOptional": { "type": "boolean" }
+            },
+            "required": ["type", "name"],
+            "additionalProperties": false
+          },
+          {
+            "title": "Directory",
+            "type": "object",
+            "properties": {
+              "type": { "enum": ["directory"] },
+              "name": { "type": "string" },
+              "isOptional": { "type": "boolean" },
+              "isRecursive": { "type": "boolean" },
+              "children": { "$ref": "rules" }
+            },
+            "required": ["type", "name"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}
