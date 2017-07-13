@@ -41,17 +41,12 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
 }
 
 export function run(files: string[], configObject: Types.FileDirectoryArray) {
-  const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
+  let newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
-  const validateChildren = (
-    children: Types.FileDirectoryArray,
-    paths: (string | RegExp)[] = ['.']
-  ) => {
-    if (children.length === 0) {
-      return;
-    }
+  function validateRules(rules: Types.FileDirectoryArray, paths: (string | RegExp)[] = ['.']) {
+    if (rules.length === 0) { return; }
 
-    children.forEach(rule => {
+    rules.forEach(rule => {
       if (rule.type === 'directory') {
         const canDirHaveFiles = newFiles.some(el =>
           canFileBelongToThisDir(el.name, paths.concat(rule.name))
@@ -61,10 +56,23 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
           throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
         }
 
+        if (rule.name === '[camelCase]') {
+          let isValidating = true;
+
+          while (isValidating) {
+            try {
+              if (newFiles.length === 0) { break; }
+              validateRules(rule.children || [], [...paths, rule.name]);
+            } catch (err) {
+              isValidating = false;
+            }
+          }
+        }
+
         if (rule.isRecursive) {
           if (canDirHaveFiles) {
             rule.isOptional = true;
-            validateChildren([rule], [...paths, rule.name]);
+            validateRules([rule], [...paths, rule.name]);
           } else {
             rule.isOptional = true;
             rule.isRecursive = false;
@@ -72,7 +80,8 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
         }
 
         if (!rule.isOptional || canDirHaveFiles) {
-          validateChildren(rule.children || [], [...paths, rule.name]);
+          // TODO: Change name children to rules
+          validateRules(rule.children || [], [...paths, rule.name]);
         }
 
         return;
@@ -80,32 +89,49 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
 
       const filenameRule = rule.name;
       const fileExtRule = rule.extension;
-      let fileRulePassed = false;
 
-      fileRulePassed = newFiles
-        .filter(file => canFileBelongToThisDir(file.name, paths))
-        .reduce((result, file) => {
-          const { base, name, ext } = path.parse(file.name);
-          const newExt = ext.substring(1);
-          let isFileValid;
+      const filesThatCanBelongToThisDir = newFiles
+        .filter(file => canFileBelongToThisDir(file.name, paths));
 
-          if (!fileExtRule) {
-            isFileValid = isNameValid(filenameRule, base);
-          } else {
-            isFileValid = isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, newExt);
-          }
+      const fileRulePassed = filesThatCanBelongToThisDir.reduce((result, file) => {
+        const { base, name, ext } = path.parse(file.name);
 
-          file.isValidated = file.isValidated || isFileValid || !!rule.isOptional;
-          return result || isFileValid || !!rule.isOptional;
-        }, false);
+        if (!fileExtRule) {
+          file.isValidated = isNameValid(filenameRule, base);
+        } else {
+          file.isValidated =
+            isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, ext.substring(1));
+        }
+
+        return result || file.isValidated || !!rule.isOptional;
+      }, newFiles.length === 0);
 
       if (!fileRulePassed) {
         throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
       }
-    });
-  };
 
-  validateChildren(configObject);
+      const parentPaths = _.groupBy(filesThatCanBelongToThisDir, el => {
+        const pathFragments = el.name.split(path.sep);
+        return pathFragments.slice(0, pathFragments.length - 1).join(path.sep);
+      });
+
+      const dirPathToRemove = _.keys(parentPaths).reduce((result, el) => {
+        if (parentPaths[el].length <= result.length) { return result; }
+        return { length: parentPaths[el].length, dirPath: el };
+      }, { length: 0, dirPath: '' });
+
+      // Removing files validated
+      newFiles = newFiles.filter(el =>
+        !filesThatCanBelongToThisDir
+          .filter(el => {
+            return el.isValidated && el.name.indexOf(dirPathToRemove.dirPath) === 0;
+          })
+          .some(el2 => el === el2)
+      );
+    });
+  }
+
+  validateRules(configObject);
 
   newFiles.forEach(el => {
     if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }

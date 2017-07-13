@@ -508,7 +508,7 @@ describe('Module src:', () => {
 
     describe('Edge Cases:', () => {
       it(`should throw when a rule matches 2 dirs (dirA, dirB), dirB's children
-          are a subset of dirA's. the rule satisfies dirA's children but does
+          are a subset of dirA's. the rule first satisfies dirA's children but does
           not for dirB's`, () => {
         const files = [
           './dirA/index.js',
@@ -531,7 +531,42 @@ describe('Module src:', () => {
 
         assert.throws(
           () => { program.run(files, configObject); },
-          (err: Error) => err.message.includes('lul')
+          (err: Error) =>
+            err.message.includes(
+              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+            )
+        );
+      });
+
+      it(`should throw when a rule matches 2 dirs (dirA, dirB), dirB's children
+          are a subset of dirA's. the rule first satisfies dirB's children but does
+          not for dirB's`, () => {
+        const files = [
+          './dirB/Y.js',
+          './dirA/index.js',
+          './dirA/X.js',
+          './dirA/Y.js'
+        ];
+        it('do this with folders too');
+
+        const configObject: Types.FileDirectoryArray = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' },
+              { name: 'X.js', type: 'file' },
+              { name: 'Y.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) =>
+            err.message.includes(
+              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+            )
         );
       });
     });
@@ -625,7 +660,10 @@ describe('Module src:', () => {
 
         assert.throws(
           () => { program.run(files, configObject); },
-          (err: Error) => err.message.includes('SRC/index.js, was not validated')
+          (err: Error) =>
+            err.message.includes(
+              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+            )
         );
       });
     });
