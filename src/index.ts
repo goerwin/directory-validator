@@ -2,9 +2,10 @@ import * as _ from 'lodash';
 import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
 
+// TODO: Move this to an external types file
 export interface File {
   type: 'file';
-  name: string;
+  name: string | RegExp;
   extension?: string | RegExp;
   isOptional?: boolean;
 }
@@ -35,23 +36,27 @@ export type FileDirectoryArray = (File | Directory)[];
 //   }
 // }
 
-function isNameValid(nameRule: string, name: string) {
-  const camelCaseRuleSegments = nameRule.split('[camelCase]');
-  if (camelCaseRuleSegments.length === 2) {
-    const leftSide = camelCaseRuleSegments[0];
-    const rightSide = camelCaseRuleSegments[1];
-    const rightSideIndexOf = name.lastIndexOf(rightSide);
+function isNameValid(nameRule: string | RegExp, name: string) {
+  if (typeof nameRule === 'string') {
+    const camelCaseRuleSegments = nameRule.split('[camelCase]');
+    if (camelCaseRuleSegments.length === 2) {
+      const leftSide = camelCaseRuleSegments[0];
+      const rightSide = camelCaseRuleSegments[1];
+      const rightSideIndexOf = name.lastIndexOf(rightSide);
 
-    if (name.indexOf(leftSide) !== 0) { return false; }
-    if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
+      if (name.indexOf(leftSide) !== 0) { return false; }
+      if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
 
-    const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
-    if (filenameToValidate.length === 0) { return false; }
+      const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
+      if (filenameToValidate.length === 0) { return false; }
 
-    return _.camelCase(filenameToValidate) === filenameToValidate;
+      return _.camelCase(filenameToValidate) === filenameToValidate;
+    }
+
+    return nameRule === name;
   }
 
-  return nameRule === name;
+  return nameRule.test(name);
 }
 
 export function run(files: string[], configObject: FileDirectoryArray) {

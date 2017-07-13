@@ -109,7 +109,7 @@ describe('Module src:', () => {
       );
     });
 
-    describe('[camelCase]', () => {
+    describe('[camelCase]:', () => {
       it('should validate camelcased filenames', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json'];
 
@@ -132,6 +132,33 @@ describe('Module src:', () => {
         assert.throws(
           () => { program.run(files, configObject); },
           (err: Error) => err.message.includes('no-camelcase.js, was not validated')
+        );
+      });
+    });
+
+    describe('RegExp:', () => {
+      it('should validate filenames', () => {
+        const files = ['./index.js', './package.map'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: /[a-z]\.(js|map)/, type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should throw because one file does not match', () => {
+        const files = ['./index.js', './package.map', 'rip8.js'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: /[a-z]\.(js|map)/, type: 'file' }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes('rip8.js, was not validated')
         );
       });
     });
