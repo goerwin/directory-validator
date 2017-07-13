@@ -62,7 +62,7 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
           while (isValidating) {
             try {
               if (newFiles.length === 0) { break; }
-              validateRules(rule.children || [], [...paths, rule.name]);
+              validateRules(rule.rules || [], [...paths, rule.name]);
             } catch (err) {
               isValidating = false;
             }
@@ -81,7 +81,7 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
 
         if (!rule.isOptional || canDirHaveFiles) {
           // TODO: Change name children to rules
-          validateRules(rule.children || [], [...paths, rule.name]);
+          validateRules(rule.rules || [], [...paths, rule.name]);
         }
 
         return;

@@ -10,7 +10,7 @@ export interface Directory {
   name: string | RegExp;
   isOptional?: boolean;
   isRecursive?: boolean;
-  children?: (Directory | File)[];
+  rules?: (Directory | File)[];
 }
 
 export type FileDirectoryArray = (File | Directory)[];

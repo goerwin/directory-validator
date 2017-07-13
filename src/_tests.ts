@@ -207,7 +207,7 @@ describe('Module src:', () => {
         {
           name: 'src',
           type: 'directory',
-          children: [
+          rules: [
             { name: 'nice file.js', type: 'file' },
             { name: 'blue.conf', type: 'file' }
           ]
@@ -226,7 +226,7 @@ describe('Module src:', () => {
         {
           name: 'lol',
           type: 'directory',
-          children: [
+          rules: [
             { name: 'nice file.js', type: 'file' },
             { name: 'blue.conf', type: 'file' }
           ]
@@ -251,7 +251,7 @@ describe('Module src:', () => {
           name: 'src',
           type: 'directory',
           isOptional: true,
-          children: [
+          rules: [
             { name: 'blue.conf', type: 'file' }
           ]
         }
@@ -280,7 +280,7 @@ describe('Module src:', () => {
         {
           name: 'src',
           type: 'directory',
-          children: [
+          rules: [
             { name: 'nice file.js', type: 'file' },
             { name: 'blue.conf', type: 'file' }
           ]
@@ -311,25 +311,25 @@ describe('Module src:', () => {
         {
           name: 'src',
           type: 'directory',
-          children: [
+          rules: [
             { name: 'nice file.js', type: 'file' },
             { name: 'blue.conf', type: 'file' },
             {
               name: 'dir2',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' },
                 {
                   name: 'dir2-1',
                   type: 'directory',
-                  children: [
+                  rules: [
                     { name: 'index.js', type: 'file' }
                   ]
                 },
                 {
                   name: 'dir2-2',
                   type: 'directory',
-                  children: [
+                  rules: [
                     { name: 'index.js', type: 'file' }
                   ]
                 }
@@ -338,14 +338,14 @@ describe('Module src:', () => {
             {
               name: 'dir3',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' }
               ]
             },
             {
               name: 'dir4',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' }
               ]
             }
@@ -375,7 +375,7 @@ describe('Module src:', () => {
           name: 'src',
           type: 'directory',
           isRecursive: true,
-          children: [
+          rules: [
             { name: 'index.js', type: 'file' }
           ]
         }
@@ -397,7 +397,7 @@ describe('Module src:', () => {
           name: 'src',
           type: 'directory',
           isRecursive: true,
-          children: [
+          rules: [
             { name: 'index.js', type: 'file' }
           ]
         }
@@ -425,7 +425,7 @@ describe('Module src:', () => {
           name: 'src',
           type: 'directory',
           isRecursive: true,
-          children: [
+          rules: [
             { name: 'index.js', type: 'file' }
           ]
         }
@@ -454,25 +454,25 @@ describe('Module src:', () => {
         {
           name: 'src',
           type: 'directory',
-          children: [
+          rules: [
             { name: 'nice file.js', type: 'file' },
             { name: 'blue.conf', type: 'file' },
             {
               name: 'dir2',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' },
                 {
                   name: 'dir2-1',
                   type: 'directory',
-                  children: [
+                  rules: [
                     { name: 'index.js', type: 'file' }
                   ]
                 },
                 {
                   name: 'dir2-2',
                   type: 'directory',
-                  children: [
+                  rules: [
                     { name: 'index2.js', type: 'file' }
                   ]
                 }
@@ -481,14 +481,14 @@ describe('Module src:', () => {
             {
               name: 'dir3',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' }
               ]
             },
             {
               name: 'dir4',
               type: 'directory',
-              children: [
+              rules: [
                 { name: 'index.js', type: 'file' }
               ]
             }
@@ -521,7 +521,7 @@ describe('Module src:', () => {
           {
             name: '[camelCase]',
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' },
               { name: 'X.js', type: 'file' },
               { name: 'Y.js', type: 'file' }
@@ -533,7 +533,7 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
             )
         );
       });
@@ -553,7 +553,7 @@ describe('Module src:', () => {
           {
             name: '[camelCase]',
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' },
               { name: 'X.js', type: 'file' },
               { name: 'Y.js', type: 'file' }
@@ -565,7 +565,7 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
             )
         );
       });
@@ -583,7 +583,7 @@ describe('Module src:', () => {
           {
             name: /src.*/,
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' }
             ]
           }
@@ -605,7 +605,7 @@ describe('Module src:', () => {
           {
             name: /src.*/,
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' }
             ]
           }
@@ -630,7 +630,7 @@ describe('Module src:', () => {
           {
             name: '[camelCase]',
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' }
             ]
           }
@@ -652,7 +652,7 @@ describe('Module src:', () => {
           {
             name: '[camelCase]',
             type: 'directory',
-            children: [
+            rules: [
               { name: 'index.js', type: 'file' }
             ]
           }
@@ -662,7 +662,7 @@ describe('Module src:', () => {
           () => { program.run(files, configObject); },
           (err: Error) =>
             err.message.includes(
-              `${JSON.stringify((configObject[0] as Types.Directory).children![0])}`
+              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
             )
         );
       });
