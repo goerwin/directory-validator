@@ -613,7 +613,10 @@ describe('Module src:', () => {
 
         assert.throws(
           () => { program.run(files, configObject); },
-          (err: Error) => err.message.includes('srrcNice/index.js, was not validated')
+          (err: Error) =>
+            err.message.includes(
+              `${JSON.stringify((configObject[0] as Types.Directory).rules![0])}`
+            )
         );
       });
     });

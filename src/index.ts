@@ -3,6 +3,24 @@ import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
 import * as Types from './types';
 
+function getMultimatchName(nameRule: string) {
+  return ['[camelCase]', '[UPPERCASE]', '[dash-case]', '[snake_case]']
+    .reduce((result, el) => {
+      if (result) { return result; }
+
+      const ruleSegments = nameRule.split(el);
+      if (ruleSegments.length === 2) {
+        return { type: el, leftSide: ruleSegments[0], rightSide: ruleSegments[1] };
+      }
+
+      return result;
+    }, undefined) as {
+      type: '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]';
+      leftSide: string;
+      rightSide: string;
+    } | undefined;
+}
+
 function canFileBelongToThisDir(filePath: string, parentPaths: (string | RegExp)[]) {
   let pathSegments = filePath.split(path.sep);
   pathSegments = pathSegments.slice(0, pathSegments.length - 1);
@@ -13,26 +31,31 @@ function canFileBelongToThisDir(filePath: string, parentPaths: (string | RegExp)
 }
 
 function isNameValid(nameRule: string | RegExp, name: string) {
-  if (typeof nameRule === 'string') {
-    const camelCaseRuleSegments = nameRule.split('[camelCase]');
-    if (camelCaseRuleSegments.length === 2) {
-      const leftSide = camelCaseRuleSegments[0];
-      const rightSide = camelCaseRuleSegments[1];
-      const rightSideIndexOf = name.lastIndexOf(rightSide);
-
-      if (name.indexOf(leftSide) !== 0) { return false; }
-      if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
-
-      const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
-      if (filenameToValidate.length === 0) { return false; }
-
-      return _.camelCase(filenameToValidate) === filenameToValidate;
-    }
-
-    return nameRule === name;
+  if (nameRule instanceof RegExp) {
+    return nameRule.test(name);
   }
 
-  return nameRule.test(name);
+  const multimatchname = getMultimatchName(nameRule);
+  if (multimatchname) {
+    const { type, leftSide, rightSide } = multimatchname;
+    const rightSideIndexOf = name.lastIndexOf(rightSide);
+
+    if (name.indexOf(leftSide) !== 0) { return false; }
+    if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
+
+    const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
+    if (filenameToValidate.length === 0) { return false; }
+
+    switch (type) {
+      case '[camelCase]': return _.camelCase(filenameToValidate) === filenameToValidate;
+      case '[UPPERCASE]': return _.upperCase(filenameToValidate) === filenameToValidate;
+      case '[dash-case]': return _.kebabCase(filenameToValidate) === filenameToValidate;
+      case '[snake_case]': return _.snakeCase(filenameToValidate) === filenameToValidate;
+      default: return false;
+    }
+  }
+
+  return nameRule === name;
 }
 
 function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
@@ -56,51 +79,49 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
           throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
         }
 
-        if (rule.name === '[camelCase]') {
-          let isValidating = true;
-
-          while (isValidating) {
-            try {
-              if (newFiles.length === 0) { break; }
-              validateRules(rule.rules || [], [...paths, rule.name]);
-            } catch (err) {
-              isValidating = false;
-            }
+        // If dir rule can multimatch we iterate all possible dirs
+        // until validation throws or there are no more files to validate!
+        while (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
+          try {
+            if (newFiles.length === 0) { break; }
+            validateRules(rule.rules || [], [...paths, rule.name]);
+          } catch (err) {
+            break;
           }
         }
 
         if (rule.isRecursive) {
+          // We force rule to optional so we avoid recursively looking for
+          // this rule. (It's only needed the first time)
+          rule.isOptional = true;
+
           if (canDirHaveFiles) {
-            rule.isOptional = true;
             validateRules([rule], [...paths, rule.name]);
           } else {
-            rule.isOptional = true;
             rule.isRecursive = false;
           }
         }
 
         if (!rule.isOptional || canDirHaveFiles) {
-          // TODO: Change name children to rules
           validateRules(rule.rules || [], [...paths, rule.name]);
         }
 
         return;
       }
 
-      const filenameRule = rule.name;
-      const fileExtRule = rule.extension;
+      // File Rule validation
 
-      const filesThatCanBelongToThisDir = newFiles
-        .filter(file => canFileBelongToThisDir(file.name, paths));
+      const filesThatCanBelongToThisDir =
+        newFiles.filter(file => canFileBelongToThisDir(file.name, paths));
 
       const fileRulePassed = filesThatCanBelongToThisDir.reduce((result, file) => {
         const { base, name, ext } = path.parse(file.name);
 
-        if (!fileExtRule) {
-          file.isValidated = isNameValid(filenameRule, base);
+        if (!rule.extension) {
+          file.isValidated = isNameValid(rule.name, base);
         } else {
           file.isValidated =
-            isNameValid(filenameRule, name) && isFileExtValid(fileExtRule, ext.substring(1));
+            isNameValid(rule.name, name) && isFileExtValid(rule.extension, ext.substring(1));
         }
 
         return result || file.isValidated || !!rule.isOptional;
@@ -109,6 +130,11 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
       if (!fileRulePassed) {
         throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
       }
+
+      // Idea here is to remove all the files that were validated since there can
+      // be multiple matches from different dirs, we look for the dirPath with more
+      // file children validated and we remove them from the files to validate
+      // in the next iteration
 
       const parentPaths = _.groupBy(filesThatCanBelongToThisDir, el => {
         const pathFragments = el.name.split(path.sep);
@@ -120,12 +146,9 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
         return { length: parentPaths[el].length, dirPath: el };
       }, { length: 0, dirPath: '' });
 
-      // Removing files validated
       newFiles = newFiles.filter(el =>
         !filesThatCanBelongToThisDir
-          .filter(el => {
-            return el.isValidated && el.name.indexOf(dirPathToRemove.dirPath) === 0;
-          })
+          .filter(el => el.isValidated && el.name.indexOf(dirPathToRemove.dirPath) === 0)
           .some(el2 => el === el2)
       );
     });
