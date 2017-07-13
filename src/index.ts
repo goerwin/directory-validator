@@ -66,7 +66,10 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
 export function run(files: string[], configObject: Types.FileDirectoryArray) {
   let newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
-  function validateRules(rules: Types.FileDirectoryArray, paths: (string | RegExp)[] = ['.']) {
+  function validateRules(
+    rules: Types.FileDirectoryArray = [],
+    paths: (string | RegExp)[] = ['.']
+  ) {
     if (rules.length === 0) { return; }
 
     rules.forEach((rule, idx) => {
@@ -84,7 +87,7 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
         while (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
           try {
             if (newFiles.length === 0) { break; }
-            validateRules(rule.rules || [], [...paths, rule.name]);
+            validateRules(rule.rules, [...paths, rule.name]);
           } catch (err) {
             break;
           }
@@ -103,7 +106,7 @@ export function run(files: string[], configObject: Types.FileDirectoryArray) {
         }
 
         if (!rule.isOptional || canDirHaveFiles) {
-          validateRules(rule.rules || [], [...paths, rule.name]);
+          validateRules(rule.rules, [...paths, rule.name]);
         }
 
         return;

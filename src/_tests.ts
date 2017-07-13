@@ -3,6 +3,12 @@ import * as program from './';
 import * as Types from './types';
 
 describe('Module src:', () => {
+  it('should validate if not rules passed', () => {
+    assert.doesNotThrow(() => {
+      program.run([], []);
+    });
+  });
+
   describe('Files:', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
