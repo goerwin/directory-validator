@@ -261,6 +261,8 @@ describe('Module src:', () => {
         program.run(files, configObject);
       }, () => null);
     });
+
+    it('should allow empty dirs');
   });
 
   describe('Files/Directories:', () => {
@@ -500,36 +502,37 @@ describe('Module src:', () => {
       );
     });
 
-    it(`should throw when 2 dirs at same level have common files, their rules
-        dont satisfy them individually but they do satisfy in conjuntion`, () => {
-      const files = [
-        './package.json',
-        './.gitignore',
-        './src/file2.js',
-        './src2/file1.js'
-      ];
+    it('[UPPERCASE]');
+    it('[dash-case]');
+    it('[snake_case]');
 
-      const configObject: Types.FileDirectoryArray = [
-        { name: '.gitignore', type: 'file' },
-        { name: 'package.json', type: 'file' },
-        {
-          name: 'src',
-          type: 'directory',
-          children: [
-            { name: 'file1.js', type: 'file' }
-          ]
-        },
-        {
-          name: 'src2',
-          type: 'directory',
-          children: [
-            { name: 'file2.js', type: 'file' }
-          ]
-        }
-      ];
+    describe('Edge Cases:', () => {
+      it(`should throw when a rule matches 2 dirs (dirA, dirB), dirB's children
+          are a subset of dirA's. the rule satisfies dirA's children but does
+          not for dirB's`, () => {
+        const files = [
+          './dirA/index.js',
+          './dirA/X.js',
+          './dirA/Y.js',
+          './dirB/Y.js'
+        ];
 
-      assert.throws(() => {
-        program.run(files, configObject);
+        const configObject: Types.FileDirectoryArray = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            children: [
+              { name: 'index.js', type: 'file' },
+              { name: 'X.js', type: 'file' },
+              { name: 'Y.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes('lul')
+        );
       });
     });
 
