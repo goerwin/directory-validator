@@ -1,28 +1,7 @@
 import * as _ from 'lodash';
 import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
-
-// TODO: Move this to an external types file
-export interface File {
-  type: 'file';
-  name: string | RegExp;
-  extension?: string | RegExp;
-  isOptional?: boolean;
-}
-
-export interface Directory {
-  type: 'directory';
-  name: string | RegExp;
-  isOptional?: boolean;
-  isRecursive?: boolean;
-  children?: (Directory | File)[];
-}
-
-export type FileDirectoryArray = (File | Directory)[];
-
-function canDirHaveChildren() {
-
-}
+import * as Types from './types';
 
 function canFileBelongToThisDir(filePath: string, parentPaths: (string | RegExp)[]) {
   let pathSegments = filePath.split(path.sep);
@@ -61,26 +40,29 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
   return fileExtRule === ext;
 }
 
-export function run(files: string[], configObject: FileDirectoryArray) {
+export function run(files: string[], configObject: Types.FileDirectoryArray) {
   const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
-  const validateChildren = (children: FileDirectoryArray, paths: (string | RegExp)[] = ['.']) => {
+  const validateChildren = (
+    children: Types.FileDirectoryArray,
+    paths: (string | RegExp)[] = ['.']
+  ) => {
     if (children.length === 0) {
       return;
     }
 
     children.forEach(rule => {
       if (rule.type === 'directory') {
-        const couldHaveFiles = newFiles.some(el =>
+        const canDirHaveFiles = newFiles.some(el =>
           canFileBelongToThisDir(el.name, paths.concat(rule.name))
         );
 
-        if (!couldHaveFiles && !rule.isOptional) {
+        if (!canDirHaveFiles && !rule.isOptional) {
           throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
         }
 
         if (rule.isRecursive) {
-          if (couldHaveFiles) {
+          if (canDirHaveFiles) {
             rule.isOptional = true;
             validateChildren([rule], [...paths, rule.name]);
           } else {
@@ -89,7 +71,7 @@ export function run(files: string[], configObject: FileDirectoryArray) {
           }
         }
 
-        if (!rule.isOptional || couldHaveFiles) {
+        if (!rule.isOptional || canDirHaveFiles) {
           validateChildren(rule.children || [], [...paths, rule.name]);
         }
 
