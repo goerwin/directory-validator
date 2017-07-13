@@ -1,3 +1,4 @@
+// TODO: Rename to FileRule
 export interface File {
   type: 'file';
   name: string | RegExp;
@@ -5,6 +6,7 @@ export interface File {
   isOptional?: boolean;
 }
 
+// TODO: Rename to DirectoryRule
 export interface Directory {
   type: 'directory';
   name: string | RegExp;
@@ -13,4 +15,5 @@ export interface Directory {
   rules?: (Directory | File)[];
 }
 
+// TODO: Rename to Rules
 export type FileDirectoryArray = (File | Directory)[];

@@ -6,14 +6,23 @@ import * as path from 'path';
 import * as program from './program';
 import * as Types from './types';
 
-function getMainRules(dirPath: string, rulesPath: any): Types.FileDirectoryArray {
+import Ajv = require('ajv');
+
+function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.FileDirectoryArray {
   if (typeof rulesPath === 'string') {
-    try {
-      const rules = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
-      return rules as any;
-    } catch (err) {
-      throw err;
+    const rulesSchema = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../schema.json'), 'utf8')
+    );
+
+    const configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
+    const ajv = new Ajv();
+
+    if (!ajv.validate(rulesSchema, configJson)) {
+      const error = new Error(ajv.errorsText(ajv.errors));
+      throw error;
     }
+
+    return configJson.rules as Types.FileDirectoryArray;
   }
 
   return [];
@@ -49,7 +58,6 @@ if (!commander.args.length) {
     { recursive: true, ignoreDirs, ignoreFiles }
   );
 
-  const rules = getMainRules(dirPath, commander.rulesPath);
-  console.log(rules);
-  // program.run(files.map(el => el.path), rules);
+  const rules = getRulesFromJsonFile(commander.rulesPath, dirPath);
+  program.run(files.map(el => el.path), rules);
 }
