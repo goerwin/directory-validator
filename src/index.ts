@@ -19,6 +19,41 @@ export interface Directory {
 
 export type FileDirectoryArray = (File | Directory)[];
 
+// function canFileBelongsToThisDir(elPath: string, parentPaths: string[]) {
+//   const pathSegments = elPath.split(path.sep);
+//   if (parentPaths.length !== pathSegments.length) { return false; }
+
+//   // package.json
+//   // .
+//   pathSegments.slice(0, pathSegments.length - 1).every
+//   // [package.json, src]
+//   // [., src]
+//   switch (elPath) {
+//     case '[camelCase]': {
+
+//     }
+//   }
+// }
+
+function isNameValid(nameRule: string, name: string) {
+  const camelCaseRuleSegments = nameRule.split('[camelCase]');
+  if (camelCaseRuleSegments.length === 2) {
+    const leftSide = camelCaseRuleSegments[0];
+    const rightSide = camelCaseRuleSegments[1];
+    const rightSideIndexOf = name.lastIndexOf(rightSide);
+
+    if (name.indexOf(leftSide) !== 0) { return false; }
+    if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
+
+    const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
+    if (filenameToValidate.length === 0) { return false; }
+
+    return _.camelCase(filenameToValidate) === filenameToValidate;
+  }
+
+  return nameRule === name;
+}
+
 export function run(files: string[], configObject: FileDirectoryArray) {
   const newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
 
@@ -53,14 +88,16 @@ export function run(files: string[], configObject: FileDirectoryArray) {
         return;
       }
 
-      const filename = rule.name;
-      const fileExt = rule.extension;
+      const filenameRule = rule.name;
+      const fileExtRule = rule.extension;
       let fileRulePassed = false;
 
       fileRulePassed = newFiles
         .filter(file => {
           const doesFileBelongsToThisDir =
             path.dirname(file.name) === path.normalize(paths.join(path.sep));
+          // TODO: Get possible directories
+          // canFileBelongsToThisDir(file.name, paths);
 
           const isFileInCurrentDeep = file.name.split(path.sep).length === paths.length;
           return doesFileBelongsToThisDir && isFileInCurrentDeep;
@@ -70,13 +107,14 @@ export function run(files: string[], configObject: FileDirectoryArray) {
           const correctExt = ext.substring(1);
           let evaluation = true;
 
-          if (!fileExt) {
-            if (filename !== base) { evaluation = false; }
-          } else if (filename !== name) {
+          if (!fileExtRule) {
+            evaluation = isNameValid(filenameRule, base);
+            // if (filenameRule !== base) { evaluation = false; }
+          } else if (filenameRule !== name) {
             evaluation = false;
-          } else if (fileExt instanceof RegExp) {
-            if (!fileExt.test(correctExt)) { evaluation = false; }
-          } else if (fileExt !== correctExt) {
+          } else if (fileExtRule instanceof RegExp) {
+            if (!fileExtRule.test(correctExt)) { evaluation = false; }
+          } else if (fileExtRule !== correctExt) {
             evaluation = false;
           }
 

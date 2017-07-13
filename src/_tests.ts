@@ -108,6 +108,33 @@ describe('Module src:', () => {
           err.message.includes(`${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`)
       );
     });
+
+    describe('[camelCase]', () => {
+      it('should validate camelcased filenames', () => {
+        const files = ['./camelizedNamedPogChamp.json', './package.json'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: '[camelCase].json', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should throw because one file is not camelcased', () => {
+        const files = ['./camelizedNamedPogChamp.json', './package.json', './no-camelcase.js'];
+
+        const configObject: program.FileDirectoryArray = [
+          { name: '[camelCase].json', type: 'file' }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes('no-camelcase.js, was not validated')
+        );
+      });
+    });
   });
 
   describe('Directories:', () => {
@@ -413,6 +440,39 @@ describe('Module src:', () => {
         () => { program.run(files, configObject); },
         (err: Error) => err.message.includes(`${files[4]}, was not validated`)
       );
+    });
+
+    it(`should throw when 2 dirs at same level have common files, their rules
+        dont satisfy them individually but they do satisfy in conjuntion`, () => {
+      const files = [
+        './package.json',
+        './.gitignore',
+        './src/file2.js',
+        './src2/file1.js'
+      ];
+
+      const configObject: program.FileDirectoryArray = [
+        { name: '.gitignore', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        {
+          name: 'src',
+          type: 'directory',
+          children: [
+            { name: 'file1.js', type: 'file' }
+          ]
+        },
+        {
+          name: 'src2',
+          type: 'directory',
+          children: [
+            { name: 'file2.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.throws(() => {
+        program.run(files, configObject);
+      });
     });
   });
 });
