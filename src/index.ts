@@ -8,7 +8,7 @@ import * as Types from './types';
 
 import Ajv = require('ajv');
 
-function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.FileDirectoryArray {
+function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.Rules {
   if (typeof rulesPath === 'string') {
     const rulesSchema = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, '../schema.json'), 'utf8')
@@ -22,7 +22,7 @@ function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.FileDirect
       throw error;
     }
 
-    return configJson.rules as Types.FileDirectoryArray;
+    return configJson.rules as Types.Rules;
   }
 
   return [];

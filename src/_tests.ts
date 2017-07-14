@@ -19,7 +19,7 @@ describe('Module src:', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -32,7 +32,7 @@ describe('Module src:', () => {
     it('should throw because a rule did not passed', () => {
       const files = ['./.gitignore', './package.lul'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -49,7 +49,7 @@ describe('Module src:', () => {
     it('should throw if it has invalid files', () => {
       const files = ['./.gitignore', './package.json', 'extraneous.js'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' }
       ];
@@ -65,7 +65,7 @@ describe('Module src:', () => {
     it('should validate because rule is optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file', isOptional: true },
         { name: '.gitignore', type: 'file' }
@@ -81,7 +81,7 @@ describe('Module src:', () => {
     it('should throw because rule is not optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file' },
         { name: '.gitignore', type: 'file' }
@@ -100,7 +100,7 @@ describe('Module src:', () => {
       it('should validate using string', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: 'package', extension: 'json', type: 'file' },
           { name: '.gitignore', type: 'file' }
         ];
@@ -113,7 +113,7 @@ describe('Module src:', () => {
       it('should throw because wrong string extension', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: 'package', extension: '.json', type: 'file' },
           { name: '.gitignore', type: 'file' }
         ];
@@ -129,7 +129,7 @@ describe('Module src:', () => {
       it('should validate using regex', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: 'package', extension: /(json|js)/, type: 'file' },
           { name: '.gitignore', type: 'file' }
         ];
@@ -142,7 +142,7 @@ describe('Module src:', () => {
       it('should throw because wrong regex extension', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: 'package', extension: /.(json|js)/, type: 'file' },
           { name: '.gitignore', type: 'file' }
         ];
@@ -160,7 +160,7 @@ describe('Module src:', () => {
       it('should validate camelcased filenames', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: '[camelCase].json', type: 'file' }
         ];
 
@@ -173,7 +173,7 @@ describe('Module src:', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json', './no-camelcase.js'];
         const files2 = ['./no-camelcase.js', './camelizedNamedPogChamp.json', './package.json'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: '[camelCase].json', type: 'file' }
         ];
 
@@ -191,7 +191,7 @@ describe('Module src:', () => {
       it('should validate filenames', () => {
         const files = ['./index.js', './package.map'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: /[a-z]\.(js|map)/, type: 'file' }
         ];
 
@@ -203,7 +203,7 @@ describe('Module src:', () => {
       it('should throw because one file does not match', () => {
         const files = ['./index.js', './package.map', 'rip8.js'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: /[a-z]\.(js|map)/, type: 'file' }
         ];
 
@@ -219,7 +219,7 @@ describe('Module src:', () => {
     it('should validate a basic directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -238,7 +238,7 @@ describe('Module src:', () => {
     it('should validate if no rules for a directory', () => {
       const files = ['./src/index.js'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'src',
           type: 'directory'
@@ -253,7 +253,7 @@ describe('Module src:', () => {
     it('should throw because wrong name of directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'lol',
           type: 'directory',
@@ -273,10 +273,10 @@ describe('Module src:', () => {
       );
     });
 
-    it('should validate because optional directory as first and as last', () => {
+    it('should validate because optional directory as first and as last rule', () => {
       const files = ['./index.js'];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'index.js', type: 'file' },
         {
           name: 'src',
@@ -288,7 +288,7 @@ describe('Module src:', () => {
         }
       ];
 
-      const configObject2: Types.FileDirectoryArray = [
+      const configObject2: Types.Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -306,7 +306,97 @@ describe('Module src:', () => {
       }, () => null);
     });
 
-    it('should allow empty dirs');
+    it('should throw because an optional dir rule fails', () => {
+      const files = ['src/a.js'];
+
+      const configObject: Types.Rules = [
+        {
+          name: 'src',
+          type: 'directory',
+          isOptional: true,
+          rules: [
+            { name: 'index.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.throws(
+        () => { program.run(files, configObject); },
+        (err: Error) => err.message.includes('src/a.js, was not validated')
+      );
+    });
+
+    it('should throw if dir rule fails', () => {
+      const configObject: Types.Rules = [
+        {
+          name: 'lol',
+          type: 'directory'
+        }
+      ];
+
+      assert.throws(
+        () => { program.run([], configObject); },
+        (err: Error) =>
+          err.message.includes(`${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`)
+      );
+    });
+  });
+
+  describe('EmptyDirs:', () => {
+    it('should validate empty dir has no rules', () => {
+      const emptyDirs = ['src'];
+
+      const configObject: Types.Rules = [
+        {
+          name: 'src',
+          type: 'directory'
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run([], configObject, emptyDirs);
+      }, () => null);
+    });
+
+    it('should throw if empty dir has rules', () => {
+      const emptyDirs = ['src'];
+
+      const configObject: Types.Rules = [
+        {
+          name: 'src',
+          type: 'directory',
+          rules: [
+            { name: 'index.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.throws(
+        () => { program.run([], configObject, emptyDirs); },
+        (err: Error) =>
+          err.message.includes(
+            `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          )
+      );
+    });
+
+    it('should throw if an empty dir is not validated', () => {
+      const emptyDirs = ['lol', 'src'];
+
+      const configObject: Types.Rules = [
+        {
+          name: 'lol',
+          type: 'directory',
+          isOptional: true
+        }
+      ];
+
+      assert.throws(
+        () => { program.run([], configObject, emptyDirs); },
+        (err: Error) =>
+          err.message.includes('src, was not validated')
+      );
+    });
   });
 
   describe('Files/Directories:', () => {
@@ -318,7 +408,7 @@ describe('Module src:', () => {
         './src/blue.conf'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -347,7 +437,7 @@ describe('Module src:', () => {
         './src/dir4/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -406,7 +496,7 @@ describe('Module src:', () => {
         './src/src/src/src/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -427,7 +517,7 @@ describe('Module src:', () => {
         './package.json'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         { name: 'package.json', type: 'file' },
         {
           name: 'src',
@@ -449,7 +539,7 @@ describe('Module src:', () => {
         recursion and optional because recursive folder not found`, () => {
         const files = ['./package.json', './.gitignore'];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           { name: '.gitignore', type: 'file' },
           { name: 'package.json', type: 'file' },
           {
@@ -479,7 +569,7 @@ describe('Module src:', () => {
         'src/src/src/src/index.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -509,7 +599,7 @@ describe('Module src:', () => {
           './src/dir4/index.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: 'src',
             type: 'directory',
@@ -576,7 +666,7 @@ describe('Module src:', () => {
           './dirB/Y.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -593,7 +683,7 @@ describe('Module src:', () => {
           (err: Error) =>
             err.message.includes(
               `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![2]
+                configObject[0] as Types.DirectoryRule).rules![2]
               )}, deep: 2, rule did not passed`
             )
         );
@@ -609,7 +699,7 @@ describe('Module src:', () => {
           './dirB/Y.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -626,7 +716,7 @@ describe('Module src:', () => {
           (err: Error) =>
             err.message.includes(
               `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![0]
+                configObject[0] as Types.DirectoryRule).rules![0]
               )}, deep: 2, rule did not passed`
             )
         );
@@ -643,7 +733,7 @@ describe('Module src:', () => {
         ];
         it('do this with folders too');
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -660,7 +750,7 @@ describe('Module src:', () => {
           (err: Error) =>
             err.message.includes(
               `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![0]
+                configObject[0] as Types.DirectoryRule).rules![0]
               )}, deep: 2, rule did not passed`
             )
         );
@@ -675,7 +765,7 @@ describe('Module src:', () => {
           './srcThisWorksToo/index.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: /src.*/,
             type: 'directory',
@@ -697,7 +787,7 @@ describe('Module src:', () => {
           './srcThisWorksToo/index.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: /src.*/,
             type: 'directory',
@@ -723,7 +813,7 @@ describe('Module src:', () => {
           './srcLul/index.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -745,7 +835,7 @@ describe('Module src:', () => {
           './srcLul/index.js'
         ];
 
-        const configObject: Types.FileDirectoryArray = [
+        const configObject: Types.Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -770,7 +860,7 @@ describe('Module src:', () => {
         './src2/index2.js'
       ];
 
-      const configObject: Types.FileDirectoryArray = [
+      const configObject: Types.Rules = [
         {
           name: '[camelCase]',
           type: 'directory',
