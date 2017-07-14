@@ -63,11 +63,23 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
   return fileExtRule === ext;
 }
 
+function canDirExist(paths: (string | RegExp)[], files: string[]) {
+  return files.some(el => canFileBelongToThisDir(el, paths));
+}
+
+function getFilePathsGroupedByParent(files: { path: string }[]) {
+  return _.groupBy(files, el => {
+    const pathFragments = el.path.split(path.sep);
+    return pathFragments.slice(0, pathFragments.length - 1).join(path.sep);
+  });
+}
+
 export function run(files: string[], mainRules: Types.FileDirectoryArray) {
   if (files.length === 0) { return; }
   if (mainRules.length === 0) { return; }
 
-  let newFiles = files.map(el => ({ name: path.normalize(el), isValidated: false }));
+  const newFiles = files
+    .map(el => ({ path: path.normalize(el), isGood: false, isValidated: false }));
 
   function validateRules(
     rules: Types.FileDirectoryArray = [],
@@ -76,98 +88,108 @@ export function run(files: string[], mainRules: Types.FileDirectoryArray) {
     if (rules.length === 0) { return; }
 
     rules.forEach((rule, idx) => {
-      if (rule.type === 'directory') {
-        const canDirHaveFiles = newFiles.some(el =>
-          canFileBelongToThisDir(el.name, paths.concat(rule.name))
-        );
+      if (rule.type === 'file') {
+        const filesThatCanBelongToThisDir =
+          newFiles.filter(file => canFileBelongToThisDir(file.path, paths));
 
-        if (!canDirHaveFiles && !rule.isOptional) {
+        // IF more than one file matches the rule then it passes
+        const fileRulePassed = filesThatCanBelongToThisDir.reduce((result, file) => {
+          const { base, name, ext } = path.parse(file.path);
+          let isFileValid;
+
+          if (!rule.extension) {
+            isFileValid = isNameValid(rule.name, base);
+          } else {
+            isFileValid =
+              isNameValid(rule.name, name) && isFileExtValid(rule.extension, ext.substring(1));
+          }
+
+          file.isValidated = file.isValidated || isFileValid;
+          return result || isFileValid;
+        }, newFiles.length === 0);
+
+        if (!fileRulePassed && !rule.isOptional) {
           throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
         }
 
-        // If dir rule can multimatch we iterate all possible dirs
-        // until validation throws or there are no more files to validate!
-        while (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
-          try {
-            if (newFiles.length === 0) { break; }
-            validateRules(rule.rules, [...paths, rule.name]);
-          } catch (err) {
-            break;
-          }
-        }
+        // Idea here is to remove all the files that were validated after all rules of
+        // a particular directory successfully passed.
+        // Since there can be multiple children matches from different dirs, we look for
+        // the dirPath with more children validated so that we remove them from the files
+        // to validate in the next iteration
+        if (rules.slice(idx + 1).some(el => el.type === 'file')) { return; }
 
-        if (rule.isRecursive) {
-          // We force rule to optional so we avoid recursively looking for
-          // this rule. (It's only needed the first time)
-          rule.isOptional = true;
+        const parentPaths = getFilePathsGroupedByParent(filesThatCanBelongToThisDir);
 
-          if (canDirHaveFiles) {
-            validateRules([rule], [...paths, rule.name]);
-          } else {
-            rule.isRecursive = false;
-          }
-        }
+        const dirPathToRemove = _.keys(parentPaths).reduce((result, el) => {
+          if (parentPaths[el].length <= result.length) { return result; }
+          return { length: parentPaths[el].length, dirPath: el };
+        }, { length: 0, dirPath: '' });
 
-        if (!rule.isOptional || canDirHaveFiles) {
-          validateRules(rule.rules, [...paths, rule.name]);
+        filesThatCanBelongToThisDir
+          .filter(el => el.isValidated && el.path.indexOf(dirPathToRemove.dirPath) === 0)
+          .forEach(el => { el.isGood = true; });
+
+        newFiles.forEach(el => { el.isValidated = false; });
+
+        return;
+      }
+
+      // Directory Rule
+
+      const filesThatCanBelongToThisDir = newFiles
+        .filter(el => canFileBelongToThisDir(el.path, [...paths, rule.name]));
+
+      const canThisDirExist = canDirExist([...paths, rule.name], newFiles.map(el => el.path));
+
+      if (!canThisDirExist) {
+        rule.isRecursive = false;
+        if (rule.isOptional) { return; }
+        throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+      }
+
+      if ((rule.rules || []).length === 0) {
+        filesThatCanBelongToThisDir.forEach(el => { el.isGood = true; });
+        return;
+      }
+
+      if (filesThatCanBelongToThisDir.length === 0) {
+        throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+      }
+
+      if (rule.isRecursive) {
+        // We force rule to optional so we avoid recursively looking for
+        // this rule. (It's only needed the first time)
+        rule.isOptional = true;
+
+        validateRules([rule], [...paths, rule.name]);
+        validateRules(rule.rules, [...paths, rule.name]);
+        return;
+      }
+
+      // If dir rule can multimatch we iterate all possible dirs
+      // until validation throws or there are no more files to validate!
+
+      if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
+        const parentPaths = getFilePathsGroupedByParent(filesThatCanBelongToThisDir);
+        const parentPathsArray = _.keys(parentPaths);
+
+        for (let i = 0; i < parentPathsArray.length; i += 1) {
+          validateRules(rule.rules, [...paths, parentPathsArray[i]]);
         }
 
         return;
       }
 
-      // File Rule validation
-
-      const filesThatCanBelongToThisDir =
-        newFiles.filter(file => canFileBelongToThisDir(file.name, paths));
-
-      const fileRulePassed = filesThatCanBelongToThisDir.reduce((result, file) => {
-        const { base, name, ext } = path.parse(file.name);
-        let isValid;
-
-        if (!rule.extension) {
-          isValid = isNameValid(rule.name, base);
-        } else {
-          isValid =
-            isNameValid(rule.name, name) && isFileExtValid(rule.extension, ext.substring(1));
-        }
-
-        file.isValidated = file.isValidated || isValid;
-        return result || isValid || !!rule.isOptional;
-      }, newFiles.length === 0);
-
-      if (!fileRulePassed) {
-        throw new Error(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+      if (!rule.isOptional) {
+        validateRules(rule.rules, [...paths, rule.name]);
       }
-
-      if (idx !== rules.length - 1) { return; }
-
-      // Idea here is to remove all the files that were validated after all rules of
-      // a particular directory successfully passed.
-      // Since there can be multiple children matches from different dirs, we look for
-      // the dirPath with more children validated so that we remove them from the files
-      // to validate in the next iteration
-
-      const parentPaths = _.groupBy(filesThatCanBelongToThisDir, el => {
-        const pathFragments = el.name.split(path.sep);
-        return pathFragments.slice(0, pathFragments.length - 1).join(path.sep);
-      });
-
-      const dirPathToRemove = _.keys(parentPaths).reduce((result, el) => {
-        if (parentPaths[el].length <= result.length) { return result; }
-        return { length: parentPaths[el].length, dirPath: el };
-      }, { length: 0, dirPath: '' });
-
-      newFiles = newFiles.filter(el =>
-        !filesThatCanBelongToThisDir
-          .filter(el => el.isValidated && el.name.indexOf(dirPathToRemove.dirPath) === 0)
-          .some(el2 => el === el2)
-      );
     });
   }
 
   validateRules(mainRules);
 
   newFiles.forEach(el => {
-    if (!el.isValidated) { throw new Error(`${el.name}, was not validated`); }
+    if (!el.isGood) { throw new Error(`${el.path}, was not validated`); }
   });
 }

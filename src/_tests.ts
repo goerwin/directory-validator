@@ -169,15 +169,19 @@ describe('Module src:', () => {
         }, () => null);
       });
 
-      it('should throw because one file is not camelcased', () => {
+      it('should throw because one file is not camelcased as first/last', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json', './no-camelcase.js'];
+        const files2 = ['./no-camelcase.js', './camelizedNamedPogChamp.json', './package.json'];
 
         const configObject: Types.FileDirectoryArray = [
           { name: '[camelCase].json', type: 'file' }
         ];
 
         assert.throws(
-          () => { program.run(files, configObject); },
+          () => {
+            program.run(files, configObject);
+            program.run(files2, configObject);
+          },
           (err: Error) => err.message.includes('no-camelcase.js, was not validated')
         );
       });
@@ -231,6 +235,21 @@ describe('Module src:', () => {
       }, () => null);
     });
 
+    it('should validate if no rules for a directory', () => {
+      const files = ['./src/index.js'];
+
+      const configObject: Types.FileDirectoryArray = [
+        {
+          name: 'src',
+          type: 'directory'
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
+      }, () => null);
+    });
+
     it('should throw because wrong name of directory', () => {
       const files = ['./src/nice file.js', './src/blue.conf'];
 
@@ -254,7 +273,7 @@ describe('Module src:', () => {
       );
     });
 
-    it('should validate because optional directory', () => {
+    it('should validate because optional directory as first and as last', () => {
       const files = ['./index.js'];
 
       const configObject: Types.FileDirectoryArray = [
@@ -269,8 +288,21 @@ describe('Module src:', () => {
         }
       ];
 
+      const configObject2: Types.FileDirectoryArray = [
+        {
+          name: 'src',
+          type: 'directory',
+          isOptional: true,
+          rules: [
+            { name: 'blue.conf', type: 'file' }
+          ]
+        },
+        { name: 'index.js', type: 'file' }
+      ];
+
       assert.doesNotThrow(() => {
         program.run(files, configObject);
+        program.run(files, configObject2);
       }, () => null);
     });
 
@@ -306,8 +338,6 @@ describe('Module src:', () => {
 
     it('should validate a complex tree with no recursion', () => {
       const files = [
-        './package.json',
-        './.gitignore',
         './src/nice file.js',
         './src/blue.conf',
         './src/dir2/index.js',
@@ -318,8 +348,6 @@ describe('Module src:', () => {
       ];
 
       const configObject: Types.FileDirectoryArray = [
-        { name: '.gitignore', type: 'file' },
-        { name: 'package.json', type: 'file' },
         {
           name: 'src',
           type: 'directory',
@@ -372,8 +400,6 @@ describe('Module src:', () => {
 
     it('should validate a simple tree with recursion', () => {
       const files = [
-        './package.json',
-        './.gitignore',
         './src/index.js',
         './src/src/index.js',
         './src/src/src/index.js',
@@ -381,8 +407,6 @@ describe('Module src:', () => {
       ];
 
       const configObject: Types.FileDirectoryArray = [
-        { name: '.gitignore', type: 'file' },
-        { name: 'package.json', type: 'file' },
         {
           name: 'src',
           type: 'directory',
@@ -398,38 +422,61 @@ describe('Module src:', () => {
       }, () => null);
     });
 
-    it(`should throw in a simple tree with
-        recursion and optional because recursive folder not found`, () => {
-      const files = ['./package.json', './.gitignore'];
+    it('should not throw because recursive rule is optional', () => {
+      const files = [
+        './package.json'
+      ];
 
       const configObject: Types.FileDirectoryArray = [
-        { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
           name: 'src',
           type: 'directory',
           isRecursive: true,
+          isOptional: true,
           rules: [
             { name: 'index.js', type: 'file' }
           ]
         }
       ];
 
-      assert.throws(
-        () => { program.run(files, configObject); },
-        (err: Error) => err.message.includes(
-          `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`
-        )
-      );
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
+      }, () => null);
     });
+
+    it(`should throw in a simple tree with
+        recursion and optional because recursive folder not found`, () => {
+        const files = ['./package.json', './.gitignore'];
+
+        const configObject: Types.FileDirectoryArray = [
+          { name: '.gitignore', type: 'file' },
+          { name: 'package.json', type: 'file' },
+          {
+            name: 'src',
+            type: 'directory',
+            isRecursive: true,
+            rules: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes(
+            `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`
+          )
+        );
+      });
 
     it('should throw a simple tree with recursion because random file', () => {
       const files = [
-        './src/index.js',
-        './src/src/index.js',
-        './src/src/src/index.js',
+        'src/index.js',
+        'src/src/index.js',
+        'src/src/src/index.js',
         'src/src/src/index2.js',
-        './src/src/src/src/index.js'
+        'src/src/src/src/index.js'
       ];
 
       const configObject: Types.FileDirectoryArray = [
@@ -451,68 +498,68 @@ describe('Module src:', () => {
 
     it(`should throw when files with same name in same level but
         different directories and one dir does not allow them`, () => {
-      const files = [
-        './src/nice file.js',
-        './src/blue.conf',
-        './src/dir2/index.js',
-        './src/dir2/dir2-1/index.js',
-        'src/dir2/dir2-2/index.js',
-        './src/dir2/dir2-2/index2.js',
-        './src/dir3/index.js',
-        './src/dir4/index.js'
-      ];
+        const files = [
+          './src/nice file.js',
+          './src/blue.conf',
+          './src/dir2/index.js',
+          './src/dir2/dir2-1/index.js',
+          'src/dir2/dir2-2/index.js',
+          './src/dir2/dir2-2/index2.js',
+          './src/dir3/index.js',
+          './src/dir4/index.js'
+        ];
 
-      const configObject: Types.FileDirectoryArray = [
-        {
-          name: 'src',
-          type: 'directory',
-          rules: [
-            { name: 'nice file.js', type: 'file' },
-            { name: 'blue.conf', type: 'file' },
-            {
-              name: 'dir2',
-              type: 'directory',
-              rules: [
-                { name: 'index.js', type: 'file' },
-                {
-                  name: 'dir2-1',
-                  type: 'directory',
-                  rules: [
-                    { name: 'index.js', type: 'file' }
-                  ]
-                },
-                {
-                  name: 'dir2-2',
-                  type: 'directory',
-                  rules: [
-                    { name: 'index2.js', type: 'file' }
-                  ]
-                }
-              ]
-            },
-            {
-              name: 'dir3',
-              type: 'directory',
-              rules: [
-                { name: 'index.js', type: 'file' }
-              ]
-            },
-            {
-              name: 'dir4',
-              type: 'directory',
-              rules: [
-                { name: 'index.js', type: 'file' }
-              ]
-            }
-          ]
-        }
-      ];
+        const configObject: Types.FileDirectoryArray = [
+          {
+            name: 'src',
+            type: 'directory',
+            rules: [
+              { name: 'nice file.js', type: 'file' },
+              { name: 'blue.conf', type: 'file' },
+              {
+                name: 'dir2',
+                type: 'directory',
+                rules: [
+                  { name: 'index.js', type: 'file' },
+                  {
+                    name: 'dir2-1',
+                    type: 'directory',
+                    rules: [
+                      { name: 'index.js', type: 'file' }
+                    ]
+                  },
+                  {
+                    name: 'dir2-2',
+                    type: 'directory',
+                    rules: [
+                      { name: 'index2.js', type: 'file' }
+                    ]
+                  }
+                ]
+              },
+              {
+                name: 'dir3',
+                type: 'directory',
+                rules: [
+                  { name: 'index.js', type: 'file' }
+                ]
+              },
+              {
+                name: 'dir4',
+                type: 'directory',
+                rules: [
+                  { name: 'index.js', type: 'file' }
+                ]
+              }
+            ]
+          }
+        ];
 
-      assert.throws(
-        () => { program.run(files, configObject); },
-        (err: Error) => err.message.includes(`${files[4]}, was not validated`)
-      );
-    });
+        assert.throws(
+          () => { program.run(files, configObject); },
+          (err: Error) => err.message.includes(`${files[4]}, was not validated`)
+        );
+      });
 
     it('[UPPERCASE]');
     it('[dash-case]');
@@ -546,7 +593,7 @@ describe('Module src:', () => {
           (err: Error) =>
             err.message.includes(
               `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![1]
+                configObject[0] as Types.Directory).rules![2]
               )}, deep: 2, rule did not passed`
             )
         );
@@ -663,11 +710,7 @@ describe('Module src:', () => {
         assert.throws(
           () => { program.run(files, configObject); },
           (err: Error) =>
-            err.message.includes(
-              `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![0]
-              )}, deep: 2, rule did not passed`
-            )
+            err.message.includes('srrcNice/index.js, was not validated')
         );
       });
     });
@@ -695,7 +738,7 @@ describe('Module src:', () => {
         }, () => null);
       });
 
-      it('should throw because one dirname is not camelcase', () => {
+      it('should throw because one dirname is not camelcased', () => {
         const files = [
           './src/index.js',
           './SRC/index.js',
@@ -714,13 +757,40 @@ describe('Module src:', () => {
 
         assert.throws(
           () => { program.run(files, configObject); },
-          (err: Error) =>
-            err.message.includes(
-              `${JSON.stringify((
-                configObject[0] as Types.Directory).rules![0]
-              )}, deep: 2, rule did not passed`
-            )
+          (err: Error) => err.message.includes('SRC/index.js, was not validated')
         );
+      });
+    });
+
+    it('should validate if multiple dir rules match same dirs', () => {
+      const files = [
+        './src/index.js',
+        './src/index2.js',
+        './src2/index.js',
+        './src2/index2.js'
+      ];
+
+      const configObject: Types.FileDirectoryArray = [
+        {
+          name: '[camelCase]',
+          type: 'directory',
+          rules: [
+            { name: 'index.js', type: 'file' },
+            { name: 'index2.js', type: 'file' }
+          ]
+        },
+        {
+          name: 'src2',
+          type: 'directory',
+          rules: [
+            { name: 'index.js', type: 'file' },
+            { name: 'index2.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
       });
     });
   });

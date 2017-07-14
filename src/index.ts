@@ -59,5 +59,5 @@ if (!commander.args.length) {
   );
 
   const rules = getRulesFromJsonFile(commander.rulesPath, dirPath);
-  program.run(files.map(el => el.path), rules);
+  program.run(files.filter(el => !el.isIgnored).map(el => el.path), rules);
 }
