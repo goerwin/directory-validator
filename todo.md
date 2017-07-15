@@ -1,15 +1,14 @@
 
 # TODO
-- create bin file
-- allow RegExp in names/extensions
 - add a init option to create a config template
 - should have a config file .directoryschema.json that
   should work like any config file
-  -
 - option to print the directory structure printed
 - allow rules to be exclusive
 
 # DONE
+- allow RegExp in names/extensions
+- create bin file
 - what if you want 2 dirs in a directory and the rest can be whatever?
   - { name: * } should validate all the files/dirs recursively
 - better errors in console
