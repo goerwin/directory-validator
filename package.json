@@ -6,8 +6,10 @@
   "scripts": {
     "build": "npm run test && rm -rf lib && tsc",
     "test": "mocha -r source-map-support/register --compilers ts-node/register src/_tests.ts",
-    "test-coverage": "nyc --all --reporter=html --reporter=text npm run test",
-    "test-watch": "chokidar src/**/*.ts -c 'npm run test'"
+    "test-coverage": "nyc --reporter html --reporter text npm run test",
+    "test-coverage-coveralls": "npm run test-coverage && nyc report --reporter=text-lcov | coveralls",
+    "test-watch": "chokidar src/**/*.ts -c 'npm run test'",
+    "test-watch-coverage": "chokidar src/**/*.ts -c 'npm run test-coverage'"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
   "license": "ISC",
@@ -20,6 +22,7 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.10",
     "chokidar-cli": "^1.2.0",
+    "coveralls": "^2.13.1",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "ts-node": "^3.2.0",
@@ -40,8 +43,7 @@
     "exclude": [
       "src/errors.ts",
       "src/index.ts",
-      "src/types.ts",
-      "lib"
+      "src/types.ts"
     ],
     "extension": [
       ".ts",
