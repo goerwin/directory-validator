@@ -13,7 +13,7 @@ import * as types from './types';
 
 import Ajv = require('ajv');
 const schema = require('../supportFiles/schema.json');
-const initConfigFilename = '.directoryschema.json';
+const initConfigFilename = '.directoryvalidator.json';
 
 function getConfigValues(config: any, rulesPath: string): types.Config {
   const ajv = new Ajv();

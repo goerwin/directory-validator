@@ -9,7 +9,7 @@
   "rules": [
     {
       "type": "file",
-      "name": ".directoryschema.json",
+      "name": ".directoryvalidator.json",
       "isOptional": true
     },
     {
