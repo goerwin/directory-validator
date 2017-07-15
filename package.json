@@ -4,7 +4,7 @@
   "description": "Validates folder structure",
   "main": "index.js",
   "scripts": {
-    "build": "npm run test && rm -rf dist && tsc",
+    "build": "npm run test && rm -rf lib && tsc",
     "test": "mocha -r source-map-support/register --compilers ts-node/register src/_tests.ts",
     "test-coverage": "nyc --all --reporter=html --reporter=text npm run test",
     "test-watch": "chokidar src/**/*.ts -c 'npm run test'"
