@@ -206,6 +206,21 @@ describe('Module src:', () => {
       });
     });
 
+    describe('*:', () => {
+      it('should validate all files', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: types.Rules = [
+          { name: 'package.json', type: 'file' },
+          { name: '.*', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        });
+      });
+    });
+
     describe('RegExp:', () => {
       it('should validate filenames', () => {
         const files = ['./index.js', './package.map'];
@@ -462,6 +477,26 @@ describe('Module src:', () => {
     });
   });
 
+  describe('*:', () => {
+    it('should validate a basic directory', () => {
+      const files = ['./src/file.js', './omg/file.js'];
+
+      const configObject: types.Rules = [
+        {
+          name: '*',
+          type: 'directory',
+          rules: [
+            { name: 'file.js', type: 'file' }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
+      });
+    });
+  });
+
   describe('Files/Directories:', () => {
     it('should validate basic directories/files mixed', () => {
       const files = [
@@ -714,7 +749,6 @@ describe('Module src:', () => {
         );
       });
 
-    it('*');
     it('[UPPERCASE]');
     it('[dash-case]');
     it('[snake_case]');
