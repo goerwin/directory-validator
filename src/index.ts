@@ -49,15 +49,16 @@ if (!commander.args.length) {
   const ignoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
   const ignoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
 
-  const files = nodeHelpers.file.getChildFiles(
-    dirPath,
-    { recursive: true, ignoreDirs, ignoreFiles }
-  );
-  const dirs = nodeHelpers.file.getChildDirs(
-    dirPath,
-    { recursive: true, ignoreDirs, ignoreFiles }
-  );
+  const files = nodeHelpers.file
+    .getChildFiles(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
+    .filter(el => !el.isIgnored)
+    .map(el => el.path);
+
+  const emptyDirs = nodeHelpers.file
+    .getChildDirs(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
+    .filter(el => el.isEmpty)
+    .map(el => el.path);
 
   const rules = getRulesFromJsonFile(commander.rulesPath, dirPath);
-  program.run(files.filter(el => !el.isIgnored).map(el => el.path), rules);
+  program.run(files, rules, emptyDirs);
 }
