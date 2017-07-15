@@ -59,7 +59,7 @@ function isNameValid(nameRule: string | RegExp, name: string) {
     if ((rightSideIndexOf + rightSide.length) !== name.length) { return false; }
 
     const filenameToValidate = name.substring(leftSide.length, rightSideIndexOf);
-    if (filenameToValidate.length === 0) { return false; }
+    if (filenameToValidate.length === 0 && type !== '*') { return false; }
 
     switch (type) {
       case '[camelCase]': return _.camelCase(filenameToValidate) === filenameToValidate;

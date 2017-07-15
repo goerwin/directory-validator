@@ -102,6 +102,7 @@ if (commander.init) {
   try {
     const { ignoreFiles, ignoreDirs, rules } = getConfig(commander.configFile, dirPath);
 
+    // Ignore Files
     let ignoreFilesGlob: string | undefined;
     if (ignoreFiles && ignoreFiles.length > 0) {
       ignoreFilesGlob = `{${[ignoreFiles[0], ...ignoreFiles].join(',')}}`;
@@ -109,6 +110,7 @@ if (commander.init) {
     ignoreFilesGlob = commander.ignoreFiles || ignoreFilesGlob;
     const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
 
+    // Ignore Dirs
     let ignoreDirsGlob: string | undefined;
     if (ignoreDirs && ignoreDirs.length > 0) {
       ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
@@ -117,12 +119,18 @@ if (commander.init) {
     const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
 
     const files = nodeHelpers.file
-      .getChildFiles(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
+      .getChildFiles(
+        dirPath,
+        { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+      )
       .filter(el => !el.isIgnored)
       .map(el => el.path);
 
     const emptyDirs = nodeHelpers.file
-      .getChildDirs(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
+      .getChildDirs(
+        dirPath,
+        { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+      )
       .filter(el => !el.isIgnored)
       .filter(el => el.isEmpty)
       .map(el => el.path);

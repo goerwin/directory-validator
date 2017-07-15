@@ -1,5 +1,6 @@
 
 # TODO
+- parse names starting/ending with "/" to regexp
 - option to print the directory structure printed
 - allow rules to be exclusive
 

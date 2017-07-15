@@ -3,7 +3,8 @@
     ".gitignore"
   ],
   "ignoreDirs": [
-    "node_modules"
+    "node_modules",
+    ".git"
   ],
   "rules": [
     {
@@ -17,7 +18,7 @@
     },
     {
       "type": "directory",
-      "name": ".git",
+      "name": "src",
       "rules": []
     }
   ]

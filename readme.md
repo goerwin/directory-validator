@@ -4,21 +4,18 @@
 [![Coverage Status](https://coveralls.io/repos/github/erwingo/directory-schema-validator/badge.svg?branch=master)](https://coveralls.io/github/erwingo/directory-schema-validator?branch=master)
 
 Tool to validate directory structures.
-
-If you want to have control over what files/dirs a directory can have then this
-can be useful.
+If you want to have control over what files/dirs a directory can have then this can be useful.
 
 ## Installation
 
 ```
 # TODO: Pending to publish it to NPM
 $ npm install -g https://github.com/erwingo/directory-schema-validator
-
 ```
 
 ## Usage
 
-Create a configuration file `.directoryschema.json` to start with:
+Generate a configuration file `.directoryschema.json` to start with:
 ```
 $ directory-schema-validator --init
 ```
@@ -54,7 +51,7 @@ The tool will evaluate the rules provided by the configuration file against the 
 }
 ```
 
-In this example, we want our directory to have one file named `package.json` and one directory named `.git` and nothing else (`node_modules` and `.gitignore` were omitted).
+In this example, we want our directory to have one file named `package.json` and one directory named `.git` and nothing else (`node_modules` and `.gitignore` were ignored).
 
 If our directory has any file/dir other than the ones in the rules, the tool will throw an error.
 
