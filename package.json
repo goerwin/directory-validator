@@ -55,5 +55,21 @@
     "require": [
       "ts-node/register"
     ]
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erwingo/directory-schema-validator.git"
+  },
+  "keywords": [
+    "validator",
+    "directory",
+    "folder"
+  ],
+  "bugs": {
+    "url": "https://github.com/erwingo/directory-schema-validator/issues"
+  },
+  "homepage": "https://github.com/erwingo/directory-schema-validator#readme"
 }

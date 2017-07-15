@@ -9,8 +9,7 @@ If you want to have control over what files/dirs a directory can have then this 
 ## Installation
 
 ```
-# TODO: Pending to publish it to NPM
-$ npm install -g https://github.com/erwingo/directory-schema-validator
+$ npm install -g directory-schema-validator
 ```
 
 ## Usage
