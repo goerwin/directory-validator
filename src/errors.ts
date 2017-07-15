@@ -1,3 +1,5 @@
+import * as Types from './types';
+
 export class JsonParseError extends Error {
   err: Error;
   rulesPath: string;
@@ -20,4 +22,22 @@ export class ConfigJsonValidateError extends Error {
   }
 }
 
-export class ProgramError extends Error { }
+export class ProgramRuleError extends Error {
+  paths: (string | RegExp)[];
+  rule: (Types.FileRule | Types.DirectoryRule);
+
+  constructor(rule: Types.FileRule | Types.DirectoryRule, paths: (string | RegExp)[]) {
+    super(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+    this.rule = rule;
+    this.paths = paths;
+  }
+}
+
+export class ProgramInvalidPathError extends Error {
+  path: string;
+
+  constructor(path: string) {
+    super(`${path}, was not validated`);
+    this.path = path;
+  }
+}

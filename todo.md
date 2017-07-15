@@ -1,11 +1,13 @@
 
 # TODO
-- better errors in console
 - should have a config file directoryschema.json that
   should work like any config file
+- option to print the directory structure printed
+- create bin file
 - allow rules to be exclusive
 
 # DONE
+- better errors in console
 - rename it to directory-schema-validator
 - read config from passed file
 - allow dir rules to be inclusive

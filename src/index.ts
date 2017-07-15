@@ -95,16 +95,27 @@ if (!commander.args.length) {
 
     program.run(files, rules, emptyDirs);
   } catch (err) {
+    const dash = '-'.bold;
+    const errorTitle = '\n\t' + 'Error:'.bold.red.underline;
+
     if (err instanceof errors.JsonParseError) {
-      console.log('\n\t', 'Error:'.bold.red.underline, 'at config file:'.red, err.rulesPath);
-      console.log('\t', '-'.bold, 'Could not parse/read the file');
-      console.log('\t', '-'.bold, err.message);
+      console.log(errorTitle, 'at config file:'.red, err.rulesPath);
+      console.log('\t', dash, 'Could not parse/read the file');
+      console.log('\t', dash, err.message);
     } else if (err instanceof errors.ConfigJsonValidateError) {
-      console.log('\n\t', 'Error:'.bold.red.underline, 'at config file:'.red, err.rulesPath);
-      err.messages.forEach(el => console.log('\t', '-'.bold, `${el[0].red}:`, el[1]));
+      console.log(errorTitle, 'at config file:'.red, err.rulesPath);
+      err.messages.forEach(el => console.log('\t', dash, `${el[0].red}:`, el[1]));
+    } else if (err instanceof errors.ProgramRuleError) {
+      console.log(errorTitle);
+      const parentPath = err.paths.join(path.sep);
+      const rule = JSON.stringify(err.rule);
+      console.log('\t', dash, 'Rule', rule.red, 'did not passed at:', parentPath.red);
+    } else if (err instanceof errors.ProgramInvalidPathError) {
+      console.log(errorTitle);
+      console.log('\t', dash, err.path.red, 'was not validated');
     } else {
-      console.log('\n\t', 'Error:'.bold.red.underline);
-      console.log('\t', err.message.red);
+      console.log(errorTitle);
+      console.log('\t', dash, err.message.red);
     }
 
     console.log();

@@ -86,13 +86,13 @@ function getValidatableFiles(files: string[]): Types.ValidatableFile[] {
   return files.map(el => ({ path: path.normalize(el), isGood: false, isValidated: false }));
 }
 
-function getRuleError(rule: (Types.FileRule | Types.DirectoryRule), deep: number) {
-  return new errors.ProgramError(`${JSON.stringify(rule)}, deep: ${deep}, rule did not passed`);
+function getRuleError(rule: (Types.FileRule | Types.DirectoryRule), paths: (string | RegExp)[]) {
+  return new errors.ProgramRuleError(rule, paths);
 }
 
 function validatePath(element: { path: string, isGood: boolean }) {
   if (!element.isGood) {
-    throw new errors.ProgramError(`${element.path}, was not validated`);
+    throw new errors.ProgramInvalidPathError(element.path);
   }
 }
 
@@ -126,7 +126,7 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
         }, newFiles.length === 0);
 
         if (!fileRulePassed && !rule.isOptional) {
-          throw getRuleError(rule, paths.length);
+          throw getRuleError(rule, paths);
         }
 
         // If there are no more sibling file rules coming, we mark as good all the
@@ -164,7 +164,7 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
         rule.isRecursive = false;
 
         if (rule.isOptional) { return; }
-        throw getRuleError(rule, paths.length);
+        throw getRuleError(rule, paths);
       }
 
       if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
