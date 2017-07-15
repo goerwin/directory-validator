@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+import * as colors from 'colors/safe';
 import * as commander from 'commander';
 import * as fs from 'fs';
 import * as glob from 'glob';
@@ -77,5 +78,10 @@ if (!commander.args.length) {
     .filter(el => el.isEmpty)
     .map(el => el.path);
 
-  program.run(files, rules, emptyDirs);
+  try {
+    program.run(files, rules, emptyDirs);
+  } catch (err) {
+    console.log('\n', colors.red(`Error: ${err.message}`), '\n');
+    process.exit(1);
+  }
 }
