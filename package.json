@@ -1,5 +1,5 @@
 {
-  "name": "folder-structure-checker",
+  "name": "directory-schema-validator",
   "version": "0.0.1",
   "description": "Validates folder structure",
   "main": "index.js",

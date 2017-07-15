@@ -1,13 +1,13 @@
 
 # TODO
-- read config from passed file
-- should have a config file directoryschemavalidator.json that
-  should work like any config file
-- rename it to directory-schema-validator
 - better errors in console
+- should have a config file directoryschema.json that
+  should work like any config file
 - allow rules to be exclusive
 
 # DONE
+- rename it to directory-schema-validator
+- read config from passed file
 - allow dir rules to be inclusive
 - commander
 - program.run should accept an array of empty dirs
