@@ -2,10 +2,13 @@ import * as _ from 'lodash';
 import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
 import * as errors from './errors';
-import * as Types from './types';
+import * as types from './types';
 
 function getMultimatchName(nameRule: string) {
-  return ['[camelCase]', '[UPPERCASE]', '[dash-case]', '[snake_case]']
+  const specialNames: types.SpecialName[] =
+    ['[camelCase]', '[UPPERCASE]', '[dash-case]', '[snake_case]', '*'];
+
+  return specialNames
     .reduce((result, el) => {
       if (result) { return result; }
 
@@ -16,14 +19,14 @@ function getMultimatchName(nameRule: string) {
 
       return result;
     }, undefined) as {
-      type: '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]';
+      type: types.SpecialName;
       leftSide: string;
       rightSide: string;
     } | undefined;
 }
 
 function getDirFiles(
-  files: Types.ValidatableFile[],
+  files: types.ValidatableFile[],
   paths: (string | RegExp)[],
   isRecursive = false
 ) {
@@ -63,6 +66,7 @@ function isNameValid(nameRule: string | RegExp, name: string) {
       case '[UPPERCASE]': return _.upperCase(filenameToValidate) === filenameToValidate;
       case '[dash-case]': return _.kebabCase(filenameToValidate) === filenameToValidate;
       case '[snake_case]': return _.snakeCase(filenameToValidate) === filenameToValidate;
+      case '*': return true;
       default: return false;
     }
   }
@@ -75,18 +79,18 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
   return fileExtRule === ext;
 }
 
-function getFilesByParentDir(files: Types.ValidatableFile[]) {
+function getFilesByParentDir(files: types.ValidatableFile[]) {
   return _.groupBy(files, el => {
     const pathFragments = el.path.split(path.sep);
     return pathFragments.slice(0, pathFragments.length - 1).join(path.sep);
   });
 }
 
-function getValidatableFiles(files: string[]): Types.ValidatableFile[] {
+function getValidatableFiles(files: string[]): types.ValidatableFile[] {
   return files.map(el => ({ path: path.normalize(el), isGood: false, isValidated: false }));
 }
 
-function getRuleError(rule: (Types.FileRule | Types.DirectoryRule), paths: (string | RegExp)[]) {
+function getRuleError(rule: (types.FileRule | types.DirectoryRule), paths: (string | RegExp)[]) {
   return new errors.ProgramRuleError(rule, paths);
 }
 
@@ -96,13 +100,13 @@ function validatePath(element: { path: string, isGood: boolean }) {
   }
 }
 
-export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[] = []) {
+export function run(files: string[], mainRules: types.Rules, emptyDirs: string[] = []) {
   if (mainRules.length === 0) { return; }
 
   const newFiles = getValidatableFiles(files);
   const newEmptyDirs = emptyDirs.map(el => ({ path: path.normalize(el), isGood: false }));
 
-  function validateRules(rules: Types.Rules = [], paths: (string | RegExp)[] = ['.']) {
+  function validateRules(rules: types.Rules = [], paths: (string | RegExp)[] = ['.']) {
     if (rules.length === 0) { return; }
 
     rules.forEach((rule, idx) => {

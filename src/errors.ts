@@ -1,4 +1,4 @@
-import * as Types from './types';
+import * as types from './types';
 
 export class JsonParseError extends Error {
   err: Error;
@@ -24,9 +24,9 @@ export class ConfigJsonValidateError extends Error {
 
 export class ProgramRuleError extends Error {
   paths: (string | RegExp)[];
-  rule: (Types.FileRule | Types.DirectoryRule);
+  rule: (types.FileRule | types.DirectoryRule);
 
-  constructor(rule: Types.FileRule | Types.DirectoryRule, paths: (string | RegExp)[]) {
+  constructor(rule: types.FileRule | types.DirectoryRule, paths: (string | RegExp)[]) {
     super(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
     this.rule = rule;
     this.paths = paths;

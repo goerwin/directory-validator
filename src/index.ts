@@ -8,11 +8,11 @@ import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
 import * as errors from './errors';
 import * as program from './program';
-import * as Types from './types';
+import * as types from './types';
 
 import Ajv = require('ajv');
 
-function getConfigs(rulesPath: any, dirPath: string): Types.Config {
+function getConfigs(rulesPath: any, dirPath: string): types.Config {
   if (typeof rulesPath === 'string') {
     const rulesSchema = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, '../schema.json'), 'utf8')
@@ -55,9 +55,10 @@ commander.version(
 
 commander
   .arguments('<dirPath>')
+  .option('-i, --init', 'Create a configuration file')
   .option('-f, --ignore-files <files>', 'Ignore files (glob string) eg: -f "*.js"')
   .option('-d, --ignore-dirs <dirs>', 'Ignore directories (glob string) eg: -d "**/tests"')
-  .option('-r, --rules-path <path>', 'Path to the rules')
+  .option('-c, --config-file <path>', 'Path to the configuration file')
   .parse(process.argv);
 
 if (!commander.args.length) {
