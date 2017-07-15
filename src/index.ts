@@ -56,6 +56,7 @@ if (!commander.args.length) {
 
   const emptyDirs = nodeHelpers.file
     .getChildDirs(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
+    .filter(el => !el.isIgnored)
     .filter(el => el.isEmpty)
     .map(el => el.path);
 
