@@ -26,7 +26,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should throw because a rule did not passed', () => {
@@ -74,7 +74,7 @@ describe('Module src:', () => {
       assert.doesNotThrow(
         () => {
           program.run(files, configObject);
-        }, () => null
+        }
       );
     });
 
@@ -107,7 +107,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because wrong string extension', () => {
@@ -136,7 +136,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because wrong regex extension', () => {
@@ -166,7 +166,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should validate filenames ending camelcased', () => {
@@ -178,12 +178,11 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because one file is not camelcased as first/last', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json', './no-camelcase.js'];
-        const files2 = ['./no-camelcase.js', './camelizedNamedPogChamp.json', './package.json'];
 
         const configObject: Types.Rules = [
           { name: '[camelCase].json', type: 'file' }
@@ -192,6 +191,14 @@ describe('Module src:', () => {
         assert.throws(
           () => {
             program.run(files, configObject);
+          },
+          (err: Error) => err.message.includes('no-camelcase.js, was not validated')
+        );
+
+        const files2 = ['./no-camelcase.js', './camelizedNamedPogChamp.json', './package.json'];
+
+        assert.throws(
+          () => {
             program.run(files2, configObject);
           },
           (err: Error) => err.message.includes('no-camelcase.js, was not validated')
@@ -209,7 +216,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because one file does not match', () => {
@@ -244,7 +251,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should validate dir if it does not have rules', () => {
@@ -259,7 +266,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should validate dir and subdirs if it does not have rules', () => {
@@ -274,7 +281,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should throw because wrong name of directory', () => {
@@ -330,7 +337,7 @@ describe('Module src:', () => {
       assert.doesNotThrow(() => {
         program.run(files, configObject);
         program.run(files, configObject2);
-      }, () => null);
+      });
     });
 
     it('should throw because an optional dir rule fails', () => {
@@ -394,7 +401,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
   });
 
@@ -411,7 +418,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run([], configObject, emptyDirs);
-      }, () => null);
+      });
     });
 
     it('should throw if empty dir has rules', () => {
@@ -479,7 +486,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should validate a complex tree with no recursion', () => {
@@ -541,7 +548,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should validate a simple tree with recursion', () => {
@@ -565,7 +572,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should not throw because recursive rule is optional', () => {
@@ -588,7 +595,7 @@ describe('Module src:', () => {
 
       assert.doesNotThrow(() => {
         program.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it(`should throw in a simple tree with
@@ -833,7 +840,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because a dirname does not match regex', () => {
@@ -881,7 +888,7 @@ describe('Module src:', () => {
 
         assert.doesNotThrow(() => {
           program.run(files, configObject);
-        }, () => null);
+        });
       });
 
       it('should throw because one dirname is not camelcased', () => {

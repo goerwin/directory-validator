@@ -38,8 +38,10 @@
       "src/**/*.ts"
     ],
     "exclude": [
-      "dist",
-      "src/_tests.ts"
+      "src/errors.ts",
+      "src/index.ts",
+      "src/types.ts",
+      "lib"
     ],
     "extension": [
       ".ts",
