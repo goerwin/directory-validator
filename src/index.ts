@@ -8,7 +8,7 @@ import * as Types from './types';
 
 import Ajv = require('ajv');
 
-function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.Rules {
+function getConfigs(rulesPath: any, dirPath: string): Types.Config {
   if (typeof rulesPath === 'string') {
     const rulesSchema = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, '../schema.json'), 'utf8')
@@ -22,10 +22,14 @@ function getRulesFromJsonFile(rulesPath: any, dirPath: string): Types.Rules {
       throw error;
     }
 
-    return configJson.rules as Types.Rules;
+    return {
+      ignoreFiles: configJson.ignoreFiles,
+      ignoreDirs: configJson.ignoreDirs,
+      rules: configJson.rules
+    };
   }
 
-  return [];
+  return { rules: [] };
 }
 
 commander.version(
@@ -44,10 +48,21 @@ if (!commander.args.length) {
 } else {
   const dirPath = path.resolve(commander.args[0]);
 
-  const ignoreFilesGlob: string | undefined = commander.ignoreFiles;
-  const ignoreDirsGlob: string | undefined = commander.ignoreDirs;
-  const ignoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
-  const ignoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
+  const { ignoreFiles, ignoreDirs, rules } = getConfigs(commander.rulesPath, dirPath);
+
+  let ignoreFilesGlob: string | undefined;
+  if (ignoreFiles && ignoreFiles.length > 0) {
+    ignoreFilesGlob = `{${[ignoreFiles[0], ...ignoreFiles].join(',')}}`;
+  }
+  ignoreFilesGlob = commander.ignoreFiles || ignoreFilesGlob;
+  const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
+
+  let ignoreDirsGlob: string | undefined;
+  if (ignoreDirs && ignoreDirs.length > 0) {
+    ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
+  }
+  ignoreDirsGlob = commander.ignoreDirs || ignoreDirsGlob;
+  const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
 
   const files = nodeHelpers.file
     .getChildFiles(dirPath, { recursive: true, ignoreDirs, ignoreFiles })
@@ -60,6 +75,5 @@ if (!commander.args.length) {
     .filter(el => el.isEmpty)
     .map(el => el.path);
 
-  const rules = getRulesFromJsonFile(commander.rulesPath, dirPath);
   program.run(files, rules, emptyDirs);
 }
