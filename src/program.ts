@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
+import * as errors from './errors';
 import * as Types from './types';
 
 function getMultimatchName(nameRule: string) {
@@ -86,12 +87,12 @@ function getValidatableFiles(files: string[]): Types.ValidatableFile[] {
 }
 
 function getRuleError(rule: (Types.FileRule | Types.DirectoryRule), deep: number) {
-  return new Error(`${JSON.stringify(rule)}, deep: ${deep}, rule did not passed`);
+  return new errors.ProgramError(`${JSON.stringify(rule)}, deep: ${deep}, rule did not passed`);
 }
 
 function validatePath(element: { path: string, isGood: boolean }) {
   if (!element.isGood) {
-    throw new Error(`${element.path}, was not validated`);
+    throw new errors.ProgramError(`${element.path}, was not validated`);
   }
 }
 
