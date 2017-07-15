@@ -17,6 +17,7 @@ export interface ValidatableFile {
     isValidated: boolean;
 }
 export declare type Rules = (FileRule | DirectoryRule)[];
+export declare type SpecialName = '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]' | '*';
 export interface Config {
     ignoreFiles?: string[];
     ignoreDirs?: string[];

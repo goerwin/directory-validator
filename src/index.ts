@@ -41,7 +41,8 @@ function getFileContent(filePath: string) {
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (err) {
-    return undefined;
+    if (err.code === 'ENOENT') { return undefined; }
+    throw new errors.JsonParseError(err, filePath);
   }
 }
 
@@ -141,11 +142,11 @@ if (commander.init) {
     const errorTitle = '\n\t' + 'Error:'.bold.red.underline;
 
     if (err instanceof errors.JsonParseError) {
-      console.log(errorTitle, 'at config file:'.red, err.rulesPath);
+      console.log(errorTitle, 'at config file:'.red, err.filePath);
       console.log('\t', dash, 'Could not parse/read the file');
       console.log('\t', dash, err.message);
     } else if (err instanceof errors.ConfigJsonValidateError) {
-      console.log(errorTitle, 'at config file:'.red, err.rulesPath);
+      console.log(errorTitle, 'at config file:'.red, err.filePath);
       err.messages.forEach(el => console.log('\t', dash, `${el[0].red}:`, el[1]));
     } else if (err instanceof errors.ProgramRuleError) {
       console.log(errorTitle);

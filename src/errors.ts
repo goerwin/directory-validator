@@ -2,23 +2,23 @@ import * as types from './types';
 
 export class JsonParseError extends Error {
   err: Error;
-  rulesPath: string;
+  filePath: string;
 
-  constructor(err: Error, rulesPath: string) {
+  constructor(err: Error, filePath: string) {
     super(err.message);
     this.err = err;
-    this.rulesPath = rulesPath;
+    this.filePath = filePath;
   }
 }
 
 export class ConfigJsonValidateError extends Error {
-  rulesPath: string;
+  filePath: string;
   messages: string[][];
 
-  constructor(messages: string[][], rulesPath: string) {
+  constructor(messages: string[][], filePath: string) {
     super();
     this.messages = messages;
-    this.rulesPath = rulesPath;
+    this.filePath = filePath;
   }
 }
 

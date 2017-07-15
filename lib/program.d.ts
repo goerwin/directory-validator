@@ -1,2 +1,2 @@
-import * as Types from './types';
-export declare function run(files: string[], mainRules: Types.Rules, emptyDirs?: string[]): void;
+import * as types from './types';
+export declare function run(files: string[], mainRules: types.Rules, emptyDirs?: string[]): void;
