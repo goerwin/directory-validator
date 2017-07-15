@@ -144,9 +144,29 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
 
       // Directory Rule
 
-      if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
-        const dirFiles = getDirFiles(newFiles, [...paths, rule.name]);
+      const dirFiles = getDirFiles(newFiles, [...paths, rule.name], true);
+      const emptyDir = newEmptyDirs
+        .find(el => el.path === path.normalize([...paths, rule.name].join(path.sep)));
 
+      // If no rules for this dir, it should validate all of his files
+      if ((rule.rules || []).length === 0) {
+        dirFiles.forEach(el => { el.isGood = true; });
+
+        if (emptyDir) {
+          emptyDir.isGood = true;
+          return;
+        }
+      }
+
+      // Dir does not exist
+      if (dirFiles.length === 0) {
+        rule.isRecursive = false;
+
+        if (rule.isOptional) { return; }
+        throw getRuleError(rule, paths.length);
+      }
+
+      if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
         const parentPaths = getFilesByParentDir(dirFiles);
         const parentPathsArray = _.keys(parentPaths);
 
@@ -154,32 +174,6 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
           validateRules(rule.rules, [...paths, parentPathsArray[i]]);
         }
 
-        return;
-      }
-
-      const dirFiles = getDirFiles(newFiles, [...paths, rule.name]);
-
-      // Dir does not exist
-      if (dirFiles.length === 0) {
-        rule.isRecursive = false;
-
-        const emptyDir = newEmptyDirs
-          .find(el => el.path === path.normalize([...paths, rule.name].join(path.sep)));
-
-        if (emptyDir) {
-          emptyDir.isGood = true;
-          if ((rule.rules || []).length === 0) { return; }
-          throw getRuleError(rule, paths.length);
-        }
-
-        if (rule.isOptional) { return; }
-        throw getRuleError(rule, paths.length);
-      }
-
-      // If no rules for this dir, it should validate all of his files
-      if ((rule.rules || []).length === 0) {
-        getDirFiles(newFiles, [...paths, rule.name], true)
-          .forEach(el => { el.isGood = true; });
         return;
       }
 

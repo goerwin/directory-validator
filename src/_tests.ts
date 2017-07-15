@@ -367,6 +367,35 @@ describe('Module src:', () => {
           err.message.includes(`${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`)
       );
     });
+
+    it('should validate if dir rule fails but is optional', () => {
+      const configObject: Types.Rules = [
+        {
+          name: 'lol',
+          type: 'directory',
+          isOptional: true
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run([], configObject);
+      });
+    });
+
+    it('should validate if multiname dir rule has no rules', () => {
+      const files = ['src/index.js'];
+
+      const configObject: Types.Rules = [
+        {
+          name: '[camelCase]',
+          type: 'directory'
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
+      }, () => null);
+    });
   });
 
   describe('EmptyDirs:', () => {
