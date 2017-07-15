@@ -154,7 +154,7 @@ Directory rules should have the following format:
 
 ## Important Notes
 
-* When you run `$ directory-schema-validator .` it will look for a `.directoryschema.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
+* When you run `$ directory-schema-validator ./` it will look for a `.directoryschema.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
 
 * Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
 
@@ -168,3 +168,5 @@ TODO: Provide some folder examples
 * examples/multimatching-rules
 
 ## Contribute
+
+TODO:

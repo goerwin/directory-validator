@@ -139,6 +139,19 @@ describe('Module src:', () => {
         });
       });
 
+      it('should validate using regex as string', () => {
+        const files = ['./.gitignore', './package.json'];
+
+        const configObject: types.Rules = [
+          { name: 'package', extension: '/(json|js)/', type: 'file' },
+          { name: '.gitignore', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        });
+      });
+
       it('should throw because wrong regex extension', () => {
         const files = ['./.gitignore', './package.json'];
 
@@ -856,7 +869,7 @@ describe('Module src:', () => {
     });
 
     describe('RegExp:', () => {
-      it('should validate regexp dirnames', () => {
+      it('should validate regexp (also as string) dirnames', () => {
         const files = [
           './src/index.js',
           './.srcNice/index.js',
@@ -873,8 +886,19 @@ describe('Module src:', () => {
           }
         ];
 
+        const configObject2: types.Rules = [
+          {
+            name: '/src.*/',
+            type: 'directory',
+            rules: [
+              { name: 'index.js', type: 'file' }
+            ]
+          }
+        ];
+
         assert.doesNotThrow(() => {
           program.run(files, configObject);
+          program.run(files, configObject2);
         });
       });
 

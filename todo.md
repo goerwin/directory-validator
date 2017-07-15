@@ -1,10 +1,10 @@
 
 # TODO
-- parse names starting/ending with "/" to regexp
 - option to print the directory structure printed
 - allow rules to be exclusive
 
 # DONE
+- parse names starting/ending with "/" to regexp
 - should have a config file .directoryschema.json that
   should work like any config file
 - add a init option to create a config template

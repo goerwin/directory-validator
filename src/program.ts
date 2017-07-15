@@ -4,6 +4,16 @@ import * as path from 'path';
 import * as errors from './errors';
 import * as types from './types';
 
+function getCorrectStringRegexp(name: string | RegExp) {
+  if (typeof name === 'string') {
+    if (name[0] === '/' && name[name.length - 1] === '/' && name.length > 0) {
+      return RegExp(name.substring(1, name.length - 1));
+    }
+  }
+
+  return name;
+}
+
 function getMultimatchName(nameRule: string) {
   const specialNames: types.SpecialName[] =
     ['[camelCase]', '[UPPERCASE]', '[dash-case]', '[snake_case]', '*'];
@@ -110,6 +120,8 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
     if (rules.length === 0) { return; }
 
     rules.forEach((rule, idx) => {
+      rule.name = getCorrectStringRegexp(rule.name);
+
       if (rule.type === 'file') {
         const dirFiles = getDirFiles(newFiles, paths);
 
@@ -121,8 +133,8 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
           if (!rule.extension) {
             isFileValid = isNameValid(rule.name, base);
           } else {
-            isFileValid =
-              isNameValid(rule.name, name) && isFileExtValid(rule.extension, ext.substring(1));
+            isFileValid = isNameValid(rule.name, name) &&
+              isFileExtValid(getCorrectStringRegexp(rule.extension), ext.substring(1));
           }
 
           file.isValidated = file.isValidated || isFileValid;
