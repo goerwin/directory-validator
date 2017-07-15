@@ -1,6 +1,6 @@
 {
   "name": "directory-validator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Validates directory/folder structure",
   "main": "lib/index.js",
   "bin": {
