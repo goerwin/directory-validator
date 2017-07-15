@@ -21,14 +21,23 @@ function getMultimatchName(nameRule: string) {
     } | undefined;
 }
 
-function getDirFiles(files: Types.ValidatableFile[], paths: (string | RegExp)[]) {
+function getDirFiles(
+  files: Types.ValidatableFile[],
+  paths: (string | RegExp)[],
+  isRecursive = false
+) {
   return files.filter(el => {
     let pathSegments = el.path.split(path.sep);
     pathSegments = pathSegments.slice(0, pathSegments.length - 1);
     const parentPaths = paths.slice(1, paths.length);
 
-    if (parentPaths.length !== pathSegments.length) { return false; }
-    return pathSegments.every((el, i) => isNameValid(parentPaths[i], el));
+    if (isRecursive) {
+      if (parentPaths.length > pathSegments.length) { return false; }
+    } else {
+      if (parentPaths.length !== pathSegments.length) { return false; }
+    }
+
+    return parentPaths.every((el, i) => isNameValid(el, pathSegments[i]));
   });
 }
 
@@ -150,6 +159,7 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
 
       const dirFiles = getDirFiles(newFiles, [...paths, rule.name]);
 
+      // Dir does not exist
       if (dirFiles.length === 0) {
         rule.isRecursive = false;
 
@@ -166,8 +176,10 @@ export function run(files: string[], mainRules: Types.Rules, emptyDirs: string[]
         throw getRuleError(rule, paths.length);
       }
 
+      // If no rules for this dir, it should validate all of his files
       if ((rule.rules || []).length === 0) {
-        dirFiles.forEach(el => { el.isGood = true; });
+        getDirFiles(newFiles, [...paths, rule.name], true)
+          .forEach(el => { el.isGood = true; });
         return;
       }
 

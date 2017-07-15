@@ -235,8 +235,23 @@ describe('Module src:', () => {
       }, () => null);
     });
 
-    it('should validate if no rules for a directory', () => {
+    it('should validate dir if it does not have rules', () => {
       const files = ['./src/index.js'];
+
+      const configObject: Types.Rules = [
+        {
+          name: 'src',
+          type: 'directory'
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        program.run(files, configObject);
+      }, () => null);
+    });
+
+    it('should validate dir and subdirs if it does not have rules', () => {
+      const files = ['./src/index.js', './src/lul/index.js'];
 
       const configObject: Types.Rules = [
         {
