@@ -157,11 +157,23 @@ describe('Module src:', () => {
     });
 
     describe('[camelCase]:', () => {
-      it('should validate camelcased filenames', () => {
+      it('should validate filenames starting camelcased', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json'];
 
         const configObject: Types.Rules = [
           { name: '[camelCase].json', type: 'file' }
+        ];
+
+        assert.doesNotThrow(() => {
+          program.run(files, configObject);
+        }, () => null);
+      });
+
+      it('should validate filenames ending camelcased', () => {
+        const files = ['./_ERcamelizedNamedPogChamp'];
+
+        const configObject: Types.Rules = [
+          { name: '_ER[camelCase]', type: 'file' }
         ];
 
         assert.doesNotThrow(() => {

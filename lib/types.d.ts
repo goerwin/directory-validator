@@ -17,3 +17,8 @@ export interface ValidatableFile {
     isValidated: boolean;
 }
 export declare type Rules = (FileRule | DirectoryRule)[];
+export interface Config {
+    ignoreFiles?: string[];
+    ignoreDirs?: string[];
+    rules: Rules;
+}

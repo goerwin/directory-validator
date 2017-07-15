@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import * as commander from 'commander';
 import * as fs from 'fs';
 import * as glob from 'glob';
