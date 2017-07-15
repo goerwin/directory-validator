@@ -1,7 +1,7 @@
-# directory-schema-validator
+# directory-validator
 
-[![Build Status](https://travis-ci.org/erwingo/directory-schema-validator.svg?branch=master)](https://travis-ci.org/erwingo/directory-schema-validator)
-[![Coverage Status](https://coveralls.io/repos/github/erwingo/directory-schema-validator/badge.svg?branch=master)](https://coveralls.io/github/erwingo/directory-schema-validator?branch=master)
+[![Build Status](https://travis-ci.org/erwingo/directory-validator.svg?branch=master)](https://travis-ci.org/erwingo/directory-validator)
+[![Coverage Status](https://coveralls.io/repos/github/erwingo/directory-validator/badge.svg?branch=master)](https://coveralls.io/github/erwingo/directory-validator?branch=master)
 
 Tool to validate directory structures.
 If you want to have control over what files/dirs a directory can have then this can be useful.
@@ -9,19 +9,19 @@ If you want to have control over what files/dirs a directory can have then this 
 ## Installation
 
 ```
-$ npm install -g directory-schema-validator
+$ npm install -g directory-validator
 ```
 
 ## Usage
 
 Generate a configuration file `.directoryschema.json` to start with:
 ```
-$ directory-schema-validator --init
+$ directory-validator --init
 ```
 
 Run the validator on the current directory:
 ```
-$ directory-schema-validator .
+$ directory-validator .
 ```
 
 The tool will evaluate the rules provided by the configuration file against the current directory and output errors if any.
@@ -153,7 +153,7 @@ Directory rules should have the following format:
 
 ## Important Notes
 
-* When you run `$ directory-schema-validator ./` it will look for a `.directoryschema.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
+* When you run `$ directory-validator ./` it will look for a `.directoryschema.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
 
 * Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
 

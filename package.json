@@ -1,13 +1,14 @@
 {
-  "name": "directory-schema-validator",
+  "name": "directory-validator",
   "version": "1.0.2",
   "description": "Validates folder structure",
   "main": "lib/index.js",
   "bin": {
-    "directory-schema-validator": "lib/index.js"
+    "directory-validator": "lib/index.js"
   },
   "scripts": {
-    "build": "npm run test && rm -rf lib && tsc",
+    "build": "npm run clean && npm run test && tsc",
+    "clean": "rm -rf .nyc_output && rm -rf coverage && rm -rf lib",
     "test": "mocha -r source-map-support/register --compilers ts-node/register src/_tests.ts",
     "test-coverage": "nyc --reporter html --reporter text npm run test",
     "test-coverage-coveralls": "npm run test-coverage && nyc report --reporter=text-lcov | coveralls",
