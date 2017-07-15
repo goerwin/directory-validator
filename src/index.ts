@@ -5,48 +5,78 @@ import * as commander from 'commander';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as nodeHelpers from 'node-helpers';
+import * as os from 'os';
 import * as path from 'path';
 import * as errors from './errors';
 import * as program from './program';
 import * as types from './types';
 
 import Ajv = require('ajv');
+const schema = require('../supportFiles/schema.json');
+const initConfigFilename = '.directoryschema.json';
 
-function getConfigs(rulesPath: any, dirPath: string): types.Config {
+function getConfigValues(config: any, rulesPath: string): types.Config {
+  const ajv = new Ajv();
+
+  if (!ajv.validate(schema, config)) {
+    let errorMessages: string[][] = [];
+
+    if (ajv.errors) {
+      errorMessages = ajv.errors.map(el =>
+        [`data${el.dataPath}`, `${el.message || ''}`]
+      );
+    }
+
+    throw new errors.ConfigJsonValidateError(errorMessages, rulesPath);
+  }
+
+  return {
+    ignoreFiles: config.ignoreFiles,
+    ignoreDirs: config.ignoreDirs,
+    rules: config.rules
+  };
+}
+
+function getFileContent(filePath: string) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    return undefined;
+  }
+}
+
+function getConfig(rulesPath: any, dirPath: string) {
   if (typeof rulesPath === 'string') {
-    const rulesSchema = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, '../schema.json'), 'utf8')
-    );
+    const configJson = getFileContent(rulesPath);
 
-    let configJson;
-
-    try {
-      configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
-    } catch (err) {
-      throw new errors.JsonParseError(err, rulesPath);
+    if (!configJson) {
+      throw new errors.JsonParseError(new Error('could not read/parse file'), rulesPath);
     }
 
-    const ajv = new Ajv();
-    if (!ajv.validate(rulesSchema, configJson)) {
-      let errorMessages: string[][] = [];
+    return getConfigValues(configJson, rulesPath);
+  } else {
+    let absDirPath = path.resolve(dirPath);
+    const homeDirPath = os.homedir();
 
-      if (ajv.errors) {
-        errorMessages = ajv.errors.map(el =>
-          [`data${el.dataPath}`, `${el.message || ''}`]
-        );
-      }
-
-      throw new errors.ConfigJsonValidateError(errorMessages, rulesPath);
+    while (true) {
+      const configJson = getFileContent(path.join(absDirPath, initConfigFilename));
+      if (configJson) { return getConfigValues(configJson, rulesPath); }
+      if (absDirPath === homeDirPath) { break; }
+      absDirPath = path.resolve(absDirPath, '..');
     }
-
-    return {
-      ignoreFiles: configJson.ignoreFiles,
-      ignoreDirs: configJson.ignoreDirs,
-      rules: configJson.rules
-    };
   }
 
   return { rules: [] };
+}
+
+function generateDefaultConfig(dirPath: string) {
+  try {
+    const configFilePath = path.join(__dirname, '../supportFiles/defaultConfig.json');
+    const data = fs.readFileSync(configFilePath, 'utf8');
+    fs.writeFileSync(path.join(dirPath, initConfigFilename), data, 'utf8');
+  } catch (err) {
+    throw err;
+  }
 }
 
 commander.version(
@@ -61,13 +91,16 @@ commander
   .option('-c, --config-file <path>', 'Path to the configuration file')
   .parse(process.argv);
 
-if (!commander.args.length) {
+if (commander.init) {
+  generateDefaultConfig(process.cwd());
+  console.log('\n\t', initConfigFilename.red, 'created', '\n');
+} else if (!commander.args.length) {
   commander.help();
 } else {
   const dirPath = path.resolve(commander.args[0]);
 
   try {
-    const { ignoreFiles, ignoreDirs, rules } = getConfigs(commander.rulesPath, dirPath);
+    const { ignoreFiles, ignoreDirs, rules } = getConfig(commander.configFile, dirPath);
 
     let ignoreFilesGlob: string | undefined;
     if (ignoreFiles && ignoreFiles.length > 0) {

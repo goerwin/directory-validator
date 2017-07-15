@@ -1,0 +1,24 @@
+{
+  "ignoreFiles": [
+    ".gitignore"
+  ],
+  "ignoreDirs": [
+    "node_modules"
+  ],
+  "rules": [
+    {
+      "type": "file",
+      "name": ".directoryschema.json",
+      "isOptional": true
+    },
+    {
+      "type": "file",
+      "name": "package.json"
+    },
+    {
+      "type": "directory",
+      "name": ".git",
+      "rules": []
+    }
+  ]
+}
