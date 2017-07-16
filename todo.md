@@ -1,14 +1,14 @@
 
 # TODO
-- implement semantic release
-- license
+- test the public api
 - ability to abstract common rules so we can make them shareable
 - option to print the directory structure printed
 - allow rules to be exclusive
-- it should throw if no config file found
-- test the public api
 
 # DONE
+- it should throw if no config file found
+- license
+- implement semantic release
 - parse names starting/ending with "/" to regexp
 - should have a config file .directoryvalidator.json that
   should work like any config file
