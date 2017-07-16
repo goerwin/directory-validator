@@ -2,9 +2,9 @@
 
 import 'colors';
 import * as commander from 'commander';
+import * as nodeHelpers from 'ego-node-helpers';
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as nodeHelpers from 'node-helpers';
 import * as os from 'os';
 import * as path from 'path';
 import * as errors from './errors';

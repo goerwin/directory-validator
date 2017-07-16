@@ -36,9 +36,9 @@
     "ajv": "^5.2.2",
     "colors": "^1.1.2",
     "commander": "^2.11.0",
+    "ego-node-helpers": "^1.0.2",
     "glob": "^7.1.2",
-    "lodash": "^4.17.4",
-    "node-helpers": "git+https://github.com/erwingo/node-helpers.git"
+    "lodash": "^4.17.4"
   },
   "nyc": {
     "include": [

@@ -1,7 +1,11 @@
 
 # TODO
+- license
+- ability to abstract common rules so we can make them shareable
 - option to print the directory structure printed
 - allow rules to be exclusive
+- it should throw if no config file found
+- test the public api
 
 # DONE
 - parse names starting/ending with "/" to regexp

@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as nodeHelpers from 'node-helpers';
 import * as path from 'path';
 import * as errors from './errors';
 import * as types from './types';
