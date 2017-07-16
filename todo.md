@@ -1,5 +1,6 @@
 
 # TODO
+- implement semantic release
 - license
 - ability to abstract common rules so we can make them shareable
 - option to print the directory structure printed

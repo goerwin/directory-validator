@@ -1,13 +1,19 @@
 language: node_js
-before_deploy:
+cache:
+  directories:
+    - node_modules
+notifications:
+  email: false
+node_js:
+  - '7'
+  - '6'
+before_script:
+  - npm prune
+script:
   - npm run build
-deploy:
-  provider: npm
-  email: erwingaitano@gmail.com
-  api_key: $NPM_API_KEY
-  skip_cleanup: true
-  on:
-    tags: true
-    branch: master
 after_success:
-- npm run test-coverage-coveralls
+  - npm run test-coverage-coveralls
+  - npm run semantic-release
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

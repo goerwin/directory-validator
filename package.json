@@ -1,6 +1,6 @@
 {
   "name": "directory-validator",
-  "version": "1.0.4",
+  "version": "0.0.0-development",
   "description": "Validates directory/folder structure",
   "main": "lib/index.js",
   "bin": {
@@ -13,7 +13,8 @@
     "test-coverage": "nyc --reporter html --reporter text npm run test",
     "test-coverage-coveralls": "npm run test-coverage && nyc report --reporter=text-lcov | coveralls",
     "test-coverage-watch": "chokidar src/**/*.ts -c 'npm run test-coverage'",
-    "test-watch": "chokidar src/**/*.ts -c 'npm run test'"
+    "test-watch": "chokidar src/**/*.ts -c 'npm run test'",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
   "license": "ISC",
@@ -30,7 +31,8 @@
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "ts-node": "^3.2.0",
-    "typescript": "^2.4.1"
+    "typescript": "^2.4.1",
+    "semantic-release": "^6.3.6"
   },
   "dependencies": {
     "ajv": "^5.2.2",
@@ -64,7 +66,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/erwingo/directory-validator.git"
+    "url": "https://github.com/erwingo/directory-validator.git"
   },
   "keywords": [
     "directory",
