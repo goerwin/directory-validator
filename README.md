@@ -159,13 +159,3 @@ Directory rules should have the following format:
 
   For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.
 
-## Examples
-
-TODO: Provide some folder examples
-* examples/basic
-* examples/recursive-directories
-* examples/multimatching-rules
-
-## Contribute
-
-TODO:
