@@ -57,9 +57,11 @@
       "ts-node/register"
     ]
   },
-  "directories": {
-    "lib": "lib"
-  },
+  "files": [
+    "lib",
+    "supportFiles",
+    "readme.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/erwingo/directory-validator.git"
