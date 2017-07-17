@@ -62,7 +62,8 @@
   "files": [
     "lib",
     "supportFiles",
-    "readme.md"
+    "LICENSE",
+    "README.md"
   ],
   "repository": {
     "type": "git",
