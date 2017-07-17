@@ -48,7 +48,7 @@ describe('Program:', () => {
 
     assert.throws(
       () => { program.run(exampleProjectPath, configFile); },
-      (err: Error) => err instanceof errors.ProgramInvalidPathError
+      (err: Error) => err instanceof errors.ValidatorInvalidPathError
     );
   });
 
@@ -70,7 +70,7 @@ describe('Program:', () => {
 
     assert.throws(
       () => { program.run(exampleProjectPath, configFile); },
-      (err: Error) => err instanceof errors.ProgramInvalidPathError
+      (err: Error) => err instanceof errors.ValidatorInvalidPathError
     );
   });
 
@@ -80,7 +80,7 @@ describe('Program:', () => {
 
     assert.throws(
       () => { program.run(exampleProjectPath, configFile); },
-      (err: Error) => err instanceof errors.ProgramInvalidPathError
+      (err: Error) => err instanceof errors.ValidatorInvalidPathError
     );
   });
 

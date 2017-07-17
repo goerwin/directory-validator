@@ -22,7 +22,7 @@ export class ConfigJsonValidateError extends Error {
   }
 }
 
-export class ProgramRuleError extends Error {
+export class ValidatorRuleError extends Error {
   paths: (string | RegExp)[];
   rule: (types.FileRule | types.DirectoryRule);
 
@@ -33,7 +33,7 @@ export class ProgramRuleError extends Error {
   }
 }
 
-export class ProgramInvalidPathError extends Error {
+export class ValidatorInvalidPathError extends Error {
   path: string;
 
   constructor(path: string) {

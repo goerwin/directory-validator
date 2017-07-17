@@ -74,7 +74,7 @@ if (commander.init) {
     } else if (err instanceof errors.ConfigJsonValidateError) {
       console.log(errorTitle, 'at config file:'.red, err.filePath);
       err.messages.forEach(el => console.log('\t', dash, `${el[0].red}:`, el[1]));
-    } else if (err instanceof errors.ProgramRuleError) {
+    } else if (err instanceof errors.ValidatorRuleError) {
       console.log(errorTitle);
       const parentPath = err.paths.join(path.sep);
       const rule = JSON.stringify(err.rule);

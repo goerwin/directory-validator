@@ -1,6 +1,5 @@
 
 # TODO
-- test the public api
 - Examples
   - Provide some folder examples:
     * examples/basic
@@ -11,6 +10,7 @@
 - allow rules to be exclusive
 
 # DONE
+- test the public api
 - it should throw if no config file found
 - license
 - implement semantic release
