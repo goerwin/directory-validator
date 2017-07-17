@@ -15,10 +15,18 @@ import Ajv = require('ajv');
 const schema = require('../supportFiles/schema.json');
 const initConfigFilename = '.directoryvalidator.json';
 
-function getConfigValues(config: any, rulesPath: string): types.Config {
+function getConfig(rulesPath: string): types.Config {
+  let configJson: any;
+
+  try {
+    configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8')) as string;
+  } catch (err) {
+    throw new errors.JsonParseError(err, rulesPath);
+  }
+
   const ajv = new Ajv();
 
-  if (!ajv.validate(schema, config)) {
+  if (!ajv.validate(schema, configJson)) {
     let errorMessages: string[][] = [];
 
     if (ajv.errors) {
@@ -31,53 +39,79 @@ function getConfigValues(config: any, rulesPath: string): types.Config {
   }
 
   return {
-    ignoreFiles: config.ignoreFiles,
-    ignoreDirs: config.ignoreDirs,
-    rules: config.rules
+    ignoreFiles: configJson.ignoreFiles,
+    ignoreDirs: configJson.ignoreDirs,
+    rules: configJson.rules
   };
 }
 
-function getFileContent(filePath: string) {
-  try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch (err) {
-    if (err.code === 'ENOENT') { return undefined; }
-    throw new errors.JsonParseError(err, filePath);
-  }
-}
+function getDefaultConfigFilePath(dirPath: string) {
+  let absDirPath = path.resolve(dirPath);
+  const homeDirPath = os.homedir();
 
-function getConfig(rulesPath: any, dirPath: string) {
-  if (typeof rulesPath === 'string') {
-    const configJson = getFileContent(rulesPath);
-
-    if (!configJson) {
-      throw new errors.JsonParseError(new Error('could not read/parse file'), rulesPath);
-    }
-
-    return getConfigValues(configJson, rulesPath);
-  } else {
-    let absDirPath = path.resolve(dirPath);
-    const homeDirPath = os.homedir();
-
-    while (true) {
-      const configJson = getFileContent(path.join(absDirPath, initConfigFilename));
-      if (configJson) { return getConfigValues(configJson, rulesPath); }
-      if (absDirPath === homeDirPath) { break; }
-      absDirPath = path.resolve(absDirPath, '..');
-    }
+  while (true) {
+    const configPath = path.join(absDirPath, initConfigFilename);
+    if (fs.existsSync(configPath)) { return configPath; }
+    if (absDirPath === homeDirPath) { break; }
+    absDirPath = path.resolve(absDirPath, '..');
   }
 
-  throw new Error('Could not find a configuration file or it wasn\'t provided');
+  throw new Error('configuration file was not provided/found');
 }
 
-function generateDefaultConfig(dirPath: string) {
+export function writeDefaultConfigFile(parentPath: string) {
   try {
     const configFilePath = path.join(__dirname, '../supportFiles/defaultConfig.json');
     const data = fs.readFileSync(configFilePath, 'utf8');
-    fs.writeFileSync(path.join(dirPath, initConfigFilename), data, 'utf8');
+    fs.writeFileSync(path.join(parentPath, initConfigFilename), data, 'utf8');
   } catch (err) {
     throw err;
   }
+}
+
+export function run(
+  dirPath: string,
+  configPath: string, options: {
+    ignoreDirsGlob?: string;
+    ignoreFilesGlob?: string;
+  } = {}
+) {
+  const { ignoreFiles, ignoreDirs, rules } = getConfig(configPath);
+
+  let ignoreFilesGlob: string | undefined;
+  if (ignoreFiles && ignoreFiles.length > 0) {
+    ignoreFilesGlob = `{${[ignoreFiles[0], ...ignoreFiles].join(',')}}`;
+  }
+
+  ignoreFilesGlob = options.ignoreFilesGlob || ignoreFilesGlob;
+  const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
+
+  // Ignore Dirs
+  let ignoreDirsGlob: string | undefined;
+  if (ignoreDirs && ignoreDirs.length > 0) {
+    ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
+  }
+  ignoreDirsGlob = options.ignoreDirsGlob || ignoreDirsGlob;
+  const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
+
+  const files = nodeHelpers.file
+    .getChildFiles(
+      dirPath,
+      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+    )
+    .filter(el => !el.isIgnored)
+    .map(el => el.path);
+
+  const emptyDirs = nodeHelpers.file
+    .getChildDirs(
+      dirPath,
+      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+    )
+    .filter(el => !el.isIgnored)
+    .filter(el => el.isEmpty)
+    .map(el => el.path);
+
+  program.run(files, rules, emptyDirs);
 }
 
 commander.version(
@@ -93,7 +127,7 @@ commander
   .parse(process.argv);
 
 if (commander.init) {
-  generateDefaultConfig(process.cwd());
+  writeDefaultConfigFile(process.cwd());
   console.log('\n\t', initConfigFilename.red, 'created', '\n');
 } else if (!commander.args.length) {
   commander.help();
@@ -101,42 +135,13 @@ if (commander.init) {
   const dirPath = path.resolve(commander.args[0]);
 
   try {
-    const { ignoreFiles, ignoreDirs, rules } = getConfig(commander.configFile, dirPath);
+    const configPath = (commander.configFile as string) || getDefaultConfigFilePath(dirPath);
 
-    // Ignore Files
-    let ignoreFilesGlob: string | undefined;
-    if (ignoreFiles && ignoreFiles.length > 0) {
-      ignoreFilesGlob = `{${[ignoreFiles[0], ...ignoreFiles].join(',')}}`;
-    }
-    ignoreFilesGlob = commander.ignoreFiles || ignoreFilesGlob;
-    const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
-
-    // Ignore Dirs
-    let ignoreDirsGlob: string | undefined;
-    if (ignoreDirs && ignoreDirs.length > 0) {
-      ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
-    }
-    ignoreDirsGlob = commander.ignoreDirs || ignoreDirsGlob;
-    const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
-
-    const files = nodeHelpers.file
-      .getChildFiles(
-        dirPath,
-        { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-      )
-      .filter(el => !el.isIgnored)
-      .map(el => el.path);
-
-    const emptyDirs = nodeHelpers.file
-      .getChildDirs(
-        dirPath,
-        { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-      )
-      .filter(el => !el.isIgnored)
-      .filter(el => el.isEmpty)
-      .map(el => el.path);
-
-    program.run(files, rules, emptyDirs);
+    run(
+      dirPath,
+      configPath,
+      { ignoreDirsGlob: commander.ignoreDirs, ignoreFilesGlob: commander.ignoreFiles }
+    );
   } catch (err) {
     const dash = '-'.bold;
     const errorTitle = '\n\t' + 'Error:'.bold.red.underline;
