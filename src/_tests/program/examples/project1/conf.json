@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    }
+  ]
+}

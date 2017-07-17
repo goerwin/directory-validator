@@ -1,0 +1,11 @@
+{
+  "ignoreFiles": [
+    "file1.jpg"
+  ],
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    }
+  ]
+}

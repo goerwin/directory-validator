@@ -1,0 +1,11 @@
+{
+  "ignoreDirs": [
+    "dir1"
+  ],
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    }
+  ]
+}

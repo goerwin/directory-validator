@@ -100,11 +100,13 @@ function getValidatableFiles(files: string[]): types.ValidatableFile[] {
 }
 
 function getRuleError(rule: (types.FileRule | types.DirectoryRule), paths: (string | RegExp)[]) {
+  // TODO: Rename to ValidatorRuleError
   return new errors.ProgramRuleError(rule, paths);
 }
 
 function validatePath(element: { path: string, isGood: boolean }) {
   if (!element.isGood) {
+    // TODO: Rename to ValidatorInvalidPathError
     throw new errors.ProgramInvalidPathError(element.path);
   }
 }
