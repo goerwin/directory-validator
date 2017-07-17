@@ -79,7 +79,7 @@ if (commander.init) {
       const parentPath = err.paths.join(path.sep);
       const rule = JSON.stringify(err.rule);
       console.log('\t', dash, 'Rule', rule.red, 'did not passed at:', parentPath.red);
-    } else if (err instanceof errors.ProgramInvalidPathError) {
+    } else if (err instanceof errors.ValidatorInvalidPathError) {
       console.log(errorTitle);
       console.log('\t', dash, err.path.red, 'was not validated');
     } else {
