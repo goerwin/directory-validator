@@ -17,7 +17,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/bluebird": "^3.5.8",
     "@types/colors": "^1.1.3",
