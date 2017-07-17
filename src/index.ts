@@ -67,7 +67,7 @@ function getConfig(rulesPath: any, dirPath: string) {
     }
   }
 
-  throw new Error('Could not find a config-file or it wasn\'nt provided');
+  throw new Error('Could not find a configuration file or it wasn\'t provided');
 }
 
 function generateDefaultConfig(dirPath: string) {
