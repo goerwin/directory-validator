@@ -8,8 +8,8 @@ import * as glob from 'glob';
 import * as os from 'os';
 import * as path from 'path';
 import * as errors from './errors';
-import * as program from './program';
 import * as types from './types';
+import * as validator from './validator';
 
 import Ajv = require('ajv');
 const schema = require('../supportFiles/schema.json');
@@ -111,7 +111,7 @@ export function run(
     .filter(el => el.isEmpty)
     .map(el => el.path);
 
-  program.run(files, rules, emptyDirs);
+  validator.run(files, rules, emptyDirs);
 }
 
 commander.version(
