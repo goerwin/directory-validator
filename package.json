@@ -12,8 +12,8 @@
     "test": "mocha -r source-map-support/register --compilers ts-node/register src/**/_tests/**/*.ts",
     "test-coverage": "nyc --reporter html --reporter text npm run test",
     "test-coverage-coveralls": "npm run test-coverage && nyc report --reporter=text-lcov | coveralls",
-    "test-coverage-watch": "chokidar 'src/**/*.ts' -c 'npm run test-coverage'",
-    "test-watch": "chokidar src/**/*.ts -c 'npm run test'",
+    "test-coverage-watch": "chokidar src -c 'npm run test-coverage'",
+    "test-watch": "chokidar src -c 'npm run test'",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
@@ -43,8 +43,15 @@
     "lodash": "^4.17.4"
   },
   "nyc": {
+    "all": true,
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 90,
+    "statements": 90,
+    "functions": 90,
+    "branches": 90,
     "include": [
-      "src/**/*.ts"
+      "src"
     ],
     "exclude": [
       "src/index.ts",
