@@ -35,8 +35,8 @@ function getConfig(rulesPath: string): types.Config {
 
   const parseCommonRules = (rules: types.Rules) => {
     return rules.map(rule => {
-      if (rule.type === 'commonRule') {
-        const parsedRule = configJson.commonRules[rule.id];
+      if (rule.type === 'common') {
+        const parsedRule = configJson.commonRules[rule.key];
 
         if (!parsedRule) {
           throw new errors.ConfigJsonValidateError(

@@ -1,12 +1,12 @@
 {
   "rules": [
     {
-      "type": "commonRule",
-      "id": "rule_jsonfiles"
+      "type": "common",
+      "key": "rule_jsonfiles"
     },
     {
-      "type": "commonRule",
-      "id": "rule_dir"
+      "type": "common",
+      "key": "rule_dir"
     }
   ],
   "commonRules": {

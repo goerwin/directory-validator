@@ -37,13 +37,13 @@
           { "$ref": "#/definitions/fileRule" },
           { "$ref": "#/definitions/directoryRule" },
           {
-            "title": "commonRule",
+            "title": "common",
             "type": "object",
             "properties": {
-              "type": { "enum": ["commonRule"] },
-              "id": { "type": "string", "pattern": "^rule_" }
+              "type": { "enum": ["common"] },
+              "key": { "type": "string", "pattern": "^rule_" }
             },
-            "required": ["type", "id"],
+            "required": ["type", "key"],
             "additionalProperties": false
           }
         ]
@@ -78,7 +78,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "rules"
-  ]
+  "required": ["rules"]
 }

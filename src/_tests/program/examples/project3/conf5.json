@@ -9,8 +9,8 @@
       "name": "dir1",
       "rules": [
         {
-          "type": "commonRule",
-          "id": "rule_dirchildren"
+          "type": "common",
+          "key": "rule_dirchildren"
         }
       ]
     }
