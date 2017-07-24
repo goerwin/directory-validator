@@ -13,13 +13,18 @@ export interface DirectoryRule {
   rules?: Rules;
 }
 
+export interface CommonRule {
+  type: 'commonRule';
+  id: string;
+}
+
 export interface ValidatableFile {
   path: string;
   isGood: boolean;
   isValidated: boolean;
 }
 
-export type Rules = (FileRule | DirectoryRule)[];
+export type Rules = (FileRule | DirectoryRule | CommonRule)[];
 
 export type SpecialName = '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]' | '*';
 
