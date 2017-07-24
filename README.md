@@ -35,26 +35,45 @@ The tool will evaluate the rules provided by the configuration file against the 
     ".gitignore"
   ],
   "ignoreDirs": [
-    "node_modules"
+    "node_modules",
+    ".git"
   ],
+  "commonRules": {
+    "rule_indexfile": {
+      "type": "file",
+      "name": "index.js"
+    }
+  },
   "rules": [
     {
       "type": "file",
       "name": "package.json"
     },
     {
+      "type": "common",
+      "key": "rule_indexfile"
+    },
+    {
       "type": "directory",
-      "name": ".git",
-      "rules": []
+      "name": "src",
+      "isOptional": true,
+      "rules": [
+        {
+          "type": "common",
+          "key": "rule_indexfile"
+        }
+      ]
     }
   ]
 }
 ```
 
-In this example, we want our directory to have one file named `package.json` and one directory named `.git` and nothing else (`node_modules` and `.gitignore` were ignored).
-
-If our directory has any file/dir other than the ones in the rules, the tool will throw an error.
-
+In this example:
+- We ignore the file `.gitignore` and both `.node_modules` and `.git` directories from being analized
+- We want to have one file name `package.json` and one file named `index.js`
+- We want one directory `src` to have one file named `index.js`. Since it's optional,
+  if the directory does not exist we ignore the rule, but if it does then it must only
+  have one file `index.js`
 
 ### ignoreFiles
 
@@ -64,7 +83,7 @@ A string or glob pattern. For example:
 [
   "package.json",
   "**/*.test.js",
-  ".*" // .gitignore file
+  ".*" // It will match files starting with "."
 ]
 ```
 
@@ -76,13 +95,37 @@ A string or glob pattern. For example:
 [
   "node_modules",
   "src/**/tests",
-  ".*" // .git directory
+  ".*" // It will dirs starting with "."
 ]
 ```
 
-### File Rules
+### commonRules
 
-File rules should have the following format:
+Define File and Directory rules that can be reused in `rules`
+
+```javascript
+{
+  // key must start with "rule_"
+  // Examples:
+  "rule_indexfile": {
+    "type": "file",
+    "name": "index.js"
+  },
+  "rule_anotherrule": {
+    "type": "directory",
+    "name": "images",
+    "rules": [
+      { "type": "file", "name": "logo.png" }
+    ]
+  }
+}
+```
+
+### rules
+
+Can contain File, Directory and Common Rules.
+
+#### File Rule
 
 ```javascript
 {
@@ -119,9 +162,7 @@ File rules should have the following format:
 }
 ```
 
-### Directory Rules
-
-Directory rules should have the following format:
+#### Directory Rule
 
 ```javascript
 {
@@ -147,8 +188,24 @@ Directory rules should have the following format:
 
   // Optional
   // An array containing file and directory rules
-  // If empty or omitted then we don't validate its content
+  // If empty or omitted then we don't validate dir content
   "rules": []
+}
+```
+
+#### Common Rule
+
+```javascript
+{
+  // Required
+  "type": "common",
+
+  // Required
+  // must match a key property inside "commonRules"
+  // examples:
+  "key": "rule_indexfile",
+  "key": "rule_test2",
+  "key": "rule_whatever"
 }
 ```
 

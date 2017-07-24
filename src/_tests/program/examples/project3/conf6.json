@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    },
+    {
+      "type": "directory",
+      "name": "dir1",
+      "rules": [
+        {
+          "type": "common",
+          "key": "rule_xxxxxxxxxxxxxxxxx"
+        }
+      ]
+    }
+  ],
+  "commonRules": {
+    "rule_dirchildren": {
+      "type": "file",
+      "name": "file1.json"
+    }
+  }
+}

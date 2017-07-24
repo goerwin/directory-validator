@@ -12,24 +12,51 @@ function getConfig(rulesPath: string): types.Config {
   let configJson: any;
 
   try {
-    configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8')) as string;
+    configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
   } catch (err) {
     throw new errors.JsonParseError(err, rulesPath);
   }
 
-  const ajv = new Ajv();
+  const validateWithSchema = (configJson: any) => {
+    const ajv = new Ajv();
 
-  if (!ajv.validate(schema, configJson)) {
-    let errorMessages: string[][] = [];
+    if (!ajv.validate(schema, configJson)) {
+      let errorMessages: string[][] = [];
 
-    if (ajv.errors) {
-      errorMessages = ajv.errors.map(el =>
-        [`data${el.dataPath}`, `${el.message || ''}`]
-      );
+      if (ajv.errors) {
+        errorMessages = ajv.errors.map(el =>
+          [`data${el.dataPath}`, `${el.message || ''}`]
+        );
+      }
+
+      throw new errors.ConfigJsonValidateError(errorMessages, rulesPath);
     }
+  };
 
-    throw new errors.ConfigJsonValidateError(errorMessages, rulesPath);
-  }
+  const parseCommonRules = (rules: types.Rules) => {
+    return rules.map(rule => {
+      if (rule.type === 'common') {
+        const parsedRule = configJson.commonRules[rule.key];
+
+        if (!parsedRule) {
+          throw new errors.ConfigJsonValidateError(
+            [['Common Rule Invalid', JSON.stringify(rule)]],
+            rulesPath
+          );
+        }
+
+        return { ...parsedRule };
+      } else if (rule.type === 'directory') {
+        rule.rules = parseCommonRules(rule.rules || []);
+      }
+
+      return rule;
+    });
+  };
+
+  validateWithSchema(configJson);
+  configJson.rules = parseCommonRules(configJson.rules);
+  validateWithSchema(configJson);
 
   return {
     ignoreFiles: configJson.ignoreFiles,

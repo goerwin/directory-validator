@@ -93,6 +93,44 @@ describe('Program:', () => {
       program.run(exampleProjectPath, configFile, { ignoreDirsGlob: 'dir1' });
       program.run(exampleProjectPath, configFile, { ignoreDirsGlob: '{dir1,dir2}' });
       program.run(exampleProjectPath, configFile2);
-    }, () => null);
+    });
+  });
+
+  it('should validate conf3.json in project3 because of common rule', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project3');
+    const configFile = path.join(exampleProjectPath, 'conf3.json');
+
+    assert.doesNotThrow(() => {
+      program.run(exampleProjectPath, configFile);
+    });
+  });
+
+  it('should throw because common rule in conf4.json in project3 not enough', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project3');
+    const configFile = path.join(exampleProjectPath, 'conf4.json');
+
+    assert.throws(
+      () => { program.run(exampleProjectPath, configFile); },
+      (err: Error) => err instanceof errors.ValidatorRuleError
+    );
+  });
+
+  it('should validate because config file validates everything', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project3');
+    const configFile = path.join(exampleProjectPath, 'conf5.json');
+
+    assert.doesNotThrow(() => {
+      program.run(exampleProjectPath, configFile);
+    });
+  });
+
+  it('should throw if common rule not found', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project3');
+    const configFile = path.join(exampleProjectPath, 'conf6.json');
+
+    assert.throws(
+      () => { program.run(exampleProjectPath, configFile); },
+      (err: Error) => err instanceof errors.ConfigJsonValidateError
+    );
   });
 });

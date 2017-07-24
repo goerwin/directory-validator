@@ -119,6 +119,8 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
     if (rules.length === 0) { return; }
 
     rules.forEach((rule, idx) => {
+      if (rule.type === 'common') { return; }
+
       rule.name = getCorrectStringRegexp(rule.name);
 
       if (rule.type === 'file') {
