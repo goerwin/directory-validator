@@ -1,85 +1,83 @@
 {
-  "title": "Folder schema validator",
-  "type": "object",
-  "properties": {
-    "ignoreFiles": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "type": "string"
-      }
+  "definitions": {
+    "fileRule": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": {
+          "enum": ["file"]
+        },
+        "name": { "type": "string" },
+        "extension": { "type": "string" },
+        "isOptional": { "type": "boolean" }
+      },
+      "additionalProperties": false
     },
-    "ignoreDirs": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "type": "string"
-      }
+    "directoryRule": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": {
+          "enum": [
+            "directory"
+          ]
+        },
+        "name": { "type": "string" },
+        "isOptional": { "type": "boolean" },
+        "isRecursive": { "type": "boolean" },
+        "rules": { "$ref": "#/definitions/rules" }
+      },
+      "additionalProperties": false
     },
     "rules": {
-      "id": "rules",
-      "description": "Rules",
       "type": "array",
       "uniqueItems": true,
       "items": {
         "oneOf": [
+          { "$ref": "#/definitions/fileRule" },
+          { "$ref": "#/definitions/directoryRule" },
           {
-            "title": "File",
+            "title": "commonRule",
             "type": "object",
             "properties": {
-              "type": {
-                "enum": [
-                  "file"
-                ]
-              },
-              "name": {
-                "type": "string"
-              },
-              "extension": {
-                "type": "string"
-              },
-              "isOptional": {
-                "type": "boolean"
-              }
+              "type": { "enum": ["commonRule"] },
+              "id": { "type": "string", "pattern": "^rule_" }
             },
-            "required": [
-              "type",
-              "name"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "title": "Directory",
-            "type": "object",
-            "properties": {
-              "type": {
-                "enum": [
-                  "directory"
-                ]
-              },
-              "name": {
-                "type": "string"
-              },
-              "isOptional": {
-                "type": "boolean"
-              },
-              "isRecursive": {
-                "type": "boolean"
-              },
-              "rules": {
-                "$ref": "rules"
-              }
-            },
-            "required": [
-              "type",
-              "name"
-            ],
+            "required": ["type", "id"],
             "additionalProperties": false
           }
         ]
       }
     }
   },
+  "title": "Folder schema validator",
+  "type": "object",
+  "properties": {
+    "ignoreFiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "ignoreDirs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "rules": { "$ref": "#/definitions/rules" },
+    "commonRules": {
+      "type": "object",
+      "patternProperties": {
+        "^rule_": {
+          "oneOf": [
+            { "$ref": "#/definitions/fileRule" },
+            { "$ref": "#/definitions/directoryRule" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
   "required": [
     "rules"
   ]
