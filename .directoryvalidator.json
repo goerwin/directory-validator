@@ -1,9 +1,14 @@
 {
   "ignoreFiles": [
-    ".gitignore"
+    ".gitignore",
+    ".directoryvalidator.json",
+    "package-lock.json",
+    ".DS_Store"
   ],
   "ignoreDirs": [
     "node_modules",
+    ".nyc_output",
+    "coverage",
     ".git"
   ],
   "commonRules": {
@@ -18,18 +23,30 @@
       "name": "package.json"
     },
     {
-      "type": "common",
-      "key": "rule_indexfile"
+      "type": "file",
+      "name": "LICENSE"
+    },
+    {
+      "type": "file",
+      "name": ".travis.yml"
+    },
+    {
+      "type": "file",
+      "name": "tsconfig.json"
+    },
+    {
+      "type": "file",
+      "name": "*.md"
+    },
+    {
+      "type": "directory",
+      "name": "supportFiles"
     },
     {
       "type": "directory",
       "name": "src",
       "isOptional": true,
       "rules": [
-        {
-          "type": "common",
-          "key": "rule_indexfile"
-        }
       ]
     }
   ]

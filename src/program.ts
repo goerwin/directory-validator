@@ -92,20 +92,26 @@ export function run(
 
   const files = nodeHelpers.file
     .getChildFiles(
-    dirPath,
-    { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-    )
-    .filter(el => !el.isIgnored)
-    .map(el => el.path);
+      dirPath,
+      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+    );
 
   const emptyDirs = nodeHelpers.file
     .getChildDirs(
-    dirPath,
-    { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-    )
-    .filter(el => !el.isIgnored)
-    .filter(el => el.isEmpty)
-    .map(el => el.path);
+      dirPath,
+      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
+    );
 
-  validator.run(files, rules, emptyDirs);
+  validator.run(
+    files.filter(el => !el.isIgnored).map(el => el.path),
+    rules,
+    emptyDirs.filter(el => !el.isIgnored && el.isEmpty).map(el => el.path)
+  );
+
+  return {
+    asciiTree: nodeHelpers.file.generateAsciiTree(
+      dirPath,
+      [...files, ...emptyDirs.filter(el => el.isIgnored || el.isEmpty)]
+    )
+  };
 }

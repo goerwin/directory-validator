@@ -42,6 +42,7 @@ commander.version(
 commander
   .arguments('<dirPath>')
   .option('-i, --init', 'Create a configuration file')
+  .option('-p, --print', 'Print the directory structure validated')
   .option('-f, --ignore-files <files>', 'Ignore files (glob string) eg: -f "*.js"')
   .option('-d, --ignore-dirs <dirs>', 'Ignore directories (glob string) eg: -d "**/tests"')
   .option('-c, --config-file <path>', 'Path to the configuration file')
@@ -58,36 +59,45 @@ if (commander.init) {
   try {
     const configPath = (commander.configFile as string) || getDefaultConfigFilePath(dirPath);
 
-    program.run(
+    const results = program.run(
       dirPath,
       configPath,
       { ignoreDirsGlob: commander.ignoreDirs, ignoreFilesGlob: commander.ignoreFiles }
     );
+
+    if (commander.print && results.asciiTree) {
+      console.log(
+        results.asciiTree
+          .replace(/\/fileIgnored/g, '[File Ignored]'.dim)
+          .replace(/\/directoryIgnored/g, '[Directory Ignored]'.dim)
+          .replace(/\/emptyDirectory/g, '[Empty Directory]'.dim)
+      );
+    }
   } catch (err) {
     const dash = '-'.bold;
     const errorTitle = '\n\t' + 'Error:'.bold.red.underline;
 
     if (err instanceof errors.JsonParseError) {
-      console.log(errorTitle, 'at config file:'.red, err.filePath);
-      console.log('\t', dash, 'Could not parse/read the file');
-      console.log('\t', dash, err.message);
+      console.error(errorTitle, 'at config file:'.red, err.filePath);
+      console.error('\t', dash, 'Could not parse/read the file');
+      console.error('\t', dash, err.message);
     } else if (err instanceof errors.ConfigJsonValidateError) {
-      console.log(errorTitle, 'at config file:'.red, err.filePath);
-      err.messages.forEach(el => console.log('\t', dash, `${el[0].red}:`, el[1]));
+      console.error(errorTitle, 'at config file:'.red, err.filePath);
+      err.messages.forEach(el => console.error('\t', dash, `${el[0].red}:`, el[1]));
     } else if (err instanceof errors.ValidatorRuleError) {
-      console.log(errorTitle);
+      console.error(errorTitle);
       const parentPath = err.paths.join(path.sep);
       const rule = JSON.stringify(err.rule);
-      console.log('\t', dash, 'Rule', rule.red, 'did not passed at:', parentPath.red);
+      console.error('\t', dash, 'Rule', rule.red, 'did not passed at:', parentPath.red);
     } else if (err instanceof errors.ValidatorInvalidPathError) {
-      console.log(errorTitle);
-      console.log('\t', dash, err.path.red, 'was not validated');
+      console.error(errorTitle);
+      console.error('\t', dash, err.path.red, 'was not validated');
     } else {
-      console.log(errorTitle);
-      console.log('\t', dash, err.message.red);
+      console.error(errorTitle);
+      console.error('\t', dash, err.message.red);
     }
 
-    console.log();
+    console.error();
     process.exit(1);
   }
 }

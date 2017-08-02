@@ -1,15 +1,15 @@
 
 # TODO
-- ability to abstract common rules so we can make them shareable
 - Examples
   - Provide some folder examples:
     * examples/basic
     * examples/recursive-directories
     * examples/multimatching-rules
-- option to print the directory structure printed
 - allow rules to be exclusive
 
 # DONE
+- option to print the directory structure printed
+- ability to abstract common rules so we can make them shareable
 - test the public api
 - it should throw if no config file found
 - license
