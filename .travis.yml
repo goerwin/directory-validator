@@ -10,9 +10,11 @@ node_js:
 before_script:
   - npm prune
 script:
-  - npm run test-coverage-coveralls
+  - npm run test
+  - npm run coverage
   - npm run build
 after_success:
+  - npm run coverage-coveralls
   - npm run semantic-release
 branches:
   except:
