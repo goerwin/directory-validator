@@ -46,7 +46,9 @@ function getConfig(rulesPath: string): types.Config {
         }
 
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
-        parsedRule.isOptional = !!rule.isOptional;
+        parsedRule.isOptional = typeof parsedRule.isOptional === 'undefined' ?
+          !!rule.isOptional : parsedRule.isOptional;
+
         return { ...parsedRule };
       } else if (rule.type === 'directory') {
         rule.rules = parseCommonRules(rule.rules || []);
