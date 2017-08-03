@@ -1,8 +1,8 @@
 
 # TODO
-- common dir rules can have other common rules inside
 - more error info (path) in validatorRuleError
-
+  - better ubication of a rule when displaying errors (rules[3].rules[1]) like
+    ajv when validating json schemas
 - Examples
   - Provide some folder examples:
     * examples/basic
@@ -11,6 +11,7 @@
 - allow rules to be exclusive
 
 # DONE
+- common dir rules can have other common rules inside
 - common rules can be optional
 - option to print the directory structure printed
 - ability to abstract common rules so we can make them shareable
