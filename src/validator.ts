@@ -187,12 +187,16 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
       if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
         const parentPaths = getFilesByParentDir(dirFiles);
         const parentPathsArray = _.keys(parentPaths);
+        const nextDirNamesChecked: string[] = [];
 
         for (let i = 0; i < parentPathsArray.length; i += 1) {
-          // TODO: I think i can win some performance gains here by avoiding
-          // redundant searches
+          // Only look for the nextDirName (no recursively) to form the new path.
+          // So it case we have a file 'a/b/c/d.js', we only iterate on [...paths, 'a']
           const nextDirName = parentPathsArray[i].split(path.sep)[paths.length - 1];
-          validateRules(rule.rules, [...paths, nextDirName]);
+          if (!nextDirNamesChecked.includes(nextDirName)) {
+            nextDirNamesChecked.push(nextDirName);
+            validateRules(rule.rules, [...paths, nextDirName]);
+          }
         }
 
         return;
