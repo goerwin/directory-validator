@@ -1,5 +1,9 @@
 
 # TODO
+- common dir rules can have other common rules inside
+- common rules can be optional
+- more error info (path) in validatorRuleError
+
 - Examples
   - Provide some folder examples:
     * examples/basic

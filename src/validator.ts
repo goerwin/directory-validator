@@ -166,7 +166,7 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
       const emptyDir = newEmptyDirs
         .find(el => el.path === path.normalize([...paths, rule.name].join(path.sep)));
 
-      // If no rules for this dir, it should validate all of his files
+      // If no rules for this dir, it should validate all of its files
       if ((rule.rules || []).length === 0) {
         dirFiles.forEach(el => { el.isGood = true; });
 
@@ -189,7 +189,10 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
         const parentPathsArray = _.keys(parentPaths);
 
         for (let i = 0; i < parentPathsArray.length; i += 1) {
-          validateRules(rule.rules, [...paths, parentPathsArray[i]]);
+          // TODO: I think i can win some performance gains here by avoiding
+          // redundant searches
+          const nextDirName = parentPathsArray[i].split(path.sep)[paths.length - 1];
+          validateRules(rule.rules, [...paths, nextDirName]);
         }
 
         return;
@@ -205,9 +208,7 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
         return;
       }
 
-      if (!rule.isOptional) {
-        validateRules(rule.rules, [...paths, rule.name]);
-      }
+      validateRules(rule.rules, [...paths, rule.name]);
     });
   }
 

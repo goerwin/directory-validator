@@ -109,6 +109,61 @@ export function run() {
       });
     });
 
+    it('should work for > 1 level deep directory', () => {
+      const files = ['a/b/c.js'];
+
+      const configObject: types.Rules = [
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              rules: [
+                {
+                  type: 'file',
+                  name: 'c.js'
+                }
+              ]
+            }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        validator.run(files, configObject);
+      }, () => null);
+    });
+
+    it('should work for > 1 level deep optional directory', () => {
+      const files = ['a/b/c.js'];
+
+      const configObject: types.Rules = [
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              isOptional: true,
+              rules: [
+                {
+                  type: 'file',
+                  name: 'c.js'
+                }
+              ]
+            }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        validator.run(files, configObject);
+      }, () => null);
+    });
+
     it('should throw because an optional dir rule fails', () => {
       const files = ['src/a.js'];
 
@@ -125,7 +180,7 @@ export function run() {
 
       assert.throws(
         () => { validator.run(files, configObject); },
-        (err: Error) => err.message.includes('src/a.js, was not validated')
+        (err: Error) => err.message.includes('}, deep: 2, rule did not passed')
       );
     });
 
@@ -279,6 +334,33 @@ export function run() {
         assert.doesNotThrow(() => {
           validator.run(files, configObject);
         });
+      });
+
+      it('should work for > 1 level deep', () => {
+        const files = ['a/b/c.js'];
+
+        const configObject: types.Rules = [
+          {
+            name: '*',
+            type: 'directory',
+            rules: [
+              {
+                name: '*',
+                type: 'directory',
+                rules: [
+                  {
+                    type: 'file',
+                    name: 'c.js'
+                  }
+                ]
+              }
+            ]
+          }
+        ];
+
+        assert.doesNotThrow(() => {
+          validator.run(files, configObject);
+        }, () => null);
       });
     });
   });
