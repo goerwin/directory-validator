@@ -1,6 +1,7 @@
 import * as nodeHelpers from 'ego-node-helpers';
 import * as fs from 'fs';
 import * as glob from 'glob';
+import * as _ from 'lodash';
 import * as errors from './errors';
 import * as types from './types';
 import * as validator from './validator';
@@ -45,6 +46,7 @@ function getConfig(rulesPath: string): types.Config {
           );
         }
 
+        parsedRule = _.cloneDeep(parsedRule);
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
         parsedRule.isOptional = typeof parsedRule.isOptional === 'undefined' ?
           !!rule.isOptional : parsedRule.isOptional;
