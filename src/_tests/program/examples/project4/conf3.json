@@ -1,0 +1,43 @@
+{
+  "commonRules": {
+    "rule_dirs": {
+      "type": "directory",
+      "name": "*",
+      "rules": [
+        {
+          "type": "directory",
+          "name": "*",
+          "rules": [
+            {
+              "type": "common",
+              "key": "rule_inception"
+            }
+          ]
+        }
+      ]
+    },
+    "rule_inception": {
+      "type": "file",
+      "name": "c.js"
+    },
+    "rule_bad": {
+      "type": "file",
+      "name": "lul"
+    }
+  },
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    },
+    {
+      "type": "common",
+      "key": "rule_dirs"
+    },
+    {
+      "type": "common",
+      "key": "rule_bad",
+      "isOptional": true
+    }
+  ]
+}

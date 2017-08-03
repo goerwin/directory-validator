@@ -25,7 +25,8 @@ export interface ValidatableFile {
   isValidated: boolean;
 }
 
-export type Rules = (FileRule | DirectoryRule | CommonRule)[];
+export type Rule = (FileRule | DirectoryRule | CommonRule);
+export type Rules = Rule[];
 
 export type SpecialName = '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]' | '*';
 

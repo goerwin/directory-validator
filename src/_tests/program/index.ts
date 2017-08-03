@@ -152,6 +152,15 @@ describe('Program:', () => {
     });
   });
 
+  it('should validate project4 conf3.json because inception rule', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project4');
+    const configFile = path.join(exampleProjectPath, 'conf3.json');
+
+    assert.doesNotThrow(() => {
+      program.run(exampleProjectPath, configFile);
+    });
+  });
+
   it('should throw project4 confbad1.json', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project4');
     const configFile = path.join(exampleProjectPath, 'confbad1.json');

@@ -75,7 +75,7 @@ In this example:
   if the directory does not exist we ignore the rule, but if it does then it must only
   have one file `index.js`
 
-### ignoreFiles
+### ignoreFiles:
 
 A string or glob pattern. For example:
 
@@ -83,11 +83,11 @@ A string or glob pattern. For example:
 [
   "package.json",
   "**/*.test.js",
-  ".*" // It will ignore files starting with "."
+  ".*" // files starting with "."
 ]
 ```
 
-### ignoreDirs
+### ignoreDirs:
 
 A string or glob pattern. For example:
 
@@ -95,13 +95,13 @@ A string or glob pattern. For example:
 [
   "node_modules",
   "src/**/tests",
-  ".*" // It will ignore dirs starting with "."
+  ".*" // dirs starting with "."
 ]
 ```
 
-### commonRules
+### commonRules:
 
-Define File and Directory rules that can be reused in `rules`
+Define File, Directory and Common rules that can be reused in `rules`
 
 ```javascript
 {
@@ -121,9 +121,9 @@ Define File and Directory rules that can be reused in `rules`
 }
 ```
 
-### rules
+### rules:
 
-Can contain File, Directory and Common Rules.
+Can contain File, Directory and Common Rules
 
 #### File Rule
 
@@ -205,15 +205,18 @@ Can contain File, Directory and Common Rules.
   // examples:
   "key": "rule_indexfile",
   "key": "rule_test2",
-  "key": "rule_whatever"
+  "key": "rule_whatever",
+
+  // Optional
+  // default: false
+  // Whether the directory can be included
+  "isOptional": false
 }
 ```
 
-## Important Notes
+## Notes
 
 * When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
 
 * Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
-
-  For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.
-
+  * For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.

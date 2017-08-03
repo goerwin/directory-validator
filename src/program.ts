@@ -33,11 +33,10 @@ function getConfig(rulesPath: string): types.Config {
     }
   };
 
-  const parseCommonRules = (rules: types.Rules) => {
+  const parseCommonRules = (rules: types.Rules): types.Rules => {
     return rules.map(rule => {
       if (rule.type === 'common') {
-        const parsedRule =
-          configJson.commonRules[rule.key] as (types.FileRule | types.DirectoryRule | undefined);
+        let parsedRule = configJson.commonRules[rule.key] as (types.Rule | null);
 
         if (!parsedRule) {
           throw new errors.ConfigJsonValidateError(
@@ -46,6 +45,7 @@ function getConfig(rulesPath: string): types.Config {
           );
         }
 
+        parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
         parsedRule.isOptional = !!rule.isOptional;
         return { ...parsedRule };
       } else if (rule.type === 'directory') {
