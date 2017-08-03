@@ -83,7 +83,7 @@ A string or glob pattern. For example:
 [
   "package.json",
   "**/*.test.js",
-  ".*" // It will match files starting with "."
+  ".*" // It will ignore files starting with "."
 ]
 ```
 
@@ -95,7 +95,7 @@ A string or glob pattern. For example:
 [
   "node_modules",
   "src/**/tests",
-  ".*" // It will dirs starting with "."
+  ".*" // It will ignore dirs starting with "."
 ]
 ```
 
