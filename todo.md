@@ -1,7 +1,6 @@
 
 # TODO
 - common dir rules can have other common rules inside
-- common rules can be optional
 - more error info (path) in validatorRuleError
 
 - Examples
@@ -12,6 +11,7 @@
 - allow rules to be exclusive
 
 # DONE
+- common rules can be optional
 - option to print the directory structure printed
 - ability to abstract common rules so we can make them shareable
 - test the public api

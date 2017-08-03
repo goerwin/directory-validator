@@ -41,7 +41,8 @@
             "type": "object",
             "properties": {
               "type": { "enum": ["common"] },
-              "key": { "type": "string", "pattern": "^rule_" }
+              "key": { "type": "string", "pattern": "^rule_" },
+              "isOptional": { "type": "boolean" }
             },
             "required": ["type", "key"],
             "additionalProperties": false

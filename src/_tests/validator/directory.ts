@@ -133,7 +133,7 @@ export function run() {
 
       assert.doesNotThrow(() => {
         validator.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should work for > 1 level deep optional directory', () => {
@@ -161,7 +161,7 @@ export function run() {
 
       assert.doesNotThrow(() => {
         validator.run(files, configObject);
-      }, () => null);
+      });
     });
 
     it('should throw because an optional dir rule fails', () => {
@@ -317,6 +317,104 @@ export function run() {
       });
     });
 
+    it('should work for > 1 level deep', () => {
+      const files = ['a/b/c.js'];
+
+      const configObject: types.Rules = [
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              rules: [
+                { type: 'file', name: 'c.js' }
+              ]
+            }
+          ]
+        }
+      ];
+    });
+
+    it('should work for > 1 level deep and dir rule first', () => {
+      const files = ['file.js', 'file2.js', 'a/b/c.js'];
+
+      const configObject: types.Rules = [
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              rules: [
+                { type: 'file', name: 'c.js' }
+              ]
+            }
+          ]
+        },
+        { type: 'file', name: '[camelCase].js' },
+        { type: 'file', name: 'lol', isOptional: true }
+      ];
+
+      assert.doesNotThrow(() => {
+        validator.run(files, configObject);
+      });
+    });
+
+    it('should work for > 1 level deep and dir rule last', () => {
+      const files = ['file.js', 'file2.js', 'a/b/c.js'];
+
+      const configObject: types.Rules = [
+        { type: 'file', name: '[camelCase].js' },
+        { type: 'file', name: 'lol', isOptional: true },
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              rules: [
+                { type: 'file', name: 'c.js' }
+              ]
+            }
+          ]
+        }
+      ];
+
+      assert.doesNotThrow(() => {
+        validator.run(files, configObject);
+      });
+    });
+
+    it('should work for > 1 level deep and dir rule not first/last', () => {
+      const files = ['file.js', 'file2.js', 'a/b/c.js'];
+
+      const configObject: types.Rules = [
+        { type: 'file', name: '[camelCase].js' },
+        {
+          name: 'a',
+          type: 'directory',
+          rules: [
+            {
+              name: 'b',
+              type: 'directory',
+              rules: [
+                { type: 'file', name: 'c.js' }
+              ]
+            }
+          ]
+        },
+        { type: 'file', name: 'lol', isOptional: true }
+      ];
+
+      assert.doesNotThrow(() => {
+        validator.run(files, configObject);
+      });
+    });
+
     describe('*:', () => {
       it('should validate a basic directory', () => {
         const files = ['./src/file.js', './omg/file.js'];
@@ -360,7 +458,7 @@ export function run() {
 
         assert.doesNotThrow(() => {
           validator.run(files, configObject);
-        }, () => null);
+        });
       });
     });
   });

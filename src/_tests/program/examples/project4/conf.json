@@ -1,0 +1,30 @@
+{
+  "commonRules": {
+    "rule_dirs": {
+      "type": "directory",
+      "name": "*",
+      "rules": [
+        {
+          "type": "directory",
+          "name": "*",
+          "rules": [
+            {
+              "type": "file",
+              "name": "c.js"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "file",
+      "name": "[camelCase].json"
+    },
+    {
+      "type": "common",
+      "key": "rule_dirs"
+    }
+  ]
+}

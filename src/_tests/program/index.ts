@@ -133,4 +133,42 @@ describe('Program:', () => {
       (err: Error) => err instanceof errors.ConfigJsonValidateError
     );
   });
+
+  it('should validate project4 conf.json', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project4');
+    const configFile = path.join(exampleProjectPath, 'conf.json');
+
+    assert.doesNotThrow(() => {
+      program.run(exampleProjectPath, configFile);
+    });
+  });
+
+  it('should validate project4 conf2.json because optional common rule', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project4');
+    const configFile = path.join(exampleProjectPath, 'conf2.json');
+
+    assert.doesNotThrow(() => {
+      program.run(exampleProjectPath, configFile);
+    });
+  });
+
+  it('should throw project4 confbad1.json', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project4');
+    const configFile = path.join(exampleProjectPath, 'confbad1.json');
+
+    assert.throws(
+      () => { program.run(exampleProjectPath, configFile); },
+      (err: Error) => err instanceof errors.ValidatorRuleError
+    );
+  });
+
+  it('should throw project4 confbad2.json because of non optional common rule', () => {
+    const exampleProjectPath = path.join(__dirname, 'examples/project4');
+    const configFile = path.join(exampleProjectPath, 'confbad2.json');
+
+    assert.throws(
+      () => { program.run(exampleProjectPath, configFile); },
+      (err: Error) => err instanceof errors.ValidatorRuleError
+    );
+  });
 });

@@ -16,6 +16,7 @@ export interface DirectoryRule {
 export interface CommonRule {
   type: 'common';
   key: string;
+  isOptional?: boolean;
 }
 
 export interface ValidatableFile {

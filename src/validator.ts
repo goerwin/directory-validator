@@ -146,11 +146,7 @@ export function run(files: string[], mainRules: types.Rules, emptyDirs: string[]
           throw getRuleError(rule, paths);
         }
 
-        // If there are no more sibling file rules coming, we mark as good all the
-        // files that passed the test
-
-        if (rules.slice(idx + 1).some(el => el.type === 'file')) { return; }
-
+        // Mark as good all files that were validated
         dirFiles
           .filter(el => el.isValidated)
           .forEach(el => { el.isGood = true; });
