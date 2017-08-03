@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rm -rf .nyc_output && rm -rf coverage && rm -rf lib",
-    "coverage": "nyc --reporter html --reporter text npm run test",
+    "coverage": "nyc --reporter=html --reporter=text npm run test",
     "coverage-coveralls": "npm run coverage && nyc report --reporter=text-lcov | coveralls",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "test": "mocha -r source-map-support/register --compilers ts-node/register src/**/_tests/**/*.ts",
