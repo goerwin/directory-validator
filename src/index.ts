@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import 'colors';
-import * as commander from 'commander';
+import { program as commanderProgram } from 'commander';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -29,24 +29,18 @@ function getDefaultConfigFilePath(dirPath: string) {
 }
 
 export function writeDefaultConfigFile(parentPath: string) {
-  try {
-    const configFilePath = path.join(
-      __dirname,
-      '../supportFiles/defaultConfig.json'
-    );
-    const data = fs.readFileSync(configFilePath, 'utf8');
-    fs.writeFileSync(path.join(parentPath, initConfigFilename), data, 'utf8');
-  } catch (err) {
-    throw err;
-  }
+  fs.copyFileSync(
+    path.join(__dirname, './supportFiles/defaultConfig.json'),
+    parentPath
+  );
 }
 
-commander.version(
+commanderProgram.version(
   JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'))
     .version
 );
 
-commander
+commanderProgram
   .arguments('<dirPath>')
   .option('-i, --init', 'Create a configuration file')
   .option('-p, --print', 'Print the directory structure validated')
@@ -61,24 +55,30 @@ commander
   .option('-c, --config-file <path>', 'Path to the configuration file')
   .parse(process.argv);
 
-if (commander.init) {
-  writeDefaultConfigFile(process.cwd());
+const selectedOptions = commanderProgram.opts();
+
+if (selectedOptions.init) {
+  fs.copyFileSync(
+    path.join(__dirname, './supportFiles/defaultConfig.json'),
+    path.join(process.cwd(), initConfigFilename)
+  );
   console.log('\n\t', initConfigFilename.red, 'created', '\n');
-} else if (!commander.args.length) {
-  commander.help();
+} else if (!commanderProgram.args.length) {
+  commanderProgram.help();
 } else {
-  const dirPath = path.resolve(commander.args[0]);
+  const dirPath = path.resolve(commanderProgram.args[0]);
 
   try {
     const configPath =
-      (commander.configFile as string) || getDefaultConfigFilePath(dirPath);
+      (selectedOptions.configFile as string) ||
+      getDefaultConfigFilePath(dirPath);
 
     const results = program.run(dirPath, configPath, {
-      ignoreDirsGlob: commander.ignoreDirs,
-      ignoreFilesGlob: commander.ignoreFiles,
+      ignoreDirsGlob: selectedOptions.ignoreDirs,
+      ignoreFilesGlob: selectedOptions.ignoreFiles,
     });
 
-    if (commander.print && results.asciiTree) {
+    if (selectedOptions.print && results.asciiTree) {
       console.log(
         results.asciiTree
           .replace(/\/fileIgnored/g, '[File Ignored]'.dim)
@@ -88,7 +88,7 @@ if (commander.init) {
     }
   } catch (err) {
     const dash = '-'.bold;
-    const errorTitle = '\n\t' + 'Error:'.bold.red.underline;
+    const errorTitle = '\n\t' + 'Error:'.red.underline;
 
     if (err instanceof errors.JsonParseError) {
       console.error(errorTitle, 'at config file:'.red, err.filePath);

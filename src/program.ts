@@ -1,14 +1,12 @@
-import * as nodeHelpers from 'goerwin-ts-helpers/dist/node';
+import Ajv from 'ajv';
 import * as fs from 'fs';
 import * as glob from 'glob';
+import * as nodeHelpers from 'goerwin-ts-helpers/dist/node';
 import * as _ from 'lodash';
 import * as errors from './errors';
+import schema from './supportFiles/schema.json';
 import * as types from './types';
 import * as validator from './validator';
-import Ajv from 'ajv';
-import schema from '../supportFiles/schema.json';
-
-// const schema = require('../supportFiles/schema.json');
 
 function getConfig(rulesPath: string): types.Config {
   let configJson: any;
@@ -27,7 +25,7 @@ function getConfig(rulesPath: string): types.Config {
 
       if (ajv.errors) {
         errorMessages = ajv.errors.map(
-          (el) => [`data${el.data}`, `${el.message || ''}`]
+          (el) => [`data${el.instancePath}`, `${el.message || ''}`]
           // TODO: Verify
           // [`data${el.dataPath}`, `${el.message || ''}`]
         );

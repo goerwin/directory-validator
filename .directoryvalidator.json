@@ -5,7 +5,7 @@
     "package-lock.json",
     ".DS_Store"
   ],
-  "ignoreDirs": ["node_modules", ".nyc_output", "coverage", ".git"],
+  "ignoreDirs": ["node_modules", "lib", ".git", ".github"],
   "commonRules": {
     "rule_indexfile": {
       "type": "file",
@@ -23,19 +23,15 @@
     },
     {
       "type": "file",
-      "name": ".travis.yml"
-    },
-    {
-      "type": "file",
       "name": "tsconfig.json"
     },
     {
       "type": "file",
-      "name": "*.md"
+      "name": "jest.*.js"
     },
     {
-      "type": "directory",
-      "name": "supportFiles"
+      "type": "file",
+      "name": "*.md"
     },
     {
       "type": "directory",
