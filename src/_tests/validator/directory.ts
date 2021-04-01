@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import * as types from '../../types';
 import * as validator from '../../validator';
 
@@ -13,14 +12,12 @@ export function run() {
           type: 'directory',
           rules: [
             { name: 'nice file.js', type: 'file' },
-            { name: 'blue.conf', type: 'file' }
-          ]
-        }
+            { name: 'blue.conf', type: 'file' },
+          ],
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should validate dir if it does not have rules', () => {
@@ -29,13 +26,11 @@ export function run() {
       const configObject: types.Rules = [
         {
           name: 'src',
-          type: 'directory'
-        }
+          type: 'directory',
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should validate dir and subdirs if it does not have rules', () => {
@@ -44,13 +39,11 @@ export function run() {
       const configObject: types.Rules = [
         {
           name: 'src',
-          type: 'directory'
-        }
+          type: 'directory',
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should throw because wrong name of directory', () => {
@@ -62,17 +55,13 @@ export function run() {
           type: 'directory',
           rules: [
             { name: 'nice file.js', type: 'file' },
-            { name: 'blue.conf', type: 'file' }
-          ]
-        }
+            { name: 'blue.conf', type: 'file' },
+          ],
+        },
       ];
 
-      assert.throws(
-        () => { validator.run(files, configObject); },
-        (err: Error) =>
-          err.message.includes(
-            `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
-          )
+      expect(() => validator.run(files, configObject)).toThrowError(
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
       );
     });
 
@@ -85,10 +74,8 @@ export function run() {
           name: 'src',
           type: 'directory',
           isOptional: true,
-          rules: [
-            { name: 'blue.conf', type: 'file' }
-          ]
-        }
+          rules: [{ name: 'blue.conf', type: 'file' }],
+        },
       ];
 
       const configObject2: types.Rules = [
@@ -96,17 +83,15 @@ export function run() {
           name: 'src',
           type: 'directory',
           isOptional: true,
-          rules: [
-            { name: 'blue.conf', type: 'file' }
-          ]
+          rules: [{ name: 'blue.conf', type: 'file' }],
         },
-        { name: 'index.js', type: 'file' }
+        { name: 'index.js', type: 'file' },
       ];
 
-      assert.doesNotThrow(() => {
+      expect(() => {
         validator.run(files, configObject);
         validator.run(files, configObject2);
-      });
+      }).not.toThrow();
     });
 
     it('should work for > 1 level deep directory', () => {
@@ -123,17 +108,15 @@ export function run() {
               rules: [
                 {
                   type: 'file',
-                  name: 'c.js'
-                }
-              ]
-            }
-          ]
-        }
+                  name: 'c.js',
+                },
+              ],
+            },
+          ],
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should work for > 1 level deep optional directory', () => {
@@ -151,17 +134,15 @@ export function run() {
               rules: [
                 {
                   type: 'file',
-                  name: 'c.js'
-                }
-              ]
-            }
-          ]
-        }
+                  name: 'c.js',
+                },
+              ],
+            },
+          ],
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should throw because an optional dir rule fails', () => {
@@ -172,45 +153,40 @@ export function run() {
           name: 'src',
           type: 'directory',
           isOptional: true,
-          rules: [
-            { name: 'index.js', type: 'file' }
-          ]
-        }
+          rules: [{ name: 'index.js', type: 'file' }],
+        },
       ];
 
-      assert.throws(
-        () => { validator.run(files, configObject); },
-        (err: Error) => err.message.includes('}, deep: 2, rule did not passed')
+      expect(() => validator.run(files, configObject)).toThrowError(
+        '}, deep: 2, rule did not passed'
       );
     });
 
     it('should throw if dir rule fails', () => {
-      const configObject: types.Rules = [
-        {
-          name: 'lol',
-          type: 'directory'
-        }
-      ];
-
-      assert.throws(
-        () => { validator.run([], configObject); },
-        (err: Error) =>
-          err.message.includes(`${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`)
-      );
-    });
-
-    it('should validate if dir rule fails but is optional', () => {
+      const files: string[] = [];
       const configObject: types.Rules = [
         {
           name: 'lol',
           type: 'directory',
-          isOptional: true
-        }
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run([], configObject);
-      });
+      expect(() => validator.run(files, configObject)).toThrowError(
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+      );
+    });
+
+    it('should validate if dir rule fails but is optional', () => {
+      const files: string[] = [];
+      const configObject: types.Rules = [
+        {
+          name: 'lol',
+          type: 'directory',
+          isOptional: true,
+        },
+      ];
+
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should validate if multiname dir rule has no rules', () => {
@@ -219,13 +195,11 @@ export function run() {
       const configObject: types.Rules = [
         {
           name: '[camelCase]',
-          type: 'directory'
-        }
+          type: 'directory',
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should validate if multiple dir rules match same dirs', () => {
@@ -233,7 +207,7 @@ export function run() {
         './src/index.js',
         './src/index2.js',
         './src2/index.js',
-        './src2/index2.js'
+        './src2/index2.js',
       ];
 
       const configObject: types.Rules = [
@@ -242,78 +216,72 @@ export function run() {
           type: 'directory',
           rules: [
             { name: 'index.js', type: 'file' },
-            { name: 'index2.js', type: 'file' }
-          ]
+            { name: 'index2.js', type: 'file' },
+          ],
         },
         {
           name: 'src2',
           type: 'directory',
           rules: [
             { name: 'index.js', type: 'file' },
-            { name: 'index2.js', type: 'file' }
-          ]
-        }
+            { name: 'index2.js', type: 'file' },
+          ],
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     describe('EmptyDirs:', () => {
       it('should validate empty dir has no rules', () => {
-        const emptyDirs = ['src'];
-
-        const configObject: types.Rules = [
-          {
-            name: 'src',
-            type: 'directory'
-          }
-        ];
-
-        assert.doesNotThrow(() => {
-          validator.run([], configObject, emptyDirs);
-        });
-      });
-
-      it('should throw if empty dir has rules', () => {
+        const files: string[] = [];
         const emptyDirs = ['src'];
 
         const configObject: types.Rules = [
           {
             name: 'src',
             type: 'directory',
-            rules: [
-              { name: 'index.js', type: 'file' }
-            ]
-          }
+          },
         ];
 
-        assert.throws(
-          () => { validator.run([], configObject, emptyDirs); },
-          (err: Error) =>
-            err.message.includes(
-              `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
-            )
+        expect(() =>
+          validator.run(files, configObject, emptyDirs)
+        ).not.toThrow();
+      });
+
+      it('should throw if empty dir has rules', () => {
+        const files: string[] = [];
+        const emptyDirs = ['src'];
+
+        const configObject: types.Rules = [
+          {
+            name: 'src',
+            type: 'directory',
+            rules: [{ name: 'index.js', type: 'file' }],
+          },
+        ];
+
+        expect(() =>
+          validator.run(files, configObject, emptyDirs)
+        ).toThrowError(
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
         );
       });
 
       it('should throw if an empty dir is not validated', () => {
+        const files: string[] = [];
         const emptyDirs = ['lol', 'src'];
-
         const configObject: types.Rules = [
           {
             name: 'lol',
             type: 'directory',
-            isOptional: true
-          }
+            isOptional: true,
+          },
         ];
 
-        assert.throws(
-          () => { validator.run([], configObject, emptyDirs); },
-          (err: Error) =>
-            err.message.includes('src, was not validated')
-        );
+        expect(() =>
+          validator.run(files, configObject, emptyDirs)
+        ).toThrowError('src, was not validated');
       });
     });
 
@@ -328,13 +296,13 @@ export function run() {
             {
               name: 'b',
               type: 'directory',
-              rules: [
-                { type: 'file', name: 'c.js' }
-              ]
-            }
-          ]
-        }
+              rules: [{ type: 'file', name: 'c.js' }],
+            },
+          ],
+        },
       ];
+
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should work for > 1 level deep and dir rule first', () => {
@@ -348,19 +316,15 @@ export function run() {
             {
               name: 'b',
               type: 'directory',
-              rules: [
-                { type: 'file', name: 'c.js' }
-              ]
-            }
-          ]
+              rules: [{ type: 'file', name: 'c.js' }],
+            },
+          ],
         },
         { type: 'file', name: '[camelCase].js' },
-        { type: 'file', name: 'lol', isOptional: true }
+        { type: 'file', name: 'lol', isOptional: true },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should work for > 1 level deep and dir rule last', () => {
@@ -376,17 +340,13 @@ export function run() {
             {
               name: 'b',
               type: 'directory',
-              rules: [
-                { type: 'file', name: 'c.js' }
-              ]
-            }
-          ]
-        }
+              rules: [{ type: 'file', name: 'c.js' }],
+            },
+          ],
+        },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     it('should work for > 1 level deep and dir rule not first/last', () => {
@@ -401,18 +361,14 @@ export function run() {
             {
               name: 'b',
               type: 'directory',
-              rules: [
-                { type: 'file', name: 'c.js' }
-              ]
-            }
-          ]
+              rules: [{ type: 'file', name: 'c.js' }],
+            },
+          ],
         },
-        { type: 'file', name: 'lol', isOptional: true }
+        { type: 'file', name: 'lol', isOptional: true },
       ];
 
-      assert.doesNotThrow(() => {
-        validator.run(files, configObject);
-      });
+      expect(() => validator.run(files, configObject)).not.toThrow();
     });
 
     describe('*:', () => {
@@ -423,15 +379,11 @@ export function run() {
           {
             name: '*',
             type: 'directory',
-            rules: [
-              { name: 'file.js', type: 'file' }
-            ]
-          }
+            rules: [{ name: 'file.js', type: 'file' }],
+          },
         ];
 
-        assert.doesNotThrow(() => {
-          validator.run(files, configObject);
-        });
+        expect(() => validator.run(files, configObject)).not.toThrow();
       });
 
       it('should work for > 1 level deep', () => {
@@ -448,17 +400,15 @@ export function run() {
                 rules: [
                   {
                     type: 'file',
-                    name: 'c.js'
-                  }
-                ]
-              }
-            ]
-          }
+                    name: 'c.js',
+                  },
+                ],
+              },
+            ],
+          },
         ];
 
-        assert.doesNotThrow(() => {
-          validator.run(files, configObject);
-        });
+        expect(() => validator.run(files, configObject)).not.toThrow();
       });
     });
   });

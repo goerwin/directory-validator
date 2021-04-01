@@ -5,12 +5,7 @@
     "package-lock.json",
     ".DS_Store"
   ],
-  "ignoreDirs": [
-    "node_modules",
-    ".nyc_output",
-    "coverage",
-    ".git"
-  ],
+  "ignoreDirs": ["node_modules", ".nyc_output", "coverage", ".git"],
   "commonRules": {
     "rule_indexfile": {
       "type": "file",
@@ -46,8 +41,7 @@
       "type": "directory",
       "name": "src",
       "isOptional": true,
-      "rules": [
-      ]
+      "rules": []
     }
   ]
 }

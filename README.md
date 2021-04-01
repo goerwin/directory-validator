@@ -1,10 +1,8 @@
 # directory-validator
 
-[![Build Status](https://travis-ci.org/erwingo/directory-validator.svg?branch=master)](https://travis-ci.org/erwingo/directory-validator)
-[![Coverage Status](https://coveralls.io/repos/github/erwingo/directory-validator/badge.svg?branch=master)](https://coveralls.io/github/erwingo/directory-validator?branch=master)
 [![Package Version](https://img.shields.io/npm/v/directory-validator.svg)](https://www.npmjs.com/package/directory-validator)
 
-Tool to validate directory structures.
+CLI Tool to validate directory structures.
 If you want to have control over what files/dirs a directory can have then this can be useful.
 
 ## Installation

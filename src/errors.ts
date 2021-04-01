@@ -24,10 +24,15 @@ export class ConfigJsonValidateError extends Error {
 
 export class ValidatorRuleError extends Error {
   paths: (string | RegExp)[];
-  rule: (types.FileRule | types.DirectoryRule);
+  rule: types.FileRule | types.DirectoryRule;
 
-  constructor(rule: types.FileRule | types.DirectoryRule, paths: (string | RegExp)[]) {
-    super(`${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`);
+  constructor(
+    rule: types.FileRule | types.DirectoryRule,
+    paths: (string | RegExp)[]
+  ) {
+    super(
+      `${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`
+    );
     this.rule = rule;
     this.paths = paths;
   }

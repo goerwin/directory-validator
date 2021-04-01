@@ -1,13 +1,14 @@
-import * as nodeHelpers from 'ego-node-helpers';
+import * as nodeHelpers from 'goerwin-ts-helpers/dist/node';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as _ from 'lodash';
 import * as errors from './errors';
 import * as types from './types';
 import * as validator from './validator';
+import Ajv from 'ajv';
+import schema from '../supportFiles/schema.json';
 
-import Ajv = require('ajv');
-const schema = require('../supportFiles/schema.json');
+// const schema = require('../supportFiles/schema.json');
 
 function getConfig(rulesPath: string): types.Config {
   let configJson: any;
@@ -25,8 +26,10 @@ function getConfig(rulesPath: string): types.Config {
       let errorMessages: string[][] = [];
 
       if (ajv.errors) {
-        errorMessages = ajv.errors.map(el =>
-          [`data${el.dataPath}`, `${el.message || ''}`]
+        errorMessages = ajv.errors.map(
+          (el) => [`data${el.data}`, `${el.message || ''}`]
+          // TODO: Verify
+          // [`data${el.dataPath}`, `${el.message || ''}`]
         );
       }
 
@@ -35,9 +38,9 @@ function getConfig(rulesPath: string): types.Config {
   };
 
   const parseCommonRules = (rules: types.Rules): types.Rules => {
-    return rules.map(rule => {
+    return rules.map((rule) => {
       if (rule.type === 'common') {
-        let parsedRule = configJson.commonRules[rule.key] as (types.Rule | null);
+        let parsedRule = configJson.commonRules[rule.key] as types.Rule | null;
 
         if (!parsedRule) {
           throw new errors.ConfigJsonValidateError(
@@ -48,8 +51,10 @@ function getConfig(rulesPath: string): types.Config {
 
         parsedRule = _.cloneDeep(parsedRule);
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
-        parsedRule.isOptional = typeof parsedRule.isOptional === 'undefined' ?
-          !!rule.isOptional : parsedRule.isOptional;
+        parsedRule.isOptional =
+          typeof parsedRule.isOptional === 'undefined'
+            ? !!rule.isOptional
+            : parsedRule.isOptional;
 
         return { ...parsedRule };
       } else if (rule.type === 'directory') {
@@ -67,13 +72,14 @@ function getConfig(rulesPath: string): types.Config {
   return {
     ignoreFiles: configJson.ignoreFiles,
     ignoreDirs: configJson.ignoreDirs,
-    rules: configJson.rules
+    rules: configJson.rules,
   };
 }
 
 export function run(
   dirPath: string,
-  configPath: string, options: {
+  configPath: string,
+  options: {
     ignoreDirsGlob?: string;
     ignoreFilesGlob?: string;
   } = {}
@@ -86,7 +92,9 @@ export function run(
   }
 
   ignoreFilesGlob = options.ignoreFilesGlob || ignoreFilesGlob;
-  const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
+  const newIgnoreFiles = ignoreFilesGlob
+    ? glob.sync(ignoreFilesGlob, { cwd: dirPath })
+    : [];
 
   // Ignore Dirs
   let ignoreDirsGlob: string | undefined;
@@ -94,30 +102,32 @@ export function run(
     ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
   }
   ignoreDirsGlob = options.ignoreDirsGlob || ignoreDirsGlob;
-  const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
+  const newIgnoreDirs = ignoreDirsGlob
+    ? glob.sync(ignoreDirsGlob, { cwd: dirPath })
+    : [];
 
-  const files = nodeHelpers.file
-    .getChildFiles(
-      dirPath,
-      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-    );
+  const files = nodeHelpers.file.getChildFiles(dirPath, {
+    recursive: true,
+    ignoreDirs: newIgnoreDirs,
+    ignoreFiles: newIgnoreFiles,
+  });
 
-  const emptyDirs = nodeHelpers.file
-    .getChildDirs(
-      dirPath,
-      { recursive: true, ignoreDirs: newIgnoreDirs, ignoreFiles: newIgnoreFiles }
-    );
+  const emptyDirs = nodeHelpers.file.getChildDirs(dirPath, {
+    recursive: true,
+    ignoreDirs: newIgnoreDirs,
+    ignoreFiles: newIgnoreFiles,
+  });
 
   validator.run(
-    files.filter(el => !el.isIgnored).map(el => el.path),
+    files.filter((el) => !el.isIgnored).map((el) => el.path),
     rules,
-    emptyDirs.filter(el => !el.isIgnored && el.isEmpty).map(el => el.path)
+    emptyDirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path)
   );
 
   return {
-    asciiTree: nodeHelpers.file.generateAsciiTree(
-      dirPath,
-      [...files, ...emptyDirs.filter(el => el.isIgnored || el.isEmpty)]
-    )
+    asciiTree: nodeHelpers.file.generateAsciiTree(dirPath, [
+      ...files,
+      ...emptyDirs.filter((el) => el.isIgnored || el.isEmpty),
+    ]),
   };
 }

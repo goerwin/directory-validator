@@ -18,9 +18,7 @@
       "required": ["type", "name"],
       "properties": {
         "type": {
-          "enum": [
-            "directory"
-          ]
+          "enum": ["directory"]
         },
         "name": { "type": "string" },
         "isOptional": { "type": "boolean" },
