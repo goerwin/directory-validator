@@ -34,6 +34,10 @@
       "name": "*.md"
     },
     {
+      "type": "file",
+      "name": ".prettier*"
+    },
+    {
       "type": "directory",
       "name": "src",
       "isOptional": true,
