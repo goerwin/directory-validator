@@ -1,7 +1,11 @@
 import Ajv from 'ajv';
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as nodeHelpers from 'goerwin-ts-helpers/dist/node';
+import {
+  generateAsciiTree,
+  getChildDirs,
+  getChildFiles,
+} from 'goerwin-helpers/node/file';
 import * as _ from 'lodash';
 import * as errors from './errors';
 import schema from './supportFiles/schema.json';
@@ -13,7 +17,7 @@ function getConfig(rulesPath: string): types.Config {
 
   try {
     configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
-  } catch (err) {
+  } catch (err: any) {
     throw new errors.JsonParseError(err, rulesPath);
   }
 
@@ -104,13 +108,13 @@ export function run(
     ? glob.sync(ignoreDirsGlob, { cwd: dirPath })
     : [];
 
-  const files = nodeHelpers.file.getChildFiles(dirPath, {
+  const files = getChildFiles(dirPath, {
     recursive: true,
     ignoreDirs: newIgnoreDirs,
     ignoreFiles: newIgnoreFiles,
   });
 
-  const emptyDirs = nodeHelpers.file.getChildDirs(dirPath, {
+  const emptyDirs = getChildDirs(dirPath, {
     recursive: true,
     ignoreDirs: newIgnoreDirs,
     ignoreFiles: newIgnoreFiles,
@@ -123,7 +127,7 @@ export function run(
   );
 
   return {
-    asciiTree: nodeHelpers.file.generateAsciiTree(dirPath, [
+    asciiTree: generateAsciiTree(dirPath, [
       ...files,
       ...emptyDirs.filter((el) => el.isIgnored || el.isEmpty),
     ]),

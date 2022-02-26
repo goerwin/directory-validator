@@ -8,7 +8,7 @@ If you want to have control over what files/dirs a directory can have then this 
 ## Installation
 
 ```
-$ npm install -g directory-validator
+$ npm install directory-validator
 ```
 
 ## Usage

@@ -215,9 +215,9 @@ export function run() {
       );
     });
 
-    it.skip('[UPPERCASE]', () => {});
-    it.skip('[dash-case]', () => {});
-    it.skip('[snake_case]', () => {});
+    it.todo('[UPPERCASE]');
+    it.todo('[dash-case]');
+    it.todo('[snake_case]');
 
     describe('Edge Cases:', () => {
       it(`should throw when a rule matches 2 dirs (dirA, dirB), the rule first
