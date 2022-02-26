@@ -4,9 +4,11 @@ export class JsonParseError extends Error {
   err: Error;
   filePath: string;
 
-  constructor(err: Error, filePath: string) {
-    super(err.message);
-    this.err = err;
+  constructor(err: unknown, filePath: string) {
+    const parsedError = isError(err) ? err : new Error('unknown error');
+
+    super(parsedError.message);
+    this.err = parsedError;
     this.filePath = filePath;
   }
 }
@@ -45,4 +47,8 @@ export class ValidatorInvalidPathError extends Error {
     super(`${path}, was not validated`);
     this.path = path;
   }
+}
+
+export function isError(err: any): err is Error {
+  return Boolean(err && err.stack && err.message);
 }

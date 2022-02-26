@@ -78,6 +78,8 @@ if (selectedOptions.init) {
       ignoreFilesGlob: selectedOptions.ignoreFiles,
     });
 
+    console.log('Directory successfully validated!');
+
     if (selectedOptions.print && results.asciiTree) {
       console.log(
         results.asciiTree
@@ -114,12 +116,13 @@ if (selectedOptions.init) {
     } else if (err instanceof errors.ValidatorInvalidPathError) {
       console.error(errorTitle);
       console.error('\t', dash, err.path.red, 'was not validated');
-    } else {
+    } else if (errors.isError(err)) {
       console.error(errorTitle);
       console.error('\t', dash, err.message.red);
+    } else {
+      console.error('Unknown error');
     }
 
-    console.error();
     process.exit(1);
   }
 }

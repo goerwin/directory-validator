@@ -17,7 +17,7 @@ function getConfig(rulesPath: string): types.Config {
 
   try {
     configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
-  } catch (err: any) {
+  } catch (err) {
     throw new errors.JsonParseError(err, rulesPath);
   }
 
