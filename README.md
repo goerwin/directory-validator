@@ -14,11 +14,13 @@ $ npm install directory-validator
 ## Usage
 
 Generate a configuration file `.directoryvalidator.json` to start with:
+
 ```
 $ directory-validator --init
 ```
 
 Run the validator on the current directory:
+
 ```
 $ directory-validator .
 ```
@@ -67,6 +69,7 @@ The tool will evaluate the rules provided by the configuration file against the 
 ```
 
 In this example:
+
 - We ignore the file `.gitignore` and both `.node_modules` and `.git` directories from being analized
 - We want to have one file name `package.json` and one file named `index.js`
 - We want one directory `src` to have one file named `index.js`. Since it's optional,
@@ -81,7 +84,7 @@ A string or glob pattern. For example:
 [
   "package.json",
   "**/*.test.js",
-  ".*" // files starting with "."
+  ".*", // files starting with "."
 ]
 ```
 
@@ -93,7 +96,7 @@ A string or glob pattern. For example:
 [
   "node_modules",
   "src/**/tests",
-  ".*" // dirs starting with "."
+  ".*", // dirs starting with "."
 ]
 ```
 
@@ -214,7 +217,7 @@ Can contain File, Directory and Common Rules
 
 ## Notes
 
-* When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
+- When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
 
-* Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
-  * For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.
+- Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
+  - For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.

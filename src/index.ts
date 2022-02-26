@@ -30,7 +30,7 @@ function getDefaultConfigFilePath(dirPath: string) {
 
 export function writeDefaultConfigFile(parentPath: string) {
   fs.copyFileSync(
-    path.join(__dirname, './supportFiles/defaultConfig.json'),
+    path.join(__dirname, './resources/defaultConfig.json'),
     parentPath
   );
 }
@@ -59,7 +59,7 @@ const selectedOptions = commanderProgram.opts();
 
 if (selectedOptions.init) {
   fs.copyFileSync(
-    path.join(__dirname, './supportFiles/defaultConfig.json'),
+    path.join(__dirname, './resources/defaultConfig.json'),
     path.join(process.cwd(), initConfigFilename)
   );
   console.log('\n\t', initConfigFilename.red, 'created', '\n');
@@ -82,6 +82,7 @@ if (selectedOptions.init) {
 
     if (selectedOptions.print && results.asciiTree) {
       console.log(
+        '\n',
         results.asciiTree
           .replace(/\/fileIgnored/g, '[File Ignored]'.dim)
           .replace(/\/directoryIgnored/g, '[Directory Ignored]'.dim)

@@ -5,7 +5,7 @@
     "package-lock.json",
     ".DS_Store"
   ],
-  "ignoreDirs": ["node_modules", "lib", ".git", ".github"],
+  "ignoreDirs": ["node_modules", "dist", ".git", ".github"],
   "commonRules": {
     "rule_indexfile": {
       "type": "file",

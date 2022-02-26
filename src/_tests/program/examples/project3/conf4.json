@@ -17,9 +17,7 @@
     "rule_dir": {
       "type": "directory",
       "name": "dir1",
-      "rules": [
-        { "type": "file", "name": "lul" }
-      ]
+      "rules": [{ "type": "file", "name": "lul" }]
     }
   }
 }

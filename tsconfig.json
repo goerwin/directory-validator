@@ -1,5 +1,5 @@
 {
-  "exclude": ["src/**/_tests/*", "src/**/*/*.test.ts"],
+  "exclude": ["src/**/_tests/*", "src/**/*/*.test.ts", "dist"],
   "compilerOptions": {
     /* Basic Options */
     "target": "es2016" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */,
@@ -13,7 +13,7 @@
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
-    "outDir": "./lib" /* Redirect output structure to the directory. */,
+    "outDir": "./dist" /* Redirect output structure to the directory. */,
     "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
     // "removeComments": true,                /* Do not emit comments to output. */
     // "noEmit": true,                        /* Do not emit outputs. */

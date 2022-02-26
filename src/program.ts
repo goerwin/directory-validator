@@ -8,7 +8,7 @@ import {
 } from 'goerwin-helpers/node/file';
 import * as _ from 'lodash';
 import * as errors from './errors';
-import schema from './supportFiles/schema.json';
+import schema from './resources/schema.json';
 import * as types from './types';
 import * as validator from './validator';
 

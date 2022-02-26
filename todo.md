@@ -1,16 +1,17 @@
-
 # TODO
+
 - more error info (path) in validatorRuleError
   - better ubication of a rule when displaying errors (rules[3].rules[1]) like
     ajv when validating json schemas
 - Examples
   - Provide some folder examples:
-    * examples/basic
-    * examples/recursive-directories
-    * examples/multimatching-rules
+    - examples/basic
+    - examples/recursive-directories
+    - examples/multimatching-rules
 - allow rules to be exclusive
 
 # DONE
+
 - common dir rules can have other common rules inside
 - common rules can be optional
 - option to print the directory structure printed
@@ -26,7 +27,7 @@
 - allow RegExp in names/extensions
 - create bin file
 - what if you want 2 dirs in a directory and the rest can be whatever?
-  - { name: * } should validate all the files/dirs recursively
+  - { name: \* } should validate all the files/dirs recursively
 - better errors in console
 - rename it to directory-validator
 - read config from passed file

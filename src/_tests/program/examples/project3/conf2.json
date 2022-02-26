@@ -1,7 +1,5 @@
 {
-  "ignoreDirs": [
-    "dir1"
-  ],
+  "ignoreDirs": ["dir1"],
   "rules": [
     {
       "type": "file",
