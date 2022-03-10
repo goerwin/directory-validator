@@ -29,15 +29,10 @@ The tool will evaluate the rules provided by the configuration file against the 
 
 ## Configuration File
 
-```javascript
+```jsonc
 {
-  "ignoreFiles": [
-    ".gitignore"
-  ],
-  "ignoreDirs": [
-    "node_modules",
-    ".git"
-  ],
+  "ignoreFiles": [".gitignore"],
+  "ignoreDirs": ["node_modules", ".git"],
   "commonRules": {
     "rule_indexfile": {
       "type": "file",
@@ -80,11 +75,11 @@ In this example:
 
 A string or glob pattern. For example:
 
-```javascript
+```jsonc
 [
   "package.json",
   "**/*.test.js",
-  ".*", // files starting with "."
+  ".*" // files starting with "."
 ]
 ```
 
@@ -92,11 +87,11 @@ A string or glob pattern. For example:
 
 A string or glob pattern. For example:
 
-```javascript
+```jsonc
 [
   "node_modules",
   "src/**/tests",
-  ".*", // dirs starting with "."
+  ".*" // dirs starting with "."
 ]
 ```
 
@@ -104,7 +99,7 @@ A string or glob pattern. For example:
 
 Define File, Directory and Common rules that can be reused in `rules`
 
-```javascript
+```jsonc
 {
   // key must start with "rule_"
   // Examples:
@@ -116,7 +111,10 @@ Define File, Directory and Common rules that can be reused in `rules`
     "type": "directory",
     "name": "images",
     "rules": [
-      { "type": "file", "name": "logo.png" }
+      {
+        "type": "file",
+        "name": "logo.png"
+      }
     ]
   }
 }
@@ -128,7 +126,7 @@ Can contain File, Directory and Common Rules
 
 #### File Rule
 
-```javascript
+```jsonc
 {
   // Required
   "type": "file",
@@ -165,7 +163,7 @@ Can contain File, Directory and Common Rules
 
 #### Directory Rule
 
-```javascript
+```jsonc
 {
   // Required
   "type": "directory",
@@ -196,7 +194,7 @@ Can contain File, Directory and Common Rules
 
 #### Common Rule
 
-```javascript
+```jsonc
 {
   // Required
   "type": "common",
