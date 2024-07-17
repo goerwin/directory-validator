@@ -3,9 +3,10 @@
     ".gitignore",
     ".directoryvalidator.json",
     "package-lock.json",
-    ".DS_Store"
+    ".DS_Store",
+    "**/.DS_Store"
   ],
-  "ignoreDirs": ["node_modules", "dist", ".git", ".github"],
+  "ignoreDirs": ["node_modules", "dist", ".git", ".github", "**/temp42"],
   "commonRules": {
     "rule_indexfile": {
       "type": "file",
@@ -15,33 +16,17 @@
   "rules": [
     {
       "type": "file",
-      "name": "package.json"
-    },
-    {
-      "type": "file",
-      "name": "LICENSE"
-    },
-    {
-      "type": "file",
-      "name": "tsconfig.json"
-    },
-    {
-      "type": "file",
-      "name": "jest.*.js"
-    },
-    {
-      "type": "file",
-      "name": "*.md"
-    },
-    {
-      "type": "file",
-      "name": ".prettier*"
+      "name": "testfile.json"
     },
     {
       "type": "directory",
-      "name": "src",
-      "isOptional": true,
-      "rules": []
+      "name": "temp2",
+      "rules": [
+        {
+          "type": "directory",
+          "name": "temp3"
+        }
+      ]
     }
   ]
 }

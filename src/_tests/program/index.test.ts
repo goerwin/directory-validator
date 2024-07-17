@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'node:path';
 import * as errors from '../../errors';
 import * as program from '../../program';
 

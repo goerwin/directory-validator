@@ -132,7 +132,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`
+        `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`,
       );
     });
 
@@ -155,7 +155,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${files[3]}, was not validated`
+        `${files[3]}, was not validated`,
       );
     });
 
@@ -211,7 +211,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${files[4]}, was not validated`
+        `${files[4]}, was not validated`,
       );
     });
 
@@ -244,8 +244,8 @@ export function run() {
 
         expect(() => validator.run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules![2]
-          )}, deep: 2, rule did not passed`
+            (configObject[0] as types.DirectoryRule).rules![2],
+          )}, deep: 2, rule did not passed`,
         );
       });
 
@@ -273,8 +273,8 @@ export function run() {
 
         expect(() => validator.run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules![0]
-          )}, deep: 2, rule did not passed`
+            (configObject[0] as types.DirectoryRule).rules![0],
+          )}, deep: 2, rule did not passed`,
         );
       });
 
@@ -305,8 +305,8 @@ export function run() {
 
         expect(() => validator.run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules![0]
-          )}, deep: 2, rule did not passed`
+            (configObject[0] as types.DirectoryRule).rules![0],
+          )}, deep: 2, rule did not passed`,
         );
       });
     });
@@ -357,7 +357,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          'srrcNice/index.js, was not validated'
+          'srrcNice/index.js, was not validated',
         );
       });
     });
@@ -393,7 +393,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          'SRC/index.js, was not validated'
+          'SRC/index.js, was not validated',
         );
       });
     });

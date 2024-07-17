@@ -1,16 +1,13 @@
 import Ajv from 'ajv';
-import * as fs from 'fs';
+import fs from 'node:fs';
 import * as glob from 'glob';
-import {
-  generateAsciiTree,
-  getChildDirs,
-  getChildFiles,
-} from 'goerwin-helpers/node/file';
+import { generateAsciiTree } from 'goerwin-helpers/node/file';
 import * as _ from 'lodash';
 import * as errors from './errors';
 import schema from './resources/schema.json';
-import * as types from './types';
+import type * as types from './types';
 import * as validator from './validator';
+import { getFilesAndDirectories } from './helpers/file';
 
 function getConfig(rulesPath: string): types.Config {
   let configJson: any;
@@ -29,7 +26,7 @@ function getConfig(rulesPath: string): types.Config {
 
       if (ajv.errors) {
         errorMessages = ajv.errors.map(
-          (el) => [`data${el.instancePath}`, `${el.message || ''}`]
+          (el) => [`data${el.instancePath}`, `${el.message || ''}`],
           // TODO: Verify
           // [`data${el.dataPath}`, `${el.message || ''}`]
         );
@@ -47,7 +44,7 @@ function getConfig(rulesPath: string): types.Config {
         if (!parsedRule) {
           throw new errors.ConfigJsonValidateError(
             [['Common Rule Invalid', JSON.stringify(rule)]],
-            rulesPath
+            rulesPath,
           );
         }
 
@@ -59,7 +56,9 @@ function getConfig(rulesPath: string): types.Config {
             : parsedRule.isOptional;
 
         return { ...parsedRule };
-      } else if (rule.type === 'directory') {
+      }
+
+      if (rule.type === 'directory') {
         rule.rules = parseCommonRules(rule.rules || []);
       }
 
@@ -84,7 +83,7 @@ export function run(
   options: {
     ignoreDirsGlob?: string;
     ignoreFilesGlob?: string;
-  } = {}
+  } = {},
 ) {
   const { ignoreFiles, ignoreDirs, rules } = getConfig(configPath);
 
@@ -108,28 +107,17 @@ export function run(
     ? glob.sync(ignoreDirsGlob, { cwd: dirPath })
     : [];
 
-  const files = getChildFiles(dirPath, {
+  const filesAndDirs = getFilesAndDirectories(dirPath, {
     recursive: true,
-    ignoreDirs: newIgnoreDirs,
-    ignoreFiles: newIgnoreFiles,
+    ignoreFilesAndDirectories: [...newIgnoreFiles, ...newIgnoreDirs],
   });
 
-  const emptyDirs = getChildDirs(dirPath, {
-    recursive: true,
-    ignoreDirs: newIgnoreDirs,
-    ignoreFiles: newIgnoreFiles,
-  });
-
-  validator.run(
-    files.filter((el) => !el.isIgnored).map((el) => el.path),
-    rules,
-    emptyDirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path)
-  );
+  validator.run(filesAndDirs, rules);
 
   return {
     asciiTree: generateAsciiTree(dirPath, [
-      ...files,
-      ...emptyDirs.filter((el) => el.isIgnored || el.isEmpty),
+      // ...files,
+      // ...dirs.filter((el) => el.isIgnored || el.isEmpty),
     ]),
   };
 }

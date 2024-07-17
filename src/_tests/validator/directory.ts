@@ -1,4 +1,4 @@
-import * as types from '../../types';
+import type * as types from '../../types';
 import * as validator from '../../validator';
 
 export function run() {
@@ -61,7 +61,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
       );
     });
 
@@ -158,7 +158,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        '}, deep: 2, rule did not passed'
+        '}, deep: 2, rule did not passed',
       );
     });
 
@@ -172,7 +172,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
       );
     });
 
@@ -233,7 +233,7 @@ export function run() {
     });
 
     describe('EmptyDirs:', () => {
-      it('should validate empty dir has no rules', () => {
+      it('should validate empty dir with no rules', () => {
         const files: string[] = [];
         const emptyDirs = ['src'];
 
@@ -245,7 +245,29 @@ export function run() {
         ];
 
         expect(() =>
-          validator.run(files, configObject, emptyDirs)
+          validator.run(files, configObject, emptyDirs),
+        ).not.toThrow();
+      });
+
+      it('should validate nested empty dir with no rules', () => {
+        const files: string[] = [];
+        const emptyDirs = ['src/lol'];
+        const configObject: types.Rules = [
+          {
+            name: 'src',
+            type: 'directory',
+            rules: [
+              {
+                name: 'lol',
+                type: 'directory',
+                rules: [],
+              },
+            ],
+          },
+        ];
+
+        expect(() =>
+          validator.run(files, configObject, emptyDirs),
         ).not.toThrow();
       });
 
@@ -262,9 +284,9 @@ export function run() {
         ];
 
         expect(() =>
-          validator.run(files, configObject, emptyDirs)
+          validator.run(files, configObject, emptyDirs),
         ).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
         );
       });
 
@@ -280,7 +302,7 @@ export function run() {
         ];
 
         expect(() =>
-          validator.run(files, configObject, emptyDirs)
+          validator.run(files, configObject, emptyDirs),
         ).toThrowError('src, was not validated');
       });
     });

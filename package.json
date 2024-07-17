@@ -7,10 +7,11 @@
     "directory-validator": "dist/index.js"
   },
   "scripts": {
+    "dev": "npx tsx src/index.ts",
     "build": "npm run clean && tsc && cp src/resources/* dist/resources",
     "clean": "rm -rf dist",
     "prettier": "prettier -c .",
-    "test": "npm run prettier && jest"
+    "test": "jest"
   },
   "author": "Erwin Gaitan O <erwingaitano@gmail.com>",
   "license": "MIT",

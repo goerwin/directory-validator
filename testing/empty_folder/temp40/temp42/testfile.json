@@ -1,0 +1,113 @@
+{
+    "ignoreFiles": [],
+    "ignoreDirs": [],
+    "commonRules": {},
+    "rules": [
+        {
+            "type": "file",
+            "name": "CHANGELOG.md"
+        },
+        {
+            "type": "file",
+            "name": "README.html"
+        },
+        {
+            "type": "directory",
+            "name": "Binaries",
+            "rules": [
+                {
+                    "type": "file",
+                    "name": "Prod.bin"
+                },
+                {
+                    "type": "file",
+                    "name": "Prod.elf"
+                },
+                {
+                    "type": "file",
+                    "name": "Prod.hex"
+                },
+                {
+                    "type": "file",
+                    "name": "Prod.list"
+                },
+                {
+                    "type": "file",
+                    "name": "Prod.map"
+                }
+            ]
+        },
+        {
+            "type": "directory",
+            "name": "3rdParty",
+            "rules": [
+                {
+                    "type": "file",
+                    "name": "*.md",
+                    "isOptional": true
+                },
+                {
+                    "type": "file",
+                    "name": "/Thing_v(.*)/",
+                    "extension": "bin"
+                }
+            ]
+        },
+        {
+            "type": "directory",
+            "name": "Doc",
+            "rules": [
+                {
+                    "type": "file",
+                    "name": "Documentation.html"
+                },
+                {
+                    "type": "directory",
+                    "name": "html",
+                    "isRecursive": true
+                }
+            ]
+        },
+        {
+            "type": "directory",
+            "name": "Tool2",
+            "rules": []
+        },
+        {
+            "type": "directory",
+            "name": "APIDoc",
+            "rules": []
+        },
+        {
+            "type": "directory",
+            "name": "Metrics",
+            "rules": []
+        },
+        {
+            "type": "directory",
+            "name": "Scripts",
+            "rules": []
+        },
+        {
+            "type": "directory",
+            "name": "TestReports",
+            "rules": [
+                {
+                    "type": "directory",
+                    "name": "NUnit",
+                    "rules": []
+                },
+                {
+                    "type": "directory",
+                    "name": "StaticCode",
+                    "rules": []
+                },
+                {
+                    "type": "directory",
+                    "name": "UnitTests",
+                    "rules": []
+                }
+            ]
+        }
+    ]
+}
