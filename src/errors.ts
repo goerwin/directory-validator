@@ -1,4 +1,4 @@
-import * as types from './types';
+import type * as types from './types';
 
 export class JsonParseError extends Error {
   err: Error;
@@ -25,18 +25,14 @@ export class ConfigJsonValidateError extends Error {
 }
 
 export class ValidatorRuleError extends Error {
-  paths: (string | RegExp)[];
+  path: string;
   rule: types.FileRule | types.DirectoryRule;
 
-  constructor(
-    rule: types.FileRule | types.DirectoryRule,
-    paths: (string | RegExp)[]
-  ) {
-    super(
-      `${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`
-    );
+  constructor(rule: types.FileRule | types.DirectoryRule, path: string) {
+    const depth = path === '' ? 0 : path.match(/\//g)?.length ?? 1;
+    super(`${JSON.stringify(rule)}, deep: ${depth}, rule did not passed`);
     this.rule = rule;
-    this.paths = paths;
+    this.path = path;
   }
 }
 
@@ -49,6 +45,6 @@ export class ValidatorInvalidPathError extends Error {
   }
 }
 
-export function isError(err: any): err is Error {
-  return Boolean(err && err.stack && err.message);
+export function isError(err: unknown): err is Error {
+  return typeof err === 'object' && err !== null && 'stack' in err && 'message' in err;
 }

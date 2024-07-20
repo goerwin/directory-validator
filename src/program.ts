@@ -116,6 +116,7 @@ export function run(
 
   return {
     asciiTree: generateAsciiTree(dirPath, [
+      // todo: fix ascii tree
       // ...files,
       // ...dirs.filter((el) => el.isIgnored || el.isEmpty),
     ]),

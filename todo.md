@@ -1,5 +1,6 @@
 # TODO
 
+- use biome instead of prettier
 - more error info (path) in validatorRuleError
   - better ubication of a rule when displaying errors (rules[3].rules[1]) like
     ajv when validating json schemas
