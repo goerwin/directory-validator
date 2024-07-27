@@ -7,6 +7,7 @@ import schema from './resources/schema.json';
 import type * as types from './types';
 import * as validator from './validator';
 import { getFilesAndDirectories } from './helpers/file';
+import nodePath from 'node:path';
 
 function getConfig(rulesPath: string): types.Config {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -109,7 +110,18 @@ export function run(
   return {
     asciiTree: generateAsciiTree(
       dirPath,
-      filesAndDirs.map((el) => ({ ...el, isIgnored: false, name: el.path, isEmpty: false })),
+      filesAndDirs
+        .filter((el) => el.type === 'file')
+        .map((el) => {
+          const { ext, base, name } = nodePath.parse(el.path);
+          return {
+            ...el,
+            name,
+            base,
+            ext,
+            isIgnored: false,
+          };
+        }),
     ),
   };
 }
