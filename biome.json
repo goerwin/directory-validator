@@ -5,7 +5,7 @@
   },
 
   "files": {
-    "ignore": ["_tests/**/*.json", "launch.json"]
+    "ignore": ["_tests/**/*.json", "launch.json", "dist", "package*.json"]
   },
 
   "formatter": {

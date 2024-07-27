@@ -1,6 +1,6 @@
 # TODO
 
-- use biome instead of prettier
+- recursion (is it even relevant?)
 - more error info (path) in validatorRuleError
   - better ubication of a rule when displaying errors (rules[3].rules[1]) like
     ajv when validating json schemas
@@ -13,6 +13,7 @@
 
 # DONE
 
+- use biome instead of prettier
 - common dir rules can have other common rules inside
 - common rules can be optional
 - option to print the directory structure printed

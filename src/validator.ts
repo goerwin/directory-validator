@@ -1,10 +1,8 @@
-// todo: use modularize lodash or something better
-
-import _ from 'lodash';
 import path from 'node:path';
 import * as errors from './errors';
 import type * as types from './types';
 import type { getFilesAndDirectories } from './helpers/file';
+import { toCamelCase, toDashCase, toSnakeCase, toUpperCase } from './helpers/string';
 
 function getCorrectStringRegexp(name: string | RegExp) {
   if (typeof name === 'string') {
@@ -70,13 +68,13 @@ function isNameValid(nameRule: string | RegExp, name: string) {
 
     switch (type) {
       case '[camelCase]':
-        return _.camelCase(filenameToValidate) === filenameToValidate;
+        return toCamelCase(filenameToValidate) === filenameToValidate;
       case '[UPPERCASE]':
-        return _.upperCase(filenameToValidate) === filenameToValidate;
+        return toUpperCase(filenameToValidate) === filenameToValidate;
       case '[dash-case]':
-        return _.kebabCase(filenameToValidate) === filenameToValidate;
+        return toDashCase(filenameToValidate) === filenameToValidate;
       case '[snake_case]':
-        return _.snakeCase(filenameToValidate) === filenameToValidate;
+        return toSnakeCase(filenameToValidate) === filenameToValidate;
       case '*':
         return true;
       default:

@@ -2,7 +2,6 @@ import Ajv from 'ajv';
 import fs from 'node:fs';
 import * as glob from 'glob';
 import { generateAsciiTree } from 'goerwin-helpers/node/file';
-import * as _ from 'lodash';
 import * as errors from './errors';
 import schema from './resources/schema.json';
 import type * as types from './types';
@@ -47,7 +46,7 @@ function getConfig(rulesPath: string): types.Config {
           throw new errors.ConfigJsonValidateError([['Common Rule Invalid', JSON.stringify(rule)]], rulesPath);
         }
 
-        parsedRule = _.cloneDeep(parsedRule);
+        parsedRule = structuredClone(parsedRule);
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
         parsedRule.isOptional =
           typeof parsedRule.isOptional === 'undefined' ? !!rule.isOptional : parsedRule.isOptional;
@@ -108,10 +107,9 @@ export function run(
   validator.run(filesAndDirs, rules);
 
   return {
-    asciiTree: generateAsciiTree(dirPath, [
-      // todo: fix ascii tree
-      // ...files,
-      // ...dirs.filter((el) => el.isIgnored || el.isEmpty),
-    ]),
+    asciiTree: generateAsciiTree(
+      dirPath,
+      filesAndDirs.map((el) => ({ ...el, isIgnored: false, name: el.path, isEmpty: false })),
+    ),
   };
 }
