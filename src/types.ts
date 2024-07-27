@@ -28,12 +28,7 @@ export interface ValidatableFile {
 export type Rule = FileRule | DirectoryRule | CommonRule;
 export type Rules = Rule[];
 
-export type SpecialName =
-  | '[camelCase]'
-  | '[UPPERCASE]'
-  | '[dash-case]'
-  | '[snake_case]'
-  | '*';
+export type SpecialName = '[camelCase]' | '[UPPERCASE]' | '[dash-case]' | '[snake_case]' | '*';
 
 export interface Config {
   ignoreFiles?: string[];

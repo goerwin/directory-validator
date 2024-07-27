@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import path from 'node:path';
 import * as errors from '../../errors';
 import * as program from '../../program';
@@ -15,33 +16,27 @@ describe('Program:', () => {
     const configFile = 'thisdoesnotexist';
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      "no such file or directory, open 'thisdoesnotexist'"
+      "no such file or directory, open 'thisdoesnotexist'",
     );
   });
 
   it('should throw if syntax error in JSON', () => {
     const configFile = path.join(exampleProjectPath, 'conf1.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.JsonParseError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.JsonParseError);
   });
 
   it('should throw if JSON with invalid schema', () => {
     const configFile = path.join(exampleProjectPath, 'conf2.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ConfigJsonValidateError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ConfigJsonValidateError);
   });
 
   it('should throw because of invalid file', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project2');
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorInvalidPathError);
   });
 
   it('should validate because of the option ignoreFiles', () => {
@@ -64,18 +59,14 @@ describe('Program:', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project3');
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorInvalidPathError);
   });
 
   it('should throw because of invalid dirs', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project3');
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorInvalidPathError);
   });
 
   it('should validate because of the option ignoreDirs', () => {
@@ -103,9 +94,7 @@ describe('Program:', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project3');
     const configFile = path.join(exampleProjectPath, 'conf4.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorRuleError);
   });
 
   it('should validate because config file validates everything', () => {
@@ -119,9 +108,7 @@ describe('Program:', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project3');
     const configFile = path.join(exampleProjectPath, 'conf6.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ConfigJsonValidateError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ConfigJsonValidateError);
   });
 
   it('should validate project4 conf.json', () => {
@@ -153,17 +140,13 @@ describe('Program:', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project4');
     const configFile = path.join(exampleProjectPath, 'confbad1.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorRuleError);
   });
 
   it('should throw project4 confbad2.json because of non optional common rule', () => {
     const exampleProjectPath = path.join(__dirname, 'examples/project4');
     const configFile = path.join(exampleProjectPath, 'confbad2.json');
 
-    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
-    );
+    expect(() => program.run(exampleProjectPath, configFile)).toThrowError(errors.ValidatorRuleError);
   });
 });

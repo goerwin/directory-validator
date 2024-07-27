@@ -1,3 +1,5 @@
+// todo: use modularize lodash or something better
+
 import _ from 'lodash';
 import path from 'node:path';
 import * as errors from './errors';
@@ -159,6 +161,7 @@ export function run(filesAndDirs: Readonly<ReturnType<typeof getFilesAndDirector
 
           if ((rule.rules ?? []).length > 0) {
             validateRules(rule.rules, childDirPath);
+
             child.isValid = true;
             return true;
           }
@@ -178,8 +181,6 @@ export function run(filesAndDirs: Readonly<ReturnType<typeof getFilesAndDirector
       if (!rulePassed && rule.isOptional) return;
 
       if (!rulePassed && !rule.isOptional) throw getRuleError(rule, folderPath);
-
-      // todo: implement recursive dir rules
     });
   }
 

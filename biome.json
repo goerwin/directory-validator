@@ -3,11 +3,17 @@
   "organizeImports": {
     "enabled": true
   },
+
+  "files": {
+    "ignore": ["_tests/**/*.json", "launch.json"]
+  },
+
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "lineWidth": 120
   },
+
   "linter": {
     "enabled": true,
     "rules": {
@@ -21,6 +27,7 @@
       }
     }
   },
+
   "javascript": {
     "formatter": {
       "quoteStyle": "single"

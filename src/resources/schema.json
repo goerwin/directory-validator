@@ -67,10 +67,7 @@
       "type": "object",
       "patternProperties": {
         "^rule_": {
-          "oneOf": [
-            { "$ref": "#/definitions/fileRule" },
-            { "$ref": "#/definitions/directoryRule" }
-          ]
+          "oneOf": [{ "$ref": "#/definitions/fileRule" }, { "$ref": "#/definitions/directoryRule" }]
         }
       },
       "additionalProperties": false

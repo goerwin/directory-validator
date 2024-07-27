@@ -10,6 +10,7 @@ import * as validator from './validator';
 import { getFilesAndDirectories } from './helpers/file';
 
 function getConfig(rulesPath: string): types.Config {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   let configJson: any;
 
   try {
@@ -18,6 +19,7 @@ function getConfig(rulesPath: string): types.Config {
     throw new errors.JsonParseError(err, rulesPath);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const validateWithSchema = (configJson: any) => {
     const ajv = new Ajv();
 
@@ -42,18 +44,13 @@ function getConfig(rulesPath: string): types.Config {
         let parsedRule = configJson.commonRules[rule.key] as types.Rule | null;
 
         if (!parsedRule) {
-          throw new errors.ConfigJsonValidateError(
-            [['Common Rule Invalid', JSON.stringify(rule)]],
-            rulesPath,
-          );
+          throw new errors.ConfigJsonValidateError([['Common Rule Invalid', JSON.stringify(rule)]], rulesPath);
         }
 
         parsedRule = _.cloneDeep(parsedRule);
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
         parsedRule.isOptional =
-          typeof parsedRule.isOptional === 'undefined'
-            ? !!rule.isOptional
-            : parsedRule.isOptional;
+          typeof parsedRule.isOptional === 'undefined' ? !!rule.isOptional : parsedRule.isOptional;
 
         return { ...parsedRule };
       }
@@ -93,9 +90,7 @@ export function run(
   }
 
   ignoreFilesGlob = options.ignoreFilesGlob || ignoreFilesGlob;
-  const newIgnoreFiles = ignoreFilesGlob
-    ? glob.sync(ignoreFilesGlob, { cwd: dirPath })
-    : [];
+  const newIgnoreFiles = ignoreFilesGlob ? glob.sync(ignoreFilesGlob, { cwd: dirPath }) : [];
 
   // Ignore Dirs
   let ignoreDirsGlob: string | undefined;
@@ -103,9 +98,7 @@ export function run(
     ignoreDirsGlob = `{${[ignoreDirs[0], ...ignoreDirs].join(',')}}`;
   }
   ignoreDirsGlob = options.ignoreDirsGlob || ignoreDirsGlob;
-  const newIgnoreDirs = ignoreDirsGlob
-    ? glob.sync(ignoreDirsGlob, { cwd: dirPath })
-    : [];
+  const newIgnoreDirs = ignoreDirsGlob ? glob.sync(ignoreDirsGlob, { cwd: dirPath }) : [];
 
   const filesAndDirs = getFilesAndDirectories(dirPath, {
     recursive: true,
