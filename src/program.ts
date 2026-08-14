@@ -1,12 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { globSync, readFileSync } from 'node:fs';
 import Ajv from 'ajv';
-import { sync } from 'glob';
 import {
   generateAsciiTree,
   getChildDirs,
   getChildFiles,
 } from 'goerwin-helpers/node/file';
-import * as _ from 'lodash';
 import * as errors from './errors';
 import schema from './resources/schema.json';
 import type * as types from './types';
@@ -60,7 +58,7 @@ function getConfig(rulesPath: string): types.Config {
           );
         }
 
-        parsedRule = _.cloneDeep(parsedRule);
+        parsedRule = structuredClone(parsedRule);
         parsedRule = parseCommonRules([parsedRule])[0] as types.Rule;
         parsedRule.isOptional =
           typeof parsedRule.isOptional === 'undefined'
@@ -104,7 +102,7 @@ export function run(
 
   ignoreFilesGlob = options.ignoreFilesGlob || ignoreFilesGlob;
   const newIgnoreFiles = ignoreFilesGlob
-    ? sync(ignoreFilesGlob, { cwd: dirPath })
+    ? globSync(ignoreFilesGlob, { cwd: dirPath })
     : [];
 
   // Ignore Dirs
@@ -114,7 +112,7 @@ export function run(
   }
   ignoreDirsGlob = options.ignoreDirsGlob || ignoreDirsGlob;
   const newIgnoreDirs = ignoreDirsGlob
-    ? sync(ignoreDirsGlob, { cwd: dirPath })
+    ? globSync(ignoreDirsGlob, { cwd: dirPath })
     : [];
 
   const files = getChildFiles(dirPath, {

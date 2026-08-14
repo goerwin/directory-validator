@@ -1,7 +1,7 @@
 import * as path from 'node:path';
-import * as _ from 'lodash';
 import * as errors from './errors';
 import type * as types from './types';
+import { camelCase, groupBy, kebabCase, snakeCase, upperCase } from './utils';
 
 function getCorrectStringRegexp(name: string | RegExp) {
   if (typeof name === 'string') {
@@ -100,13 +100,13 @@ function isNameValid(nameRule: string | RegExp, name: string) {
 
     switch (type) {
       case '[camelCase]':
-        return _.camelCase(filenameToValidate) === filenameToValidate;
+        return camelCase(filenameToValidate) === filenameToValidate;
       case '[UPPERCASE]':
-        return _.upperCase(filenameToValidate) === filenameToValidate;
+        return upperCase(filenameToValidate) === filenameToValidate;
       case '[dash-case]':
-        return _.kebabCase(filenameToValidate) === filenameToValidate;
+        return kebabCase(filenameToValidate) === filenameToValidate;
       case '[snake_case]':
-        return _.snakeCase(filenameToValidate) === filenameToValidate;
+        return snakeCase(filenameToValidate) === filenameToValidate;
       case '*':
         return true;
       default:
@@ -125,7 +125,7 @@ function isFileExtValid(fileExtRule: string | RegExp, ext: string) {
 }
 
 function getFilesByParentDir(files: types.ValidatableFile[]) {
-  return _.groupBy(files, (el) => {
+  return groupBy(files, (el) => {
     const pathFragments = el.path.split(path.sep);
     return pathFragments.slice(0, pathFragments.length - 1).join(path.sep);
   });
@@ -256,7 +256,7 @@ export function run(
 
       if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
         const parentPaths = getFilesByParentDir(dirFiles);
-        const parentPathsArray = _.keys(parentPaths);
+        const parentPathsArray = Object.keys(parentPaths);
         const nextDirNamesChecked: string[] = [];
 
         for (let i = 0; i < parentPathsArray.length; i += 1) {
