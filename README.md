@@ -31,7 +31,7 @@ The tool will evaluate the rules provided by the configuration file against the 
 
 | Option | Description |
 | --- | --- |
-| `<dirPath>` | Directory to validate (required, unless using `--init`) |
+| `<dirPath>` | Directory to validate (needed unless using `--init`) |
 | `-i, --init` | Create a `.directoryvalidator.json` file in the current directory |
 | `-p, --print` | Print the validated directory structure |
 | `-f, --ignore-files <files>` | Ignore files by glob string, eg: `-f "*.js"` |
@@ -112,7 +112,7 @@ A string or glob pattern. For example:
 
 ### commonRules:
 
-Define File, Directory and Common rules that can be reused in `rules`
+Define File and Directory rules that can be reused in `rules`
 
 ```jsonc
 {

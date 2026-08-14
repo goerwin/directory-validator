@@ -42,7 +42,7 @@ commanderProgram.version(
 );
 
 commanderProgram
-  .arguments('<dirPath>')
+  .arguments('[dirPath]')
   .option('-i, --init', 'Create a configuration file')
   .option('-p, --print', 'Print the directory structure validated')
   .option(
