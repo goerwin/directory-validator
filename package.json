@@ -1,6 +1,6 @@
 {
   "name": "directory-validator",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "CLI Tool to validate directory structures.",
   "type": "module",
   "main": "dist/index.js",
