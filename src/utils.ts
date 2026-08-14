@@ -53,3 +53,12 @@ export function groupBy<T>(
   });
   return result;
 }
+
+function ansi(open: string, close: string) {
+  return (input: string): string => `\x1b[${open}m${input}\x1b[${close}m`;
+}
+
+export const red = ansi('31', '39');
+export const bold = ansi('1', '22');
+export const dim = ansi('2', '22');
+export const underline = ansi('4', '24');

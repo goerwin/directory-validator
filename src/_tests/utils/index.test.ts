@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bold,
   camelCase,
+  dim,
   groupBy,
   kebabCase,
+  red,
   snakeCase,
+  underline,
   upperCase,
 } from '../../utils';
 
@@ -109,5 +113,25 @@ describe('utils:', () => {
       a: [items[0], items[2]],
       b: [items[1]],
     });
+  });
+
+  it('red wraps in red ANSI codes', () => {
+    expect(red('TEST')).toBe('\x1b[31mTEST\x1b[39m');
+  });
+
+  it('bold wraps in bold ANSI codes', () => {
+    expect(bold('TEST')).toBe('\x1b[1mTEST\x1b[22m');
+  });
+
+  it('dim wraps in dim ANSI codes', () => {
+    expect(dim('TEST')).toBe('\x1b[2mTEST\x1b[22m');
+  });
+
+  it('underline wraps in underline ANSI codes', () => {
+    expect(underline('TEST')).toBe('\x1b[4mTEST\x1b[24m');
+  });
+
+  it('supports chaining', () => {
+    expect(underline(red('TEST'))).toBe('\x1b[4m\x1b[31mTEST\x1b[39m\x1b[24m');
   });
 });

@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 
-import 'colors';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { program as commanderProgram } from 'commander';
 import * as errors from './errors';
 import * as program from './program';
+import { bold, dim, red, underline } from './utils';
 
 const initConfigFilename = '.directoryvalidator.json';
 
@@ -62,7 +62,7 @@ if (selectedOptions.init) {
     path.join(__dirname, './resources/defaultConfig.json'),
     path.join(process.cwd(), initConfigFilename),
   );
-  console.log('\n\t', initConfigFilename.red, 'created', '\n');
+  console.log('\n\t', red(initConfigFilename), 'created', '\n');
 } else if (!commanderProgram.args.length) {
   commanderProgram.help();
 } else {
@@ -84,23 +84,23 @@ if (selectedOptions.init) {
       console.log(
         '\n',
         results.asciiTree
-          .replace(/\/fileIgnored/g, '[File Ignored]'.dim)
-          .replace(/\/directoryIgnored/g, '[Directory Ignored]'.dim)
-          .replace(/\/emptyDirectory/g, '[Empty Directory]'.dim),
+          .replace(/\/fileIgnored/g, dim('[File Ignored]'))
+          .replace(/\/directoryIgnored/g, dim('[Directory Ignored]'))
+          .replace(/\/emptyDirectory/g, dim('[Empty Directory]')),
       );
     }
   } catch (err) {
-    const dash = '-'.bold;
-    const errorTitle = `\n\t${'Error:'.red.underline}`;
+    const dash = bold('-');
+    const errorTitle = `\n\t${underline(red('Error:'))}`;
 
     if (err instanceof errors.JsonParseError) {
-      console.error(errorTitle, 'at config file:'.red, err.filePath);
+      console.error(errorTitle, red('at config file:'), err.filePath);
       console.error('\t', dash, 'Could not parse/read the file');
       console.error('\t', dash, err.message);
     } else if (err instanceof errors.ConfigJsonValidateError) {
-      console.error(errorTitle, 'at config file:'.red, err.filePath);
+      console.error(errorTitle, red('at config file:'), err.filePath);
       err.messages.forEach((el) => {
-        console.error('\t', dash, `${el[0].red}:`, el[1]);
+        console.error('\t', dash, `${red(el[0])}:`, el[1]);
       });
     } else if (err instanceof errors.ValidatorRuleError) {
       console.error(errorTitle);
@@ -110,16 +110,16 @@ if (selectedOptions.init) {
         '\t',
         dash,
         'Rule',
-        rule.red,
+        red(rule),
         'did not passed at:',
-        parentPath.red,
+        red(parentPath),
       );
     } else if (err instanceof errors.ValidatorInvalidPathError) {
       console.error(errorTitle);
-      console.error('\t', dash, err.path.red, 'was not validated');
+      console.error('\t', dash, red(err.path), 'was not validated');
     } else if (errors.isError(err)) {
       console.error(errorTitle);
-      console.error('\t', dash, err.message.red);
+      console.error('\t', dash, red(err.message));
     } else {
       console.error('Unknown error');
     }
