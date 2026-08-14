@@ -6,7 +6,7 @@ import * as fileDirectory from './fileDirectory';
 describe('Validator:', () => {
   it('should validate if no rules passed', () => {
     expect(() =>
-      validator.run(['package.json', '.gitignore'], [])
+      validator.run(['package.json', '.gitignore'], []),
     ).not.toThrow();
   });
 

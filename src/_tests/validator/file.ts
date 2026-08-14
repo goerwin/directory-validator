@@ -1,4 +1,4 @@
-import * as types from '../../types';
+import type * as types from '../../types';
 import * as validator from '../../validator';
 
 export function run() {
@@ -23,7 +23,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
       );
     });
 
@@ -36,7 +36,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${files[2]}, was not validated`
+        `${files[2]}, was not validated`,
       );
     });
 
@@ -62,7 +62,7 @@ export function run() {
       ];
 
       expect(() => validator.run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`
+        `${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`,
       );
     });
 
@@ -87,7 +87,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
         );
       });
 
@@ -122,7 +122,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
         );
       });
     });
@@ -160,17 +160,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          'no-camelcase.js, was not validated'
-        );
-
-        const files2 = [
-          './no-camelcase.js',
-          './camelizedNamedPogChamp.json',
-          './package.json',
-        ];
-
-        expect(() => validator.run(files, configObject)).toThrowError(
-          'no-camelcase.js, was not validated'
+          'no-camelcase.js, was not validated',
         );
       });
     });
@@ -207,7 +197,7 @@ export function run() {
         ];
 
         expect(() => validator.run(files, configObject)).toThrowError(
-          'rip8.js, was not validated'
+          'rip8.js, was not validated',
         );
       });
     });

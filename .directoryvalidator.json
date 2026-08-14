@@ -2,6 +2,7 @@
   "ignoreFiles": [
     ".gitignore",
     ".directoryvalidator.json",
+    ".npmrc",
     "package-lock.json",
     ".DS_Store"
   ],
@@ -35,7 +36,7 @@
     },
     {
       "type": "file",
-      "name": ".prettier*"
+      "name": "biome.json"
     },
     {
       "type": "directory",

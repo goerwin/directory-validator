@@ -31,13 +31,13 @@ function getDefaultConfigFilePath(dirPath: string) {
 export function writeDefaultConfigFile(parentPath: string) {
   fs.copyFileSync(
     path.join(__dirname, './resources/defaultConfig.json'),
-    parentPath
+    parentPath,
   );
 }
 
 commanderProgram.version(
   JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'))
-    .version
+    .version,
 );
 
 commanderProgram
@@ -46,11 +46,11 @@ commanderProgram
   .option('-p, --print', 'Print the directory structure validated')
   .option(
     '-f, --ignore-files <files>',
-    'Ignore files (glob string) eg: -f "*.js"'
+    'Ignore files (glob string) eg: -f "*.js"',
   )
   .option(
     '-d, --ignore-dirs <dirs>',
-    'Ignore directories (glob string) eg: -d "**/tests"'
+    'Ignore directories (glob string) eg: -d "**/tests"',
   )
   .option('-c, --config-file <path>', 'Path to the configuration file')
   .parse(process.argv);
@@ -60,7 +60,7 @@ const selectedOptions = commanderProgram.opts();
 if (selectedOptions.init) {
   fs.copyFileSync(
     path.join(__dirname, './resources/defaultConfig.json'),
-    path.join(process.cwd(), initConfigFilename)
+    path.join(process.cwd(), initConfigFilename),
   );
   console.log('\n\t', initConfigFilename.red, 'created', '\n');
 } else if (!commanderProgram.args.length) {
@@ -86,12 +86,12 @@ if (selectedOptions.init) {
         results.asciiTree
           .replace(/\/fileIgnored/g, '[File Ignored]'.dim)
           .replace(/\/directoryIgnored/g, '[Directory Ignored]'.dim)
-          .replace(/\/emptyDirectory/g, '[Empty Directory]'.dim)
+          .replace(/\/emptyDirectory/g, '[Empty Directory]'.dim),
       );
     }
   } catch (err) {
     const dash = '-'.bold;
-    const errorTitle = '\n\t' + 'Error:'.red.underline;
+    const errorTitle = `\n\t${'Error:'.red.underline}`;
 
     if (err instanceof errors.JsonParseError) {
       console.error(errorTitle, 'at config file:'.red, err.filePath);
@@ -99,9 +99,9 @@ if (selectedOptions.init) {
       console.error('\t', dash, err.message);
     } else if (err instanceof errors.ConfigJsonValidateError) {
       console.error(errorTitle, 'at config file:'.red, err.filePath);
-      err.messages.forEach((el) =>
-        console.error('\t', dash, `${el[0].red}:`, el[1])
-      );
+      err.messages.forEach((el) => {
+        console.error('\t', dash, `${el[0].red}:`, el[1]);
+      });
     } else if (err instanceof errors.ValidatorRuleError) {
       console.error(errorTitle);
       const parentPath = err.paths.join(path.sep);
@@ -112,7 +112,7 @@ if (selectedOptions.init) {
         'Rule',
         rule.red,
         'did not passed at:',
-        parentPath.red
+        parentPath.red,
       );
     } else if (err instanceof errors.ValidatorInvalidPathError) {
       console.error(errorTitle);

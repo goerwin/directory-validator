@@ -15,7 +15,7 @@ describe('Program:', () => {
     const configFile = 'thisdoesnotexist';
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      "no such file or directory, open 'thisdoesnotexist'"
+      "no such file or directory, open 'thisdoesnotexist'",
     );
   });
 
@@ -23,7 +23,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf1.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.JsonParseError
+      errors.JsonParseError,
     );
   });
 
@@ -31,7 +31,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf2.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ConfigJsonValidateError
+      errors.ConfigJsonValidateError,
     );
   });
 
@@ -40,7 +40,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
+      errors.ValidatorInvalidPathError,
     );
   });
 
@@ -65,7 +65,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
+      errors.ValidatorInvalidPathError,
     );
   });
 
@@ -74,7 +74,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorInvalidPathError
+      errors.ValidatorInvalidPathError,
     );
   });
 
@@ -104,7 +104,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf4.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
+      errors.ValidatorRuleError,
     );
   });
 
@@ -120,7 +120,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'conf6.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ConfigJsonValidateError
+      errors.ConfigJsonValidateError,
     );
   });
 
@@ -154,7 +154,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'confbad1.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
+      errors.ValidatorRuleError,
     );
   });
 
@@ -163,7 +163,7 @@ describe('Program:', () => {
     const configFile = path.join(exampleProjectPath, 'confbad2.json');
 
     expect(() => program.run(exampleProjectPath, configFile)).toThrowError(
-      errors.ValidatorRuleError
+      errors.ValidatorRuleError,
     );
   });
 });

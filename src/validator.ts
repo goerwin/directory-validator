@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as errors from './errors';
-import * as types from './types';
+import type * as types from './types';
 
 function getCorrectStringRegexp(name: string | RegExp) {
   if (typeof name === 'string') {
@@ -45,14 +45,14 @@ function getMultimatchName(nameRule: string) {
           leftSide: string;
           rightSide: string;
         }
-      | undefined
+      | undefined,
   );
 }
 
 function getDirFiles(
   files: types.ValidatableFile[],
   paths: (string | RegExp)[],
-  isRecursive = false
+  isRecursive = false,
 ) {
   return files.filter((el) => {
     let pathSegments = el.path.split(path.sep);
@@ -92,7 +92,7 @@ function isNameValid(nameRule: string | RegExp, name: string) {
 
     const filenameToValidate = name.substring(
       leftSide.length,
-      rightSideIndexOf
+      rightSideIndexOf,
     );
     if (filenameToValidate.length === 0 && type !== '*') {
       return false;
@@ -141,7 +141,7 @@ function getValidatableFiles(files: string[]): types.ValidatableFile[] {
 
 function getRuleError(
   rule: types.FileRule | types.DirectoryRule,
-  paths: (string | RegExp)[]
+  paths: (string | RegExp)[],
 ) {
   return new errors.ValidatorRuleError(rule, paths);
 }
@@ -155,7 +155,7 @@ function validatePath(element: { path: string; isGood: boolean }) {
 export function run(
   files: string[],
   mainRules: types.Rules,
-  emptyDirs: string[] = []
+  emptyDirs: string[] = [],
 ) {
   if (mainRules.length === 0) {
     return;
@@ -169,13 +169,13 @@ export function run(
 
   function validateRules(
     rules: types.Rules = [],
-    paths: (string | RegExp)[] = ['.']
+    paths: (string | RegExp)[] = ['.'],
   ) {
     if (rules.length === 0) {
       return;
     }
 
-    rules.forEach((rule, idx) => {
+    rules.forEach((rule) => {
       if (rule.type === 'common') {
         return;
       }
@@ -188,7 +188,7 @@ export function run(
         // IF more than one file matches the rule then it passes
         const fileRulePassed = dirFiles.reduce((result, file) => {
           const { base, name, ext } = path.parse(file.path);
-          let isFileValid;
+          let isFileValid: boolean;
 
           if (!rule.extension) {
             isFileValid = isNameValid(rule.name, base);
@@ -197,7 +197,7 @@ export function run(
               isNameValid(rule.name, name) &&
               isFileExtValid(
                 getCorrectStringRegexp(rule.extension),
-                ext.substring(1)
+                ext.substring(1),
               );
           }
 
@@ -227,7 +227,8 @@ export function run(
 
       const dirFiles = getDirFiles(newFiles, [...paths, rule.name], true);
       const emptyDir = newEmptyDirs.find(
-        (el) => el.path === path.normalize([...paths, rule.name].join(path.sep))
+        (el) =>
+          el.path === path.normalize([...paths, rule.name].join(path.sep)),
       );
 
       // If no rules for this dir, it should validate all of its files

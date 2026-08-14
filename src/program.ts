@@ -9,11 +9,18 @@ import {
 import * as _ from 'lodash';
 import * as errors from './errors';
 import schema from './resources/schema.json';
-import * as types from './types';
+import type * as types from './types';
 import * as validator from './validator';
 
+type ParsedConfig = {
+  ignoreFiles?: string[];
+  ignoreDirs?: string[];
+  rules: types.Rules;
+  commonRules?: Record<string, types.Rule>;
+};
+
 function getConfig(rulesPath: string): types.Config {
-  let configJson: any;
+  let configJson: ParsedConfig;
 
   try {
     configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
@@ -21,7 +28,7 @@ function getConfig(rulesPath: string): types.Config {
     throw new errors.JsonParseError(err, rulesPath);
   }
 
-  const validateWithSchema = (configJson: any) => {
+  const validateWithSchema = (configJson: unknown) => {
     const ajv = new Ajv();
 
     if (!ajv.validate(schema, configJson)) {
@@ -29,7 +36,7 @@ function getConfig(rulesPath: string): types.Config {
 
       if (ajv.errors) {
         errorMessages = ajv.errors.map(
-          (el) => [`data${el.instancePath}`, `${el.message || ''}`]
+          (el) => [`data${el.instancePath}`, `${el.message || ''}`],
           // TODO: Verify
           // [`data${el.dataPath}`, `${el.message || ''}`]
         );
@@ -42,12 +49,14 @@ function getConfig(rulesPath: string): types.Config {
   const parseCommonRules = (rules: types.Rules): types.Rules => {
     return rules.map((rule) => {
       if (rule.type === 'common') {
-        let parsedRule = configJson.commonRules[rule.key] as types.Rule | null;
+        let parsedRule = configJson.commonRules?.[rule.key] as
+          | types.Rule
+          | undefined;
 
         if (!parsedRule) {
           throw new errors.ConfigJsonValidateError(
             [['Common Rule Invalid', JSON.stringify(rule)]],
-            rulesPath
+            rulesPath,
           );
         }
 
@@ -84,7 +93,7 @@ export function run(
   options: {
     ignoreDirsGlob?: string;
     ignoreFilesGlob?: string;
-  } = {}
+  } = {},
 ) {
   const { ignoreFiles, ignoreDirs, rules } = getConfig(configPath);
 
@@ -123,7 +132,7 @@ export function run(
   validator.run(
     files.filter((el) => !el.isIgnored).map((el) => el.path),
     rules,
-    emptyDirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path)
+    emptyDirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path),
   );
 
   return {
