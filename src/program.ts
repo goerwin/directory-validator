@@ -1,6 +1,6 @@
+import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
-import * as fs from 'fs';
-import * as glob from 'glob';
+import { sync } from 'glob';
 import {
   generateAsciiTree,
   getChildDirs,
@@ -23,7 +23,7 @@ function getConfig(rulesPath: string): types.Config {
   let configJson: ParsedConfig;
 
   try {
-    configJson = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
+    configJson = JSON.parse(readFileSync(rulesPath, 'utf8'));
   } catch (err) {
     throw new errors.JsonParseError(err, rulesPath);
   }
@@ -104,7 +104,7 @@ export function run(
 
   ignoreFilesGlob = options.ignoreFilesGlob || ignoreFilesGlob;
   const newIgnoreFiles = ignoreFilesGlob
-    ? glob.sync(ignoreFilesGlob, { cwd: dirPath })
+    ? sync(ignoreFilesGlob, { cwd: dirPath })
     : [];
 
   // Ignore Dirs
@@ -114,7 +114,7 @@ export function run(
   }
   ignoreDirsGlob = options.ignoreDirsGlob || ignoreDirsGlob;
   const newIgnoreDirs = ignoreDirsGlob
-    ? glob.sync(ignoreDirsGlob, { cwd: dirPath })
+    ? sync(ignoreDirsGlob, { cwd: dirPath })
     : [];
 
   const files = getChildFiles(dirPath, {

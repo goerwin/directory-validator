@@ -1,28 +1,29 @@
-import type * as types from '../../types';
-import * as validator from '../../validator';
+import { describe, expect, it } from 'vitest';
+import type { Rules } from '../../types';
+import { run } from '../../validator';
 
-export function run() {
+export function runFileTests() {
   describe('Files:', () => {
     it('should validate using only filenames', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it('should throw because a rule did not passed', () => {
       const files = ['./.gitignore', './package.lul'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package.json', type: 'file' },
         { name: '.gitignore', type: 'file' },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
       );
     });
@@ -30,12 +31,12 @@ export function run() {
     it('should throw if it has invalid files', () => {
       const files = ['./.gitignore', './package.json', 'extraneous.js'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package', extension: /json/, type: 'file' },
         { name: '.gitignore', type: 'file' },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${files[2]}, was not validated`,
       );
     });
@@ -43,25 +44,25 @@ export function run() {
     it('should validate because rule is optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file', isOptional: true },
         { name: '.gitignore', type: 'file' },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it('should throw because rule is not optional', () => {
       const files = ['./.gitignore', './package.json'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package.json', type: 'file' },
         { name: 'optional.js', type: 'file' },
         { name: '.gitignore', type: 'file' },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`,
       );
     });
@@ -70,23 +71,23 @@ export function run() {
       it('should validate using string', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package', extension: 'json', type: 'file' },
           { name: '.gitignore', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should throw because wrong string extension', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package', extension: '.json', type: 'file' },
           { name: '.gitignore', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
         );
       });
@@ -94,34 +95,34 @@ export function run() {
       it('should validate using regex', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package', extension: /(json|js)/, type: 'file' },
           { name: '.gitignore', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should validate using regex as string', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package', extension: '/(json|js)/', type: 'file' },
           { name: '.gitignore', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should throw because wrong regex extension', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package', extension: /.(json|js)/, type: 'file' },
           { name: '.gitignore', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
         );
       });
@@ -131,21 +132,19 @@ export function run() {
       it('should validate filenames starting camelcased', () => {
         const files = ['./camelizedNamedPogChamp.json', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: '[camelCase].json', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should validate filenames ending camelcased', () => {
         const files = ['./_ERcamelizedNamedPogChamp'];
 
-        const configObject: types.Rules = [
-          { name: '_ER[camelCase]', type: 'file' },
-        ];
+        const configObject: Rules = [{ name: '_ER[camelCase]', type: 'file' }];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should throw because one file is not camelcased as first/last', () => {
@@ -155,11 +154,11 @@ export function run() {
           './no-camelcase.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: '[camelCase].json', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           'no-camelcase.js, was not validated',
         );
       });
@@ -169,12 +168,12 @@ export function run() {
       it('should validate all files', () => {
         const files = ['./.gitignore', './package.json'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           { name: 'package.json', type: 'file' },
           { name: '.*', type: 'file' },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
     });
 
@@ -182,21 +181,17 @@ export function run() {
       it('should validate filenames', () => {
         const files = ['./index.js', './package.map'];
 
-        const configObject: types.Rules = [
-          { name: /[a-z]\.(js|map)/, type: 'file' },
-        ];
+        const configObject: Rules = [{ name: /[a-z]\.(js|map)/, type: 'file' }];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should throw because one file does not match', () => {
         const files = ['./index.js', './package.map', 'rip8.js'];
 
-        const configObject: types.Rules = [
-          { name: /[a-z]\.(js|map)/, type: 'file' },
-        ];
+        const configObject: Rules = [{ name: /[a-z]\.(js|map)/, type: 'file' }];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           'rip8.js, was not validated',
         );
       });

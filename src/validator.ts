@@ -1,5 +1,5 @@
+import * as path from 'node:path';
 import * as _ from 'lodash';
-import * as path from 'path';
 import * as errors from './errors';
 import type * as types from './types';
 

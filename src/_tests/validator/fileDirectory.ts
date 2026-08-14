@@ -1,7 +1,8 @@
-import type * as types from '../../types';
-import * as validator from '../../validator';
+import { describe, expect, it } from 'vitest';
+import type { DirectoryRule, Rules } from '../../types';
+import { run } from '../../validator';
 
-export function run() {
+export function runFileDirectoryTests() {
   describe('Files/Directories:', () => {
     it('should validate basic directories/files mixed', () => {
       const files = [
@@ -11,7 +12,7 @@ export function run() {
         './src/blue.conf',
       ];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -24,7 +25,7 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it('should validate a complex tree with no recursion', () => {
@@ -38,7 +39,7 @@ export function run() {
         './src/dir4/index.js',
       ];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -76,7 +77,7 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it('should validate a simple tree with recursion', () => {
@@ -87,7 +88,7 @@ export function run() {
         './src/src/src/src/index.js',
       ];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -96,13 +97,13 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it('should not throw because recursive rule is optional', () => {
       const files = ['./package.json'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: 'package.json', type: 'file' },
         {
           name: 'src',
@@ -113,14 +114,14 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).not.toThrow();
+      expect(() => run(files, configObject)).not.toThrow();
     });
 
     it(`should throw in a simple tree with
         recursion and optional because recursive folder not found`, () => {
       const files = ['./package.json', './.gitignore'];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         { name: '.gitignore', type: 'file' },
         { name: 'package.json', type: 'file' },
         {
@@ -131,7 +132,7 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`,
       );
     });
@@ -145,7 +146,7 @@ export function run() {
         'src/src/src/src/index.js',
       ];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -154,7 +155,7 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${files[3]}, was not validated`,
       );
     });
@@ -172,7 +173,7 @@ export function run() {
         './src/dir4/index.js',
       ];
 
-      const configObject: types.Rules = [
+      const configObject: Rules = [
         {
           name: 'src',
           type: 'directory',
@@ -210,7 +211,7 @@ export function run() {
         },
       ];
 
-      expect(() => validator.run(files, configObject)).toThrowError(
+      expect(() => run(files, configObject)).toThrowError(
         `${files[4]}, was not validated`,
       );
     });
@@ -230,7 +231,7 @@ export function run() {
           './dirB/Y.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -242,9 +243,9 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules?.[2],
+            (configObject[0] as DirectoryRule).rules?.[2],
           )}, deep: 2, rule did not passed`,
         );
       });
@@ -259,7 +260,7 @@ export function run() {
           './dirB/Y.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -271,9 +272,9 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules?.[0],
+            (configObject[0] as DirectoryRule).rules?.[0],
           )}, deep: 2, rule did not passed`,
         );
       });
@@ -291,7 +292,7 @@ export function run() {
         // TODO:
         // do this with folders too
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -303,9 +304,9 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
-            (configObject[0] as types.DirectoryRule).rules?.[0],
+            (configObject[0] as DirectoryRule).rules?.[0],
           )}, deep: 2, rule did not passed`,
         );
       });
@@ -319,7 +320,7 @@ export function run() {
           './srcThisWorksToo/index.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: /src.*/,
             type: 'directory',
@@ -327,7 +328,7 @@ export function run() {
           },
         ];
 
-        const configObject2: types.Rules = [
+        const configObject2: Rules = [
           {
             name: '/src.*/',
             type: 'directory',
@@ -336,8 +337,8 @@ export function run() {
         ];
 
         expect(() => {
-          validator.run(files, configObject);
-          validator.run(files, configObject2);
+          run(files, configObject);
+          run(files, configObject2);
         }).not.toThrow();
       });
 
@@ -348,7 +349,7 @@ export function run() {
           './srcThisWorksToo/index.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: /src.*/,
             type: 'directory',
@@ -356,7 +357,7 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           'srrcNice/index.js, was not validated',
         );
       });
@@ -370,7 +371,7 @@ export function run() {
           './srcLul/index.js',
         ];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -378,13 +379,13 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).not.toThrow();
+        expect(() => run(files, configObject)).not.toThrow();
       });
 
       it('should throw because one dirname is not camelcased', () => {
         const files = ['./src/index.js', './SRC/index.js', './srcLul/index.js'];
 
-        const configObject: types.Rules = [
+        const configObject: Rules = [
           {
             name: '[camelCase]',
             type: 'directory',
@@ -392,7 +393,7 @@ export function run() {
           },
         ];
 
-        expect(() => validator.run(files, configObject)).toThrowError(
+        expect(() => run(files, configObject)).toThrowError(
           'SRC/index.js, was not validated',
         );
       });
