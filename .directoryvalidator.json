@@ -28,7 +28,7 @@
     },
     {
       "type": "file",
-      "name": "jest.*.js"
+      "name": "vitest.*.mts"
     },
     {
       "type": "file",

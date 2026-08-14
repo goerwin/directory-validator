@@ -114,6 +114,23 @@ describe('Program:', () => {
     );
   });
 
+  it('should expose the common rule key in rulePath', () => {
+    const exampleProjectPath = join(__dirname, 'examples/project3');
+    const configFile = join(exampleProjectPath, 'conf4.json');
+
+    let err: unknown;
+    try {
+      run(exampleProjectPath, configFile);
+    } catch (e) {
+      err = e;
+    }
+
+    expect(err).toBeInstanceOf(ValidatorRuleError);
+    expect((err as ValidatorRuleError).rulePath).toBe(
+      'rules[1].rules[0] (commonRules.rule_dir)',
+    );
+  });
+
   it('should validate because config file validates everything', () => {
     const exampleProjectPath = join(__dirname, 'examples/project3');
     const configFile = join(exampleProjectPath, 'conf5.json');

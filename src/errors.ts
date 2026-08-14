@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import type * as types from './types.ts';
 
 export class JsonParseError extends Error {
@@ -27,16 +28,21 @@ export class ConfigJsonValidateError extends Error {
 export class ValidatorRuleError extends Error {
   paths: (string | RegExp)[];
   rule: types.FileRule | types.DirectoryRule;
+  rulePath: string;
 
   constructor(
     rule: types.FileRule | types.DirectoryRule,
     paths: (string | RegExp)[],
+    rulePath: string,
+    commonKey?: string,
   ) {
+    const commonRulePath = commonKey ? ` (commonRules.${commonKey})` : '';
     super(
-      `${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed`,
+      `${JSON.stringify(rule)}, deep: ${paths.length}, rule did not passed at: ${paths.join(path.sep)}, rulePath: ${rulePath}${commonRulePath}`,
     );
     this.rule = rule;
     this.paths = paths;
+    this.rulePath = `${rulePath}${commonRulePath}`;
   }
 }
 

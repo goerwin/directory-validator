@@ -133,7 +133,7 @@ export function runFileDirectoryTests() {
       ];
 
       expect(() => run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed`,
+        `${JSON.stringify(configObject[2])}, deep: 1, rule did not passed at: ., rulePath: rules[2]`,
       );
     });
 
@@ -246,7 +246,7 @@ export function runFileDirectoryTests() {
         expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
             (configObject[0] as DirectoryRule).rules?.[2],
-          )}, deep: 2, rule did not passed`,
+          )}, deep: 2, rule did not passed at: ./dirA, rulePath: rules[0].rules[2]`,
         );
       });
 
@@ -275,7 +275,7 @@ export function runFileDirectoryTests() {
         expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
             (configObject[0] as DirectoryRule).rules?.[0],
-          )}, deep: 2, rule did not passed`,
+          )}, deep: 2, rule did not passed at: ./dirB, rulePath: rules[0].rules[0]`,
         );
       });
 
@@ -307,7 +307,7 @@ export function runFileDirectoryTests() {
         expect(() => run(files, configObject)).toThrowError(
           `${JSON.stringify(
             (configObject[0] as DirectoryRule).rules?.[0],
-          )}, deep: 2, rule did not passed`,
+          )}, deep: 2, rule did not passed at: ./dirB, rulePath: rules[0].rules[0]`,
         );
       });
     });

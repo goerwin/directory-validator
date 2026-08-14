@@ -145,11 +145,22 @@ function getValidatableFiles(files: string[]): types.ValidatableFile[] {
   }));
 }
 
+function getRulePath(ruleIndices: number[]) {
+  return ruleIndices.map((el) => `rules[${el}]`).join('.');
+}
+
 function getRuleError(
   rule: types.FileRule | types.DirectoryRule,
   paths: (string | RegExp)[],
+  ruleIndices: number[],
 ) {
-  return new errors.ValidatorRuleError(rule, paths);
+  const commonKey = (rule as { __commonKey?: string }).__commonKey;
+  return new errors.ValidatorRuleError(
+    rule,
+    paths,
+    getRulePath(ruleIndices),
+    commonKey,
+  );
 }
 
 function validatePath(element: { path: string; isGood: boolean }) {
@@ -176,122 +187,130 @@ export function run(
   function validateRules(
     rules: types.Rules = [],
     paths: (string | RegExp)[] = ['.'],
+    ruleIndices: number[] = [],
   ) {
     if (rules.length === 0) {
       return;
     }
 
-    rules.forEach((rule) => {
+    rules.forEach((rule, index) => {
       if (rule.type === 'common') {
         return;
       }
 
-      rule.name = getCorrectStringRegexp(rule.name);
+      validateRule(rule, paths, [...ruleIndices, index]);
+    });
+  }
 
-      if (rule.type === 'file') {
-        const dirFiles = getDirFiles(newFiles, paths);
+  function validateRule(
+    rule: types.FileRule | types.DirectoryRule,
+    paths: (string | RegExp)[],
+    ruleIndices: number[],
+  ) {
+    rule.name = getCorrectStringRegexp(rule.name);
 
-        // IF more than one file matches the rule then it passes
-        const fileRulePassed = dirFiles.reduce((result, file) => {
-          const { base, name, ext } = path.parse(file.path);
-          let isFileValid: boolean;
+    if (rule.type === 'file') {
+      const dirFiles = getDirFiles(newFiles, paths);
 
-          if (!rule.extension) {
-            isFileValid = isNameValid(rule.name, base);
-          } else {
-            isFileValid =
-              isNameValid(rule.name, name) &&
-              isFileExtValid(
-                getCorrectStringRegexp(rule.extension),
-                ext.substring(1),
-              );
-          }
+      // IF more than one file matches the rule then it passes
+      const fileRulePassed = dirFiles.reduce((result, file) => {
+        const { base, name, ext } = path.parse(file.path);
+        let isFileValid: boolean;
 
-          file.isValidated = file.isValidated || isFileValid;
-          return result || isFileValid;
-        }, newFiles.length === 0);
-
-        if (!fileRulePassed && !rule.isOptional) {
-          throw getRuleError(rule, paths);
+        if (!rule.extension) {
+          isFileValid = isNameValid(rule.name, base);
+        } else {
+          isFileValid =
+            isNameValid(rule.name, name) &&
+            isFileExtValid(
+              getCorrectStringRegexp(rule.extension),
+              ext.substring(1),
+            );
         }
 
-        // Mark as good all files that were validated
-        dirFiles
-          .filter((el) => el.isValidated)
-          .forEach((el) => {
-            el.isGood = true;
-          });
+        file.isValidated = file.isValidated || isFileValid;
+        return result || isFileValid;
+      }, newFiles.length === 0);
 
-        newFiles.forEach((el) => {
-          el.isValidated = false;
-        });
-
-        return;
+      if (!fileRulePassed && !rule.isOptional) {
+        throw getRuleError(rule, paths, ruleIndices);
       }
 
-      // Directory Rule
-
-      const dirFiles = getDirFiles(newFiles, [...paths, rule.name], true);
-      const emptyDir = newEmptyDirs.find(
-        (el) =>
-          el.path === path.normalize([...paths, rule.name].join(path.sep)),
-      );
-
-      // If no rules for this dir, it should validate all of its files
-      if ((rule.rules || []).length === 0) {
-        dirFiles.forEach((el) => {
+      // Mark as good all files that were validated
+      dirFiles
+        .filter((el) => el.isValidated)
+        .forEach((el) => {
           el.isGood = true;
         });
 
-        if (emptyDir) {
-          emptyDir.isGood = true;
-          return;
-        }
-      }
+      newFiles.forEach((el) => {
+        el.isValidated = false;
+      });
 
-      // Dir does not exist
-      if (dirFiles.length === 0) {
-        // TODO: mmm This was making a test fail
-        // rule.isRecursive = false;
+      return;
+    }
 
-        if (rule.isOptional) {
-          return;
-        }
-        throw getRuleError(rule, paths);
-      }
+    // Directory Rule
 
-      if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
-        const parentPaths = getFilesByParentDir(dirFiles);
-        const parentPathsArray = Object.keys(parentPaths);
-        const nextDirNamesChecked: string[] = [];
+    const dirFiles = getDirFiles(newFiles, [...paths, rule.name], true);
+    const emptyDir = newEmptyDirs.find(
+      (el) => el.path === path.normalize([...paths, rule.name].join(path.sep)),
+    );
 
-        for (let i = 0; i < parentPathsArray.length; i += 1) {
-          // Only look for the nextDirName (no recursively) to form the new path.
-          // So it case we have a file 'a/b/c/d.js', we only iterate on [...paths, 'a']
-          const nextDirName = parentPathsArray[i].split(path.sep)[
-            paths.length - 1
-          ];
-          if (!nextDirNamesChecked.includes(nextDirName)) {
-            nextDirNamesChecked.push(nextDirName);
-            validateRules(rule.rules, [...paths, nextDirName]);
-          }
-        }
+    // If no rules for this dir, it should validate all of its files
+    if ((rule.rules || []).length === 0) {
+      dirFiles.forEach((el) => {
+        el.isGood = true;
+      });
 
+      if (emptyDir) {
+        emptyDir.isGood = true;
         return;
       }
+    }
 
-      if (rule.isRecursive) {
-        // We force rule to optional so we avoid recursively looking for
-        // this rule. (It's only needed the first time)
-        rule.isOptional = true;
+    // Dir does not exist
+    if (dirFiles.length === 0) {
+      // TODO: mmm This was making a test fail
+      // rule.isRecursive = false;
 
-        validateRules([rule], [...paths, rule.name]);
-        validateRules(rule.rules, [...paths, rule.name]);
+      if (rule.isOptional) {
         return;
       }
+      throw getRuleError(rule, paths, ruleIndices);
+    }
 
-      validateRules(rule.rules, [...paths, rule.name]);
-    });
+    if (rule.name instanceof RegExp || getMultimatchName(rule.name)) {
+      const parentPaths = getFilesByParentDir(dirFiles);
+      const parentPathsArray = Object.keys(parentPaths);
+      const nextDirNamesChecked: string[] = [];
+
+      for (let i = 0; i < parentPathsArray.length; i += 1) {
+        // Only look for the nextDirName (no recursively) to form the new path.
+        // So it case we have a file 'a/b/c/d.js', we only iterate on [...paths, 'a']
+        const nextDirName = parentPathsArray[i].split(path.sep)[
+          paths.length - 1
+        ];
+        if (!nextDirNamesChecked.includes(nextDirName)) {
+          nextDirNamesChecked.push(nextDirName);
+          validateRules(rule.rules, [...paths, nextDirName], ruleIndices);
+        }
+      }
+
+      return;
+    }
+
+    if (rule.isRecursive) {
+      // We force rule to optional so we avoid recursively looking for
+      // this rule. (It's only needed the first time)
+      rule.isOptional = true;
+
+      validateRule(rule, [...paths, rule.name], ruleIndices);
+      validateRules(rule.rules, [...paths, rule.name], ruleIndices);
+      return;
+    }
+
+    validateRules(rule.rules, [...paths, rule.name], ruleIndices);
   }
 
   validateRules(mainRules);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Rules } from '../../types';
+import { ValidatorRuleError } from '../../errors';
+import type { DirectoryRule, Rules } from '../../types';
 import { run } from '../../validator';
 
 export function runDirectoryTests() {
@@ -159,8 +160,33 @@ export function runDirectoryTests() {
       ];
 
       expect(() => run(files, configObject)).toThrowError(
-        '}, deep: 2, rule did not passed',
+        `${JSON.stringify(
+          (configObject[0] as DirectoryRule).rules?.[0],
+        )}, deep: 2, rule did not passed at: ./src, rulePath: rules[0].rules[0]`,
       );
+    });
+
+    it('should expose rulePath on the thrown error', () => {
+      const files = ['src/a.js'];
+
+      const configObject: Rules = [
+        {
+          name: 'src',
+          type: 'directory',
+          rules: [{ name: 'index.js', type: 'file' }],
+        },
+      ];
+
+      let err: unknown;
+      try {
+        run(files, configObject);
+      } catch (e) {
+        err = e;
+      }
+
+      expect(err).toBeInstanceOf(ValidatorRuleError);
+      expect((err as ValidatorRuleError).rulePath).toBe('rules[0].rules[0]');
+      expect((err as ValidatorRuleError).paths).toEqual(['.', 'src']);
     });
 
     it('should throw if dir rule fails', () => {
@@ -173,7 +199,7 @@ export function runDirectoryTests() {
       ];
 
       expect(() => run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed at: ., rulePath: rules[0]`,
       );
     });
 
@@ -261,7 +287,7 @@ export function runDirectoryTests() {
         ];
 
         expect(() => run(files, configObject, emptyDirs)).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed at: ., rulePath: rules[0]`,
         );
       });
 

@@ -17,6 +17,21 @@ type ParsedConfig = {
   commonRules?: Record<string, types.Rule>;
 };
 
+function markCommonKey(rule: types.Rule, key: string) {
+  const existingKey = (rule as { __commonKey?: string }).__commonKey;
+  if (existingKey) {
+    return;
+  }
+
+  Object.defineProperty(rule, '__commonKey', { value: key, enumerable: false });
+
+  if (rule.type === 'directory') {
+    (rule.rules || []).forEach((el) => {
+      markCommonKey(el, key);
+    });
+  }
+}
+
 function getConfig(rulesPath: string): types.Config {
   let configJson: ParsedConfig;
 
@@ -65,7 +80,10 @@ function getConfig(rulesPath: string): types.Config {
             ? !!rule.isOptional
             : parsedRule.isOptional;
 
-        return { ...parsedRule };
+        const resolvedRule = { ...parsedRule };
+        markCommonKey(resolvedRule, rule.key);
+
+        return resolvedRule;
       } else if (rule.type === 'directory') {
         rule.rules = parseCommonRules(rule.rules || []);
       }

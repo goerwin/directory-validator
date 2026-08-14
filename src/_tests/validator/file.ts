@@ -24,7 +24,7 @@ export function runFileTests() {
       ];
 
       expect(() => run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
+        `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed at: ., rulePath: rules[0]`,
       );
     });
 
@@ -63,7 +63,7 @@ export function runFileTests() {
       ];
 
       expect(() => run(files, configObject)).toThrowError(
-        `${JSON.stringify(configObject[1])}, deep: 1, rule did not passed`,
+        `${JSON.stringify(configObject[1])}, deep: 1, rule did not passed at: ., rulePath: rules[1]`,
       );
     });
 
@@ -88,7 +88,7 @@ export function runFileTests() {
         ];
 
         expect(() => run(files, configObject)).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed at: ., rulePath: rules[0]`,
         );
       });
 
@@ -123,7 +123,7 @@ export function runFileTests() {
         ];
 
         expect(() => run(files, configObject)).toThrowError(
-          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed`,
+          `${JSON.stringify(configObject[0])}, deep: 1, rule did not passed at: ., rulePath: rules[0]`,
         );
       });
     });

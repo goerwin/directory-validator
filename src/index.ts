@@ -114,6 +114,7 @@ if (selectedOptions.init) {
         red(rule),
         'did not passed at:',
         red(parentPath),
+        red(`(${err.rulePath})`),
       );
     } else if (err instanceof errors.ValidatorInvalidPathError) {
       console.error(errorTitle);
