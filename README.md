@@ -27,6 +27,21 @@ $ directory-validator .
 
 The tool will evaluate the rules provided by the configuration file against the current directory and output errors if any.
 
+### CLI Options
+
+| Option | Description |
+| --- | --- |
+| `<dirPath>` | Directory to validate (required, unless using `--init`) |
+| `-i, --init` | Create a `.directoryvalidator.json` file in the current directory |
+| `-p, --print` | Print the validated directory structure |
+| `-f, --ignore-files <files>` | Ignore files by glob string, eg: `-f "*.js"` |
+| `-d, --ignore-dirs <dirs>` | Ignore directories by glob string, eg: `-d "**/tests"` |
+| `-c, --config-file <path>` | Path to the configuration file |
+| `-V, --version` | Print the version |
+| `-h, --help` | Show help |
+
+The process exits with code `0` when the directory is valid and `1` when validation fails, the configuration is invalid, or the configuration file was not found.
+
 ## Configuration File
 
 ```jsonc
@@ -65,7 +80,7 @@ The tool will evaluate the rules provided by the configuration file against the 
 
 In this example:
 
-- We ignore the file `.gitignore` and both `.node_modules` and `.git` directories from being analized
+- We ignore the file `.gitignore` and both `node_modules` and `.git` directories from being analyzed
 - We want to have one file name `package.json` and one file named `index.js`
 - We want one directory `src` to have one file named `index.js`. Since it's optional,
   if the directory does not exist we ignore the rule, but if it does then it must only
@@ -156,10 +171,12 @@ Can contain File, Directory and Common Rules
 
   // Optional
   // default: false
-  // Whether the file can be included
+  // Whether the file is allowed to be absent
   "isOptional": false
 }
 ```
+
+Note: if `extension` is provided, `name` is matched against the file name **without** the extension (eg: for `logo.png`, `name` sees `logo`). If `extension` is omitted, `name` is matched against the full file name (eg: `logo.png`).
 
 #### Directory Rule
 
@@ -176,7 +193,7 @@ Can contain File, Directory and Common Rules
 
   // Optional
   // default: false
-  // Whether the directory can be included
+  // Whether the directory is allowed to be absent
   "isOptional": false,
 
   // Optional
@@ -208,14 +225,41 @@ Can contain File, Directory and Common Rules
 
   // Optional
   // default: false
-  // Whether the directory can be included
+  // Whether the referenced rule is allowed to be absent
   "isOptional": false
 }
 ```
 
 ## Notes
 
-- When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then no rules are applied.
+- When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then the process exits with an error.
 
 - Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
   - For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.
+
+## Development
+
+Requirements: Node.js 24+.
+
+```
+$ npm install
+$ npm test
+$ npm run lint
+$ npm run build
+```
+
+Run the CLI locally:
+
+```
+$ node src/index.ts .
+```
+
+## Publish
+
+Publishing is automated by the `publish-to-npm` GitHub Action on push to `main` (runs lint, test, build, then publishes). No manual `npm publish`.
+
+To release:
+
+1. Verify locally: `npm run lint`, `npm test`, `npm run build`
+2. `npm version patch|minor|major` (creates version commit + tag)
+3. `git push --follow-tags` - the commit alone triggers the workflow; the tag is pushed in the same command to keep git history in sync.

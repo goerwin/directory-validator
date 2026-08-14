@@ -4,11 +4,11 @@ import {
   generateAsciiTree,
   getChildDirs,
   getChildFiles,
-} from 'goerwin-helpers/node/file';
-import * as errors from './errors';
-import schema from './resources/schema.json';
-import type * as types from './types';
-import * as validator from './validator';
+} from 'goerwin-helpers/node/file.js';
+import * as errors from './errors.ts';
+import schema from './resources/schema.json' with { type: 'json' };
+import type * as types from './types.ts';
+import * as validator from './validator.ts';
 
 type ParsedConfig = {
   ignoreFiles?: string[];

@@ -2,12 +2,13 @@
   "name": "directory-validator",
   "version": "1.5.4",
   "description": "CLI Tool to validate directory structures.",
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "directory-validator": "dist/index.js"
   },
   "scripts": {
-    "build": "npm run clean && tsc && cp src/resources/* dist/resources",
+    "build": "npm run clean && tsc && mkdir -p dist/resources && cp src/resources/* dist/resources",
     "clean": "rm -rf dist",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

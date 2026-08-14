@@ -1,7 +1,13 @@
 import * as path from 'node:path';
-import * as errors from './errors';
-import type * as types from './types';
-import { camelCase, groupBy, kebabCase, snakeCase, upperCase } from './utils';
+import * as errors from './errors.ts';
+import type * as types from './types.ts';
+import {
+  camelCase,
+  groupBy,
+  kebabCase,
+  snakeCase,
+  upperCase,
+} from './utils.ts';
 
 function getCorrectStringRegexp(name: string | RegExp) {
   if (typeof name === 'string') {

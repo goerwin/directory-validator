@@ -1,4 +1,4 @@
-import type * as types from './types';
+import type * as types from './types.ts';
 
 export class JsonParseError extends Error {
   err: Error;

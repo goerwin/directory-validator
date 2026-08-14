@@ -4,9 +4,9 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { program as commanderProgram } from 'commander';
-import * as errors from './errors';
-import * as program from './program';
-import { bold, dim, red, underline } from './utils';
+import * as errors from './errors.ts';
+import * as program from './program.ts';
+import { bold, dim, red, underline } from './utils.ts';
 
 const initConfigFilename = '.directoryvalidator.json';
 
@@ -30,14 +30,15 @@ function getDefaultConfigFilePath(dirPath: string) {
 
 export function writeDefaultConfigFile(parentPath: string) {
   fs.copyFileSync(
-    path.join(__dirname, './resources/defaultConfig.json'),
+    path.join(import.meta.dirname, './resources/defaultConfig.json'),
     parentPath,
   );
 }
 
 commanderProgram.version(
-  JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'))
-    .version,
+  JSON.parse(
+    fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'),
+  ).version,
 );
 
 commanderProgram
@@ -59,7 +60,7 @@ const selectedOptions = commanderProgram.opts();
 
 if (selectedOptions.init) {
   fs.copyFileSync(
-    path.join(__dirname, './resources/defaultConfig.json'),
+    path.join(import.meta.dirname, './resources/defaultConfig.json'),
     path.join(process.cwd(), initConfigFilename),
   );
   console.log('\n\t', red(initConfigFilename), 'created', '\n');
