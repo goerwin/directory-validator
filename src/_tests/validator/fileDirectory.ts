@@ -289,9 +289,6 @@ export function runFileDirectoryTests() {
           './dirA/Y.js',
         ];
 
-        // TODO:
-        // do this with folders too
-
         const configObject: Rules = [
           {
             name: '[camelCase]',
@@ -308,6 +305,34 @@ export function runFileDirectoryTests() {
           `${JSON.stringify(
             (configObject[0] as DirectoryRule).rules?.[0],
           )}, deep: 2, rule did not passed at: ./dirB, rulePath: rules[0].rules[0]`,
+        );
+      });
+
+      it(`should throw when a rule matches 2 dirs (dirA, dirB) and its
+          directory rules are not satisfied per dir`, () => {
+        const files = [
+          './dirA/subA/x.js',
+          './dirA/subB/x.js',
+          './dirB/subA/x.js',
+          './dirB/subC/x.js',
+        ];
+
+        const configObject: Rules = [
+          {
+            name: '[camelCase]',
+            type: 'directory',
+            rules: [
+              { name: 'subA', type: 'directory' },
+              { name: 'subB', type: 'directory' },
+              { name: 'subC', type: 'directory' },
+            ],
+          },
+        ];
+
+        expect(() => run(files, configObject)).toThrowError(
+          `${JSON.stringify(
+            (configObject[0] as DirectoryRule).rules?.[2],
+          )}, deep: 2, rule did not passed at: ./dirA, rulePath: rules[0].rules[2]`,
         );
       });
     });

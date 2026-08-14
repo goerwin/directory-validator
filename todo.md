@@ -1,8 +1,5 @@
 # TODO
 
-- more error info (path) in validatorRuleError
-  - better ubication of a rule when displaying errors (rules[3].rules[1]) like
-    ajv when validating json schemas
 - Examples
   - Provide some folder examples:
     - examples/basic

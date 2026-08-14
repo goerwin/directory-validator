@@ -271,9 +271,6 @@ export function run(
 
     // Dir does not exist
     if (dirFiles.length === 0) {
-      // TODO: mmm This was making a test fail
-      // rule.isRecursive = false;
-
       if (rule.isOptional) {
         return;
       }

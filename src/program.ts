@@ -48,11 +48,10 @@ function getConfig(rulesPath: string): types.Config {
       let errorMessages: string[][] = [];
 
       if (ajv.errors) {
-        errorMessages = ajv.errors.map(
-          (el) => [`data${el.instancePath}`, `${el.message || ''}`],
-          // TODO: Verify
-          // [`data${el.dataPath}`, `${el.message || ''}`]
-        );
+        errorMessages = ajv.errors.map((el) => [
+          `data${el.instancePath}`,
+          `${el.message || ''}`,
+        ]);
       }
 
       throw new errors.ConfigJsonValidateError(errorMessages, rulesPath);
