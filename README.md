@@ -2,8 +2,7 @@
 
 [![Package Version](https://img.shields.io/npm/v/directory-validator.svg)](https://www.npmjs.com/package/directory-validator)
 
-CLI Tool to validate directory structures.
-If you want to have control over what files/dirs a directory can have then this can be useful.
+CLI to validate that a directory matches a set of file and folder rules.
 
 ## Installation
 
@@ -13,19 +12,19 @@ $ npm install directory-validator
 
 ## Usage
 
-Generate a configuration file `.directoryvalidator.json` to start with:
+Generate a `.directoryvalidator.json` config:
 
 ```
 $ directory-validator --init
 ```
 
-Run the validator on the current directory:
+Validate a directory:
 
 ```
 $ directory-validator .
 ```
 
-The tool will evaluate the rules provided by the configuration file against the current directory and output errors if any.
+The process exits with code `0` when the directory is valid and `1` when validation fails, the configuration is invalid, or the configuration file was not found.
 
 ### CLI Options
 
@@ -34,18 +33,18 @@ The tool will evaluate the rules provided by the configuration file against the 
 | `<dirPath>` | Directory to validate (needed unless using `--init`) |
 | `-i, --init` | Create a `.directoryvalidator.json` file in the current directory |
 | `-p, --print` | Print the validated directory structure |
-| `-f, --ignore-files <files>` | Ignore files by glob string, eg: `-f "*.js"` |
-| `-d, --ignore-dirs <dirs>` | Ignore directories by glob string, eg: `-d "**/tests"` |
+| `-f, --ignore-files <files>` | Ignore files by glob, eg: `-f "*.js"` |
+| `-d, --ignore-dirs <dirs>` | Ignore directories by glob, eg: `-d "**/tests"` |
 | `-g, --gitignore` | Respect `.gitignore` files |
 | `-c, --config-file <path>` | Path to the configuration file |
 | `-V, --version` | Print the version |
 | `-h, --help` | Show help |
 
-The process exits with code `0` when the directory is valid and `1` when validation fails, the configuration is invalid, or the configuration file was not found.
+## Configuration
 
-## Configuration File
+`--init` writes a `.directoryvalidator.json` like this:
 
-```jsonc
+```json
 {
   "ignoreFiles": [".gitignore"],
   "ignoreDirs": ["node_modules", ".git"],
@@ -80,194 +79,81 @@ The process exits with code `0` when the directory is valid and `1` when validat
 }
 ```
 
-In this example:
+If `-c` / `--config-file` is omitted, the tool looks for `.directoryvalidator.json` in the target directory, then in each parent directory up to the home directory.
 
-- We ignore the file `.gitignore` and both `node_modules` and `.git` directories from being analyzed
-- We want to have one file name `package.json` and one file named `index.js`
-- We want one directory `src` to have one file named `index.js`. Since it's optional,
-  if the directory does not exist we ignore the rule, but if it does then it must only
-  have one file `index.js`
+### Rules
 
-### useGitIgnore:
+`rules` is an array of file, directory, or common rules. Every file and directory must match at least one rule. If several rules match the same path, they all pass.
 
-When enabled (or when using the CLI flag `-g`), files and directories matching the `.gitignore`
-rules found at or below the target directory are ignored: matching files are excluded from
-validation and matching directories are not traversed. It is disabled by default.
+#### File
 
-### ignoreFiles:
+- `type` (required): `"file"`
+- `name` (required): matcher for the file name (see [Name patterns](#name-patterns))
+- `extension` (optional): extension without the dot. If set, `name` is matched against the name **without** the extension (`logo` for `logo.png`). If omitted, `name` is matched against the full filename.
+- `isOptional` (optional, default `false`): allow the file to be absent
 
-A string or glob pattern. For example:
+#### Directory
 
-```jsonc
-[
-  "package.json",
-  "**/*.test.js",
-  ".*" // files starting with "."
-]
-```
+- `type` (required): `"directory"`
+- `name` (required): same matchers as file names
+- `isOptional` (optional, default `false`): allow the directory to be absent
+- `isRecursive` (optional, default `false`): apply this directory's `rules` to nested directories with the same name
+- `rules` (optional): nested file and directory rules. If empty or omitted, any contents are allowed.
 
-### ignoreDirs:
+With `isRecursive`, both `src/index.js` and `src/src/index.js` pass:
 
-A string or glob pattern. For example:
-
-```jsonc
-[
-  "node_modules",
-  "src/**/tests",
-  ".*" // dirs starting with "."
-]
-```
-
-### commonRules:
-
-Define File and Directory rules that can be reused in `rules`
-
-```jsonc
+```json
 {
-  // key must start with "rule_"
-  // Examples:
-  "rule_indexfile": {
-    "type": "file",
-    "name": "index.js"
-  },
-  "rule_anotherrule": {
-    "type": "directory",
-    "name": "images",
-    "rules": [
-      {
-        "type": "file",
-        "name": "logo.png"
-      }
-    ]
-  }
-}
-```
-
-### rules:
-
-Can contain File, Directory and Common Rules
-
-#### File Rule
-
-```jsonc
-{
-  // Required
-  "type": "file",
-
-  // Required
-  // can be string or RegExp
-  // if RegExp then it has to start and end with /
-  // if string then it can contain one
-  // special case: [camelCase], [UPPERCASE], [dash-case], [snake_case], *
-  // Examples:
-  "name": "package.json",
-  "name": "[snake_case]",
-  "name": "[camelCase].js",
-  "name": ".[UPPERCASE]",
-  "name": ".[dash-case].jpg",
-  "name": "*.png",
-  "name": "/index.(js|ts)/",
-
-  // Optional
-  // default: null
-  // can be string or RegExp (do not include the dot)
-  // if RegExp then it has to start and end with /
-  // Examples:
-  "extension": "js",
-  "extension": "png",
-  "extension": "/(png|jpg|gif)/",
-
-  // Optional
-  // default: false
-  // Whether the file is allowed to be absent
-  "isOptional": false
-}
-```
-
-Note: if `extension` is provided, `name` is matched against the file name **without** the extension (eg: for `logo.png`, `name` sees `logo`). If `extension` is omitted, `name` is matched against the full file name (eg: `logo.png`).
-
-#### Directory Rule
-
-```jsonc
-{
-  // Required
   "type": "directory",
-
-  // Required
-  // Same options as file names
-  // Examples:
   "name": "src",
-  "name": "important-[dash-case]",
-
-  // Optional
-  // default: false
-  // Whether the directory is allowed to be absent
-  "isOptional": false,
-
-  // Optional
-  // default: false
-  // Whether the directory can be recursive
-  // Adds the ability to check directory rules recursively
-  "isRecursive": false,
-
-  // Optional
-  // An array containing file and directory rules
-  // If empty or omitted then we don't validate dir content
-  "rules": []
+  "isRecursive": true,
+  "rules": [{ "type": "file", "name": "index.js" }]
 }
 ```
 
-#### Common Rule
+#### Common
+
+Reusable file or directory rules, defined in `commonRules`. Keys must start with `rule_`.
+
+- `type` (required): `"common"`
+- `key` (required): a key in `commonRules`
+- `isOptional` (optional, default `false`): allow the referenced rule to be absent
+
+### Name patterns
+
+`name` (and `extension`) can be a string or a RegExp. In JSON, wrap a RegExp in `/.../`.
+
+Special string tokens: `[camelCase]`, `[UPPERCASE]`, `[dash-case]`, `[snake_case]`, `*`.
 
 ```jsonc
+"package.json"
+"[snake_case]"
+"[camelCase].js"
+".[UPPERCASE]"
+".[dash-case].jpg"
+"*.png"
+"/index.(js|ts)/"
+```
+
+`extension` examples: `"js"`, `"png"`, `"/(png|jpg|gif)/"`.
+
+For example, `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }` both match `index.js`.
+
+### Ignoring files and directories
+
+`ignoreFiles` and `ignoreDirs` take glob strings:
+
+```json
 {
-  // Required
-  "type": "common",
-
-  // Required
-  // must match a key property inside "commonRules"
-  // examples:
-  "key": "rule_indexfile",
-  "key": "rule_test2",
-  "key": "rule_whatever",
-
-  // Optional
-  // default: false
-  // Whether the referenced rule is allowed to be absent
-  "isOptional": false
+  "ignoreFiles": [".gitignore", "**/*.test.js", ".*"],
+  "ignoreDirs": ["node_modules", ".git", "src/**/tests"]
 }
 ```
 
-## Notes
+The same globs can be passed on the CLI with `-f` / `-d`.
 
-- When you run `$ directory-validator ./` it will look for a `.directoryvalidator.json` file in the current directory, if it doesn't find one, it will try to look for one in the upper directory and so on until the home directory is reached. If no file is found then the process exits with an error.
+When `useGitIgnore` is `true` (or `-g` is passed), `.gitignore` rules at or below the target directory are applied: matching files are skipped and matching directories are not traversed. Disabled by default.
 
-- Rules are inclusive, meaning that if multiple rules match the same files/dirs, they pass.
-  - For example, the rules `{ "name": "index.js", "type": "file" }` and `{ "name": "[camelCase].js", "type": "file" }`, will match a file `index.js` so they both pass.
+## Contributing
 
-## Development
-
-Requirements: Node.js 24+.
-
-```
-$ npm install
-$ npm test
-$ npm run lint
-$ npm run build
-```
-
-Run the CLI locally:
-
-```
-$ node src/index.ts .
-```
-
-## Publish
-
-Publishing is automated by the `publish-to-npm` GitHub Action on push to `main` (runs lint, test, build, then publishes). No manual `npm publish`.
-
-To release:
-
-1. Verify locally: `npm run lint`, `npm test`, `npm run build`
-2. `npm version patch|minor|major` (creates version commit + tag)
-3. `git push --follow-tags` - the commit alone triggers the workflow; the tag is pushed in the same command to keep git history in sync.
+Requires Node.js 24+. `npm test`, `npm run lint`, `npm run build`. Publishing is automated on push to `main`. To release: `npm version patch|minor|major`, then `git push --follow-tags`.
