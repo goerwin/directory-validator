@@ -194,4 +194,51 @@ describe('CLI:', () => {
     const { status } = runCli(['-c', configFile, '.'], dir);
     expect(status).toBe(0);
   });
+
+  it('-g ignores files matched by .gitignore', () => {
+    const dir = makeDir('gitignore');
+    makeFile(dir, 'keep.txt');
+    makeFile(dir, 'skip.log');
+    fs.writeFileSync(path.join(dir, '.gitignore'), '*.log\n');
+    const configFile = writeConfig('gitignore.json', {
+      ignoreFiles: ['.gitignore'],
+      rules: [{ type: 'file', name: 'keep.txt' }],
+    });
+
+    const ignored = runCli(['-g', '-c', configFile, '.'], dir);
+    expect(ignored.status).toBe(0);
+
+    const notIgnored = runCli(['-c', configFile, '.'], dir);
+    expect(notIgnored.status).toBe(1);
+  });
+
+  it('-p with -g marks gitignored files', () => {
+    const dir = makeDir('gitignore-print');
+    makeFile(dir, 'keep.txt');
+    makeFile(dir, 'skip.log');
+    fs.writeFileSync(path.join(dir, '.gitignore'), '*.log\n');
+    const configFile = writeConfig('gitignore-print.json', {
+      ignoreFiles: ['.gitignore'],
+      rules: [{ type: 'file', name: 'keep.txt' }],
+    });
+
+    const { status, stdout } = runCli(['-p', '-g', '-c', configFile, '.'], dir);
+    expect(status).toBe(0);
+    expect(stdout).toContain('File Ignored');
+  });
+
+  it('respects useGitIgnore set in the config file', () => {
+    const dir = makeDir('gitignore-config');
+    makeFile(dir, 'keep.txt');
+    makeFile(dir, 'skip.log');
+    fs.writeFileSync(path.join(dir, '.gitignore'), '*.log\n');
+    const configFile = writeConfig('gitignore-config.json', {
+      ignoreFiles: ['.gitignore'],
+      rules: [{ type: 'file', name: 'keep.txt' }],
+      useGitIgnore: true,
+    });
+
+    const { status } = runCli(['-c', configFile, '.'], dir);
+    expect(status).toBe(0);
+  });
 });

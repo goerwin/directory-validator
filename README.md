@@ -36,6 +36,7 @@ The tool will evaluate the rules provided by the configuration file against the 
 | `-p, --print` | Print the validated directory structure |
 | `-f, --ignore-files <files>` | Ignore files by glob string, eg: `-f "*.js"` |
 | `-d, --ignore-dirs <dirs>` | Ignore directories by glob string, eg: `-d "**/tests"` |
+| `-g, --gitignore` | Respect `.gitignore` files |
 | `-c, --config-file <path>` | Path to the configuration file |
 | `-V, --version` | Print the version |
 | `-h, --help` | Show help |
@@ -48,6 +49,7 @@ The process exits with code `0` when the directory is valid and `1` when validat
 {
   "ignoreFiles": [".gitignore"],
   "ignoreDirs": ["node_modules", ".git"],
+  "useGitIgnore": false,
   "commonRules": {
     "rule_indexfile": {
       "type": "file",
@@ -85,6 +87,12 @@ In this example:
 - We want one directory `src` to have one file named `index.js`. Since it's optional,
   if the directory does not exist we ignore the rule, but if it does then it must only
   have one file `index.js`
+
+### useGitIgnore:
+
+When enabled (or when using the CLI flag `-g`), files and directories matching the `.gitignore`
+rules found at or below the target directory are ignored: matching files are excluded from
+validation and matching directories are not traversed. It is disabled by default.
 
 ### ignoreFiles:
 

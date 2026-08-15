@@ -38,5 +38,6 @@ export type SpecialName =
 export interface Config {
   ignoreFiles?: string[];
   ignoreDirs?: string[];
+  useGitIgnore?: boolean;
   rules: Rules;
 }

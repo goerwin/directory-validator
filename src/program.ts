@@ -1,12 +1,8 @@
 import { globSync, readFileSync } from 'node:fs';
 import Ajv from 'ajv';
-import {
-  generateAsciiTree,
-  getChildDirs,
-  getChildFiles,
-} from 'goerwin-helpers/node/file.js';
 import * as errors from './errors.ts';
 import schema from './resources/schema.json' with { type: 'json' };
+import { generateAsciiTree, traverse } from './traverse.ts';
 import type * as types from './types.ts';
 import * as validator from './validator.ts';
 
@@ -15,6 +11,7 @@ type ParsedConfig = {
   ignoreDirs?: string[];
   rules: types.Rules;
   commonRules?: Record<string, types.Rule>;
+  useGitIgnore?: boolean;
 };
 
 function markCommonKey(rule: types.Rule, key: string) {
@@ -99,6 +96,7 @@ function getConfig(rulesPath: string): types.Config {
     ignoreFiles: configJson.ignoreFiles,
     ignoreDirs: configJson.ignoreDirs,
     rules: configJson.rules,
+    useGitIgnore: configJson.useGitIgnore,
   };
 }
 
@@ -108,9 +106,11 @@ export function run(
   options: {
     ignoreDirsGlob?: string;
     ignoreFilesGlob?: string;
+    useGitIgnore?: boolean;
   } = {},
 ) {
-  const { ignoreFiles, ignoreDirs, rules } = getConfig(configPath);
+  const { ignoreFiles, ignoreDirs, rules, useGitIgnore } =
+    getConfig(configPath);
 
   let ignoreFilesGlob: string | undefined;
   if (ignoreFiles && ignoreFiles.length > 0) {
@@ -132,28 +132,22 @@ export function run(
     ? globSync(ignoreDirsGlob, { cwd: dirPath })
     : [];
 
-  const files = getChildFiles(dirPath, {
-    recursive: true,
-    ignoreDirs: newIgnoreDirs,
+  const { files, dirs } = traverse(dirPath, {
     ignoreFiles: newIgnoreFiles,
-  });
-
-  const emptyDirs = getChildDirs(dirPath, {
-    recursive: true,
     ignoreDirs: newIgnoreDirs,
-    ignoreFiles: newIgnoreFiles,
+    useGitIgnore: !!(options.useGitIgnore || useGitIgnore),
   });
 
   validator.run(
     files.filter((el) => !el.isIgnored).map((el) => el.path),
     rules,
-    emptyDirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path),
+    dirs.filter((el) => !el.isIgnored && el.isEmpty).map((el) => el.path),
   );
 
   return {
     asciiTree: generateAsciiTree(dirPath, [
       ...files,
-      ...emptyDirs.filter((el) => el.isIgnored || el.isEmpty),
+      ...dirs.filter((el) => el.isIgnored || el.isEmpty),
     ]),
   };
 }

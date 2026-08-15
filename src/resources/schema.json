@@ -62,6 +62,7 @@
       "uniqueItems": true,
       "items": { "type": "string" }
     },
+    "useGitIgnore": { "type": "boolean" },
     "rules": { "$ref": "#/definitions/rules" },
     "commonRules": {
       "type": "object",

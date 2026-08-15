@@ -1,6 +1,7 @@
 {
   "ignoreFiles": [".gitignore"],
   "ignoreDirs": ["node_modules", ".git"],
+  "useGitIgnore": false,
   "commonRules": {
     "rule_indexfile": {
       "type": "file",

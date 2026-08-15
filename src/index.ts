@@ -53,6 +53,7 @@ commanderProgram
     '-d, --ignore-dirs <dirs>',
     'Ignore directories (glob string) eg: -d "**/tests"',
   )
+  .option('-g, --gitignore', 'Respect .gitignore files')
   .option('-c, --config-file <path>', 'Path to the configuration file')
   .parse(process.argv);
 
@@ -77,6 +78,7 @@ if (selectedOptions.init) {
     const results = program.run(dirPath, configPath, {
       ignoreDirsGlob: selectedOptions.ignoreDirs,
       ignoreFilesGlob: selectedOptions.ignoreFiles,
+      useGitIgnore: selectedOptions.gitignore,
     });
 
     console.log('Directory successfully validated!');
